@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>pakkit</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js"></script>
+    <!-- https://electronjs.org/docs/tutorial/security#csp-meta-tag -->
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
+    <link href="../scrollbar.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body>
+    <h1 class='title'>pakkit</h1>
+    pakkit is an advanced packet monitor proxy for Minecraft: Java Edition and Minecraft: Bedrock Edition based on node-minecraft-protocol and ProxyPass.
+    <br><br>
+    <form onsubmit="startProxy(event)">
+      <p>
+        <label for="platform">Platform:</label>
+        <select id="platform" style="width: 191px;">
+          <option value="java">Java Edition</option>
+          <option value="bedrock">Bedrock Edition</option>
+        </select>
+      </p>
+      <br>
+      <p>
+        <label for="version">Version:</label>
+        <select id="version" style="width: 191px;">
+          <option value="1.15.2">1.15.2 (latest)</option>
+        </select>
+      </p>
+      <br><br>
+      <p>
+        <label for="connect-address">Connect address:</label>
+        <input type="text" name="connect-address" id="connect-address" value="127.0.0.1" placeholder="127.0.0.1">
+      </p>
+      <br>
+      <p>
+        <label for="connect-port">Connect port:</label>
+        <input type="text" name="connect-port" id="connect-port" value="25565" placeholder="25565">
+      </p>
+      <br><br>
+      <p>
+        <label for="listen-port">Listen port:</label>
+        <input type="text" name="listen-port" id="listen-port" value="25566" placeholder="25566">
+      </p>
+      <br>
+      <p>
+        <label for="start"></label>
+        <input id="start" type="submit" value="Start!">
+      </p>
+    </form>
+  </body>
+</html>

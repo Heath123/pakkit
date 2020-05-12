@@ -1,0 +1,18 @@
+{
+  "name": "pakkit",
+  "version": "1.0.0",
+  "description": "A packet monitor for Minecraft Java and Minecraft Bedrock",
+  "main": "index.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^8.2.5"
+  },
+  "dependencies": {
+    "minecraft-protocol": "^1.11.0"
+  }
+}
