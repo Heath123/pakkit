@@ -4,7 +4,7 @@ const mc = require('minecraft-protocol')
 
 const states = mc.states
 
-exports.startProxy = function(host, port, version, callback) {
+exports.startProxy = function(host, port, listenPort, version, callback) {
   if (host.indexOf(':') !== -1) {
     port = host.substring(host.indexOf(':') + 1)
     host = host.substring(0, host.indexOf(':'))
@@ -12,7 +12,7 @@ exports.startProxy = function(host, port, version, callback) {
 
   const srv = mc.createServer({
     'online-mode': false,
-    port: 25566,
+    port: listenPort,
     keepAlive: false,
     version: version
   })

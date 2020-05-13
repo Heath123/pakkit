@@ -1,37 +1,44 @@
-html, body {
-  height: 100%;
+html {
   box-sizing: border-box;
-  margin: 0;
+  height: 100%;
 }
 
 body {
-  background: #242424;
-  color: rgba(255, 255, 255, 0.8);
-  font-family: Arial, Helvetica, sans-serif;
-  user-select: none;
+  height: calc(100% - 16px);
+}
+
+.topbar {
+  height: 120px;
 }
 
 .container {
-  height: 100%;
+  height: calc(100% - 120px);
 }
 
 .split, .gutter.gutter-horizontal {
   float: left;
-  height: 100%;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
+  height: 100%;
 }
 .gutter.gutter-horizontal {
   cursor: ew-resize;
 }
-.split {
+.box {
+  overflow-y: scroll;
   border: 1px solid #1A1A1A;
   border-radius: 10px;
+  height: calc(100% - 24px); /* Take off toolbar height */
+}
+div.toolbar {
+  height: 24px;
+}
+div.toolbar::after {
+  content: "	⃠";
 }
 #packets {
-  position: relative;
-  overflow-y: scroll;
+  position: relative; /* Is this needed? TODO: Check */
 }
 .packetlist {
   list-style: none;
@@ -71,4 +78,65 @@ body {
 
 .name {
   color: rgba(255, 255, 255, 0.8);
+}
+
+body.noPacketSelected .whenPacketSelected {
+  display: none;
+}
+
+body.packetSelected .whenNoPacketSelected {
+  display: none;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Style the tab */
+.tab {
+  overflow: hidden;
+  /* border: 1px solid #ccc; */
+  /* background-color: rgba(0, 0, 0, 0.2); */
+}
+
+/* Style the buttons inside the tab */
+.tab button {
+  color: rgba(255, 255, 255, 0.8);
+  background-color: inherit;
+  float: left;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 6px 16px;
+  font-size: 17px;
+}
+
+/* Change background color of buttons on hover */
+.tab button:hover {
+  background-color: rgba(0, 0, 0, 0.35);
+}
+
+/* Create an active/current tablink class */
+.tab button.active {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+/* Style the tab content */
+.tabcontent {
+  height: 65px;
+  display: none;
+  padding: 6px 12px;
+  /* border: 1px solid #ccc; */
+  border-top: none;
 }

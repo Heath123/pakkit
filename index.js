@@ -1,11 +1,34 @@
 const { app, BrowserWindow, ipcMain } = require('electron')
 const javaProxy = require('./proxy/java/proxy.js')
+const contextMenu = require('electron-context-menu');
+const packetStorage = require('./packetStorage.js');
+
+lastPacketId = 0;
+
+contextMenu({
+	prepend: (defaultActions, params, browserWindow) => [
+		{
+			label: 'Rainbow',
+			// Only show it when right-clicking images
+			visible: params.mediaType === 'image'
+		},
+		{
+			label: 'Search Google for “{selection}”',
+			// Only show it when right-clicking text
+			visible: params.selectionText.trim().length > 0,
+			click: () => {
+				shell.openExternal(`https://google.com/search?q=${encodeURIComponent(params.selectionText)}`);
+			}
+		}
+	]
+});
 
 function createWindow () {
   // Create the browser window.
   const win = new BrowserWindow({
     width: 800,
     height: 600,
+    // frame: false,
     webPreferences: {
       nodeIntegration: true
     },
@@ -14,9 +37,8 @@ function createWindow () {
   win.setMenu(null);
   // and load the index.html of the app.
   win.loadFile('html/startPage/index.html')
-
   // Open the DevTools.
-  win.webContents.openDevTools()
+  // win.webContents.openDevTools()
 }
 
 // This method will be called when Electron has finished
@@ -41,45 +63,12 @@ app.on('activate', () => {
   }
 })
 
-function trimData(data) {
-  newData = Object.assign({}, data);
-  Object.entries(newData).forEach(function(entry) {
-    try {
-      if (JSON.stringify(entry[1]).length > 15) {
-        if (typeof entry[1] == "number") {
-          newData[entry[0]] = Math.round((entry[1] + Number.EPSILON) * 100) / 100
-        } else {
-          newData[entry[0]] = "...";
-        }
-      }
-    } catch(err) {
-
-    }
-  });
-  newData = JSON.stringify(newData);
-  if (newData.length > 750) {
-    newData = newData.slice(0, 750);
-  }
-  return newData;
-}
-
-function packetHandler(direction, meta, data) {
-  console.log(direction);
-  console.log(meta.name);
-  BrowserWindow.getAllWindows()[0].webContents.send('asynchronous-message', JSON.stringify({name: "packet", packetName: meta.name, data: trimData(data), direction: direction}));
-}
-
-ipcMain.on('asynchronous-message', (event, arg) => {
-   ipcMessage = JSON.parse(arg);
-   switch(ipcMessage.name) {
-      case "startProxy":
-        javaProxy.startProxy(ipcMessage.connectAddress, ipcMessage.connectPort, ipcMessage.version, packetHandler);
-        BrowserWindow.getAllWindows()[0].loadFile('html/mainPage/index.html')
-        break;
-      default:
-        console.log("Unknown IPC message: " + ipcMessage.name)
-    }
-})
+ipcMain.on('startProxy', (event, arg) => {
+  ipcMessage = JSON.parse(arg);
+	packetStorage.init(BrowserWindow.getAllWindows()[0]);
+  javaProxy.startProxy(ipcMessage.connectAddress, ipcMessage.connectPort, ipcMessage.listenPort, ipcMessage.version, packetStorage.packetHandler);
+  BrowserWindow.getAllWindows()[0].loadFile('html/mainPage/index.html');
+});
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.

@@ -6,16 +6,71 @@
     <title>pakkit</title>
     <link href="style.css" rel="stylesheet" type="text/css" />
     <link href="../scrollbar.css" rel="stylesheet" type="text/css" />
+    <link href="../shared.css" rel="stylesheet" type="text/css" />
     <script src="../js/split.min.js"></script>
   </head>
-  <body>
+  <body class="noPacketSelected">
+    <div class="topbar">
+
+
+    <!-- W3Schools code !-->
+    <div class="tab">
+      <button class="tablinks active" onclick="openMenu(event, 'Main')">Main</button>
+      <button class="tablinks" onclick="openMenu(event, 'Packet')">Packet</button>
+      <button class="tablinks" onclick="openMenu(event, 'Filtering')">Filtering</button>
+    </div>
+
+    <div id="Main" class="tabcontent" style="display: block;">
+      <div class="whenNoPacketSelected">
+        <div style="padding: 8px 0;">Please select a packet!</div>
+      </div>
+      <div class="whenPacketSelected">
+        <div style="padding: 8px 0;">Quick actions</div>
+        <button style="width: 200px;" onclick="hideAll(currentPacket)">Hide all packets of this type</button>
+        <button style="width: 200px;">Edit and resend</button>
+      </div>
+    </div>
+
+    <div id="Packet" class="tabcontent">
+      <h3>Packet</h3>
+    </div>
+
+    <div id="Filtering" class="tabcontent">
+      <h3>Filtering</h3>
+    </div>
+
+    <script>
+    function openMenu(evt, MenuName) {
+      var i, tabcontent, tablinks;
+      tabcontent = document.getElementsByClassName("tabcontent");
+      for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+      }
+      tablinks = document.getElementsByClassName("tablinks");
+      for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+      }
+      document.getElementById(MenuName).style.display = "block";
+      evt.currentTarget.className += " active";
+    }
+    </script>
+
+
+
+    </div>
     <div class="container">
         <div id="packets" class="split">
-          <ul class="packetlist" id="packetlist">
+          <div class="toolbar">
+             test
+          </div>
+          <div class="box">
+            <ul class="packetlist" id="packetlist">
 
-          </ul>
+            </ul>
+          </div>
         </div>
-        <div id="two" class="split"></div>
+        <div id="sidebar" class="split">
+        </div>
     </div>
     <script src="script.js"></script>
   </body>

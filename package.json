@@ -13,6 +13,8 @@
     "electron": "^8.2.5"
   },
   "dependencies": {
+    "custom-electron-titlebar": "^3.2.2-hotfix62",
+    "electron-context-menu": "^2.0.1",
     "minecraft-protocol": "^1.11.0"
   }
 }

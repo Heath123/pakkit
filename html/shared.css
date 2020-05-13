@@ -1,0 +1,20 @@
+body {
+  background: #242424;
+  color: rgba(255, 255, 255, 0.8);
+  font-family: Arial, Helvetica, sans-serif;
+  user-select: none;
+}
+h1.title {
+  font-family: "Lucida Console", Monaco, monospace;
+}
+input, select, button {
+  background: #191919;
+  color: rgba(255, 255, 255, 0.8);
+  border: 1px solid #101010;
+  border-radius: 10px;
+  padding: 10px;
+  outline: none;
+}
+button:hover, input[type=submit]:hover {
+  background: #1F1F1F;
+}

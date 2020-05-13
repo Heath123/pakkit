@@ -4,19 +4,19 @@
     <meta charset="UTF-8">
     <title>pakkit</title>
     <link rel="stylesheet" href="style.css">
-    <script src="script.js"></script>
     <!-- https://electronjs.org/docs/tutorial/security#csp-meta-tag -->
     <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
     <link href="../scrollbar.css" rel="stylesheet" type="text/css" />
+    <link href="../shared.css" rel="stylesheet" type="text/css" />
   </head>
   <body>
     <h1 class='title'>pakkit</h1>
-    pakkit is an advanced packet monitor proxy for Minecraft: Java Edition and Minecraft: Bedrock Edition based on node-minecraft-protocol and ProxyPass.
+    pakkit is an advanced packet monitor proxy for Minecraft: Java Edition <s>and Minecraft: Bedrock Edition</s> based on node-minecraft-protocol<s> and ProxyPass</s>. <b>Bedrock support coming soon (hopefully)</b>
     <br><br>
     <form onsubmit="startProxy(event)">
       <p>
         <label for="platform">Platform:</label>
-        <select id="platform" style="width: 191px;">
+        <select id="platform" disabled style="width: 191px;">
           <option value="java">Java Edition</option>
           <option value="bedrock">Bedrock Edition</option>
         </select>
@@ -26,6 +26,9 @@
         <label for="version">Version:</label>
         <select id="version" style="width: 191px;">
           <option value="1.15.2">1.15.2 (latest)</option>
+          <option value="1.14.4">1.14.4</option>
+          <option value="1.13.2">1.13.2</option>
+          <option value="1.12.2">1.12.2</option>
         </select>
       </p>
       <br><br>
@@ -49,5 +52,6 @@
         <input id="start" type="submit" value="Start!">
       </p>
     </form>
+    <script src="script.js"></script>
   </body>
 </html>
