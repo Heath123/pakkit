@@ -3,8 +3,6 @@ const javaProxy = require('./proxy/java/proxy.js')
 const contextMenu = require('electron-context-menu');
 const packetStorage = require('./packetStorage.js');
 
-lastPacketId = 0;
-
 contextMenu({
 	prepend: (defaultActions, params, browserWindow) => [
 		{
@@ -65,7 +63,7 @@ app.on('activate', () => {
 
 ipcMain.on('startProxy', (event, arg) => {
   ipcMessage = JSON.parse(arg);
-	packetStorage.init(BrowserWindow.getAllWindows()[0]);
+	packetStorage.init(BrowserWindow.getAllWindows()[0], ipcMain);
   javaProxy.startProxy(ipcMessage.connectAddress, ipcMessage.connectPort, ipcMessage.listenPort, ipcMessage.version, packetStorage.packetHandler);
   BrowserWindow.getAllWindows()[0].loadFile('html/mainPage/index.html');
 });

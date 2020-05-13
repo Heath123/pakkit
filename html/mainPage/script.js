@@ -1,4 +1,4 @@
-const { ipcRenderer } = require('electron')
+const { ipcRenderer } = require('electron');
 
 currentPacket = undefined;
 hiddenPackets = []; // TODO: Handle this in index.js and re-request
@@ -9,7 +9,13 @@ Split(['#packets', '#sidebar'], {
 })
 
 packetlist = document.getElementById("packetlist");
-sidebar = document.getElementById("sidebar");
+sidebar = document.getElementById("sidebar-box");
+
+ipcRenderer.on('packetDetails', (event, arg) => {
+  ipcMessage = JSON.parse(arg);
+  var tree = jsonTreeViewer.parse(JSON.stringify(ipcMessage.data), sidebar);
+  // sidebar.innerHTML = `<div style="padding: 10px;">${JSON.stringify(ipcMessage.data)}</div>`;
+});
 
 ipcRenderer.on('packet', (event, arg) => {
   ipcMessage = JSON.parse(arg);
@@ -54,9 +60,8 @@ ipcRenderer.on('packet', (event, arg) => {
 function packetClick(id) {
   currentPacket = id;
   document.body.className = "packetSelected";
-  sidebar.innerHTML = '<div style="padding: 10px;">Loading packet data...</div>';
-  ipcRenderer.send('asynchronous-message', JSON.stringify({
-    name: "requestPacketDetails",
+  // sidebar.innerHTML = '<div style="padding: 10px;">Loading packet data...</div>';
+  ipcRenderer.send('requestPacketDetails', JSON.stringify({
     id: id
   }))
 }
