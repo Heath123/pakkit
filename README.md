@@ -1,6 +1,6 @@
 # pakkit
 
-A WIP packet monitor for Minecraft writen in Electron.
+A WIP packet monitor for Minecraft written in Electron.
 
 # Running
 
