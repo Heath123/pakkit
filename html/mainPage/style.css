@@ -88,6 +88,16 @@ body.packetSelected .whenNoPacketSelected {
   display: none;
 }
 
+.topbar-colour {
+  top: 0;
+  background: #121212;
+  height: 40px;
+  z-index: -1;
+  position: fixed;
+  width: 100%;
+  left: 0;
+}
+
 
 
 
@@ -112,6 +122,7 @@ body.packetSelected .whenNoPacketSelected {
 
 /* Style the buttons inside the tab */
 .tab.tab button {
+  margin: 0 2px;
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
   color: rgba(255, 255, 255, 0.8);
@@ -122,6 +133,7 @@ body.packetSelected .whenNoPacketSelected {
   cursor: pointer;
   padding: 6px 16px;
   font-size: 17px;
+  background: #191919;
 }
 
 /* Change background color of buttons on hover */
@@ -131,7 +143,7 @@ body.packetSelected .whenNoPacketSelected {
 
 /* Create an active/current tablink class */
 .tab button.active {
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: #242424;
 }
 
 /* Style the tab content */
