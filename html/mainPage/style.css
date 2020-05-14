@@ -111,7 +111,9 @@ body.packetSelected .whenNoPacketSelected {
 }
 
 /* Style the buttons inside the tab */
-.tab button {
+.tab.tab button {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
   color: rgba(255, 255, 255, 0.8);
   background-color: inherit;
   float: left;

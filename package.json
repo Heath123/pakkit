@@ -1,20 +1,59 @@
 {
   "name": "pakkit",
+  "productName": "pakkit",
   "version": "1.0.0",
   "description": "A packet monitor for Minecraft Java and Minecraft Bedrock",
   "main": "index.js",
   "scripts": {
-    "start": "electron .",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "electron-forge start",
+    "package": "electron-forge package",
+    "make": "electron-forge make",
+    "publish": "electron-forge publish",
+    "lint": "echo \"No linting configured\""
   },
-  "author": "",
+  "author": {
+    "name": "Heath Mitchell",
+    "email": "heath.mitchell27@gmail.com"
+  },
   "license": "ISC",
+  "config": {
+    "forge": {
+      "packagerConfig": {},
+      "makers": [
+        {
+          "name": "@electron-forge/maker-squirrel",
+          "config": {
+            "name": "my_app"
+          }
+        },
+        {
+          "name": "@electron-forge/maker-zip",
+          "platforms": [
+            "darwin"
+          ]
+        },
+        {
+          "name": "@electron-forge/maker-deb",
+          "config": {}
+        },
+        {
+          "name": "@electron-forge/maker-rpm",
+          "config": {}
+        }
+      ]
+    }
+  },
   "devDependencies": {
-    "electron": "^8.2.5"
+    "electron": "^8.2.5",
+    "@electron-forge/cli": "^6.0.0-beta.51",
+    "@electron-forge/maker-deb": "^6.0.0-beta.51",
+    "@electron-forge/maker-rpm": "^6.0.0-beta.51",
+    "@electron-forge/maker-squirrel": "^6.0.0-beta.51",
+    "@electron-forge/maker-zip": "^6.0.0-beta.51"
   },
   "dependencies": {
-    "custom-electron-titlebar": "^3.2.2-hotfix62",
     "electron-context-menu": "^2.0.1",
-    "minecraft-protocol": "^1.11.0"
+    "minecraft-protocol": "^1.11.0",
+    "electron-squirrel-startup": "^1.0.0"
   }
 }
