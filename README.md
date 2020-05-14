@@ -10,3 +10,7 @@ A WIP packet monitor for Minecraft written in Electron.
 - Clone the repo
 - `npm install`
 - `npm start`
+
+# Screenshots
+
+![image](https://user-images.githubusercontent.com/13787163/81986291-70e66c80-962f-11ea-99bb-dad27e80c9fa.png)
