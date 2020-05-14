@@ -5,6 +5,10 @@ const mc = require('minecraft-protocol')
 const states = mc.states
 
 exports.startProxy = function(host, port, listenPort, version, callback) {
+  const mcdata = require('minecraft-data')(version) // Used to get packets, may remove if I find a better way
+  const toClientMappings = mcdata.protocol.play.toClient.types.packet[1][0].type[1].mappings;
+  const toServerMappings = mcdata.protocol.play.toServer.types.packet[1][0].type[1].mappings;
+
   if (host.indexOf(':') !== -1) {
     port = host.substring(host.indexOf(':') + 1)
     host = host.substring(0, host.indexOf(':'))
@@ -42,7 +46,8 @@ exports.startProxy = function(host, port, listenPort, version, callback) {
     })
     client.on('packet', function (data, meta) {
       if (targetClient.state === states.PLAY && meta.state === states.PLAY) {
-        callback("serverbound", meta, data);
+        id = Object.keys(toServerMappings).find(key => toServerMappings[key] === meta.name);
+        callback("serverbound", meta, data, id);
         /* if (shouldDump(meta.name, 'o')) {
           console.log('client->server:',
             client.state + ' ' + meta.name + ' :',
@@ -58,7 +63,8 @@ exports.startProxy = function(host, port, listenPort, version, callback) {
             targetClient.state + '.' + meta.name + ' :' +
             JSON.stringify(data))
         } */
-        callback("clientbound", meta, data);
+        id = Object.keys(toClientMappings).find(key => toClientMappings[key] === meta.name);
+        callback("clientbound", meta, data, id);
         if (!endedClient) {
           client.write(meta.name, data)
           if (meta.name === 'set_compression') {

@@ -29,6 +29,7 @@ ipcRenderer.on('packet', (event, arg) => {
    packetlist.removeChild(packetlist.childNodes[0]);
   }
   packetlist.innerHTML += `<li id="packet${ipcMessage.id}" onclick="packetClick(${ipcMessage.id})" class="packet ${ipcMessage.direction}">
+               <span class="id">${ipcMessage.packetId}</span>
                <span class="name">${ipcMessage.packetName}</span>
                <span class="data">${ipcMessage.data}</span>
              </li>`; // TODO: Fix this mess

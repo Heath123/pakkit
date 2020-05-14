@@ -34,9 +34,9 @@ function trimData(data) { // Function to trim the size of stringified data for p
   return newData;
 }
 
-exports.packetHandler = function(direction, meta, data) {
+exports.packetHandler = function(direction, meta, data, id) {
   // console.log(direction);
-  // console.log(meta.name);
+  // console.log(meta);
   allPackets.push({meta: meta, data: data});
-  mainWindow.send('packet', JSON.stringify({packetName: meta.name, data: trimData(data), direction: direction, id: allPackets.length - 1}));
+  mainWindow.send('packet', JSON.stringify({packetName: meta.name, packetId: id, data: trimData(data), direction: direction, id: allPackets.length - 1}));
 }
