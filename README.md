@@ -1,3 +1,6 @@
+[![HitCount](http://hits.dwyl.com/Heath123/pakkit.svg)](http://hits.dwyl.com/Heath123/pakkit)
+ApparentApparently I can use that to see how many people view it
+
 # pakkit
 
 A WIP packet monitor for Minecraft written in Electron.
