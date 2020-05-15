@@ -34,9 +34,6 @@ body {
 div.toolbar {
   height: 24px;
 }
-div.toolbar::after {
-  content: "	⃠";
-}
 #packets {
   position: relative; /* Is this needed? TODO: Check */
 }

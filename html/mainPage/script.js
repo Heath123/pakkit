@@ -62,6 +62,9 @@ ipcRenderer.on('packet', (event, arg) => {
        console.log("Unknown IPC message: " + ipcMessage.name)
    }
 }) */
+function clearPackets() {
+  packetlist.innerHTML = "";
+}
 
 function packetClick(id) {
   currentPacket = id;
