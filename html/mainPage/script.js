@@ -5,6 +5,7 @@ var currentPacket = undefined;
 var hiddenPackets = ["update_time", "position", "position", "keep_alive", "keep_alive", "rel_entity_move", "position_look", "look", "position_look", "map_chunk", "update_light", "entity_action", "entity_update_attributes", "unload_chunk", "unload_chunk", "update_view_position", "entity_metadata"];
 
 var allPackets = [];
+offScreenCount = 0;
 
 Split(['#packets', '#sidebar'], {
     minSize: [50, 75],
@@ -47,9 +48,9 @@ function trimData(data) { // Function to trim the size of stringified data for p
 
 function refreshPackets() {
   packetlist.innerHTML = "";
-  allPackets.forEach(function(packet) {
-    addPacketToDOM(packet);
-  });
+  for (i = allPackets.length - 100; i < allPackets.length; i++) {
+    addPacketToDOM(allPackets[i]);
+  }
 }
 
 function addPacketToDOM(packet) {
@@ -59,6 +60,7 @@ function addPacketToDOM(packet) {
   }
   if (packetlist.childElementCount > 100) {
    packetlist.removeChild(packetlist.childNodes[0]);
+   offScreenCount += 1;
   }
   packetlist.innerHTML += `<li id="packet${allPackets.length - 1}" onclick="packetClick(${allPackets.length - 1})" class="packet ${packet.direction}">
                <span class="id">${escapeHtml(packet.hexIdString)}</span>
@@ -97,7 +99,7 @@ ipcRenderer.on('packet', (event, arg) => {
    }
 }) */
 function updateHidden() {
-  hiddenPacketsAmount = allPackets.length - packetlist.childElementCount;
+  hiddenPacketsAmount = (allPackets.length - packetlist.childElementCount) - offScreenCount; // Off screen packets don't count as hidden
   document.getElementById("hiddenPackets").innerHTML = hiddenPacketsAmount + ' hidden packets';
   if (hiddenPacketsAmount != 0) {
      document.getElementById("hiddenPackets").innerHTML += ' (<a href="#" onclick="showAllPackets()">show all</a>)'
@@ -112,6 +114,7 @@ function deselectPacket() {
 
 function clearPackets() {
   allPackets = [];
+  offScreenCount = 0;
   packetlist.innerHTML = "";
   deselectPacket();
 }
@@ -119,6 +122,9 @@ function clearPackets() {
 function showAllPackets() {
   hiddenPackets = [];
   refreshPackets();
+  // Since we're showing all packets any not shown will be off screen
+  offScreenCount = allPackets.length - packetlist.childElementCount;
+  updateHidden();
 }
 
 function packetClick(id) {
