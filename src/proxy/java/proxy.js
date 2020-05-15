@@ -4,6 +4,8 @@ const mc = require('minecraft-protocol')
 
 const states = mc.states
 
+var realClient;
+
 exports.startProxy = function(host, port, listenPort, version, callback) {
   const mcdata = require('minecraft-data')(version) // Used to get packets, may remove if I find a better way
   const toClientMappings = mcdata.protocol.play.toClient.types.packet[1][0].type[1].mappings;
@@ -22,6 +24,7 @@ exports.startProxy = function(host, port, listenPort, version, callback) {
   })
   console.log("Proxy started!");
   srv.on('login', function (client) {
+    realClient = client;
     const addr = client.socket.remoteAddress
     console.log('Incoming connection', '(' + addr + ')')
     let endedClient = false
@@ -117,4 +120,8 @@ exports.startProxy = function(host, port, listenPort, version, callback) {
       if (!endedClient) { client.end('Error') }
     })
   })
+}
+
+exports.writeToClient = function(meta, data) {
+  realClient.write(meta.name, data);
 }

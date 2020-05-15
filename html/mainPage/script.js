@@ -4,6 +4,7 @@ const { ipcRenderer } = require('electron');
 var currentPacket = undefined;
 var currentPacketType = undefined;
 var hiddenPackets = ["update_time", "position", "position", "keep_alive", "keep_alive", "rel_entity_move", "position_look", "look", "position_look", "map_chunk", "update_light", "entity_action", "entity_update_attributes", "unload_chunk", "unload_chunk", "update_view_position", "entity_metadata"];
+var dialogOpen = false;
 
 var allPackets = [];
 offScreenCount = 0;
@@ -119,6 +120,42 @@ ipcRenderer.on('packet', (event, arg) => {
        console.log("Unknown IPC message: " + ipcMessage.name)
    }
 }) */
+function closeDialog() {
+  dialogOpen = false;
+  document.getElementById("dialog-overlay").className = "dialog-overlay";
+  document.getElementById("dialog").innerHTML = "";
+}
+
+function resendEdited(id, newValue) {
+  try {
+    ipcRenderer.send('injectPacket', JSON.stringify({
+      meta: allPackets[id].meta,
+      data: JSON.parse(newValue)
+    }))
+  } catch (err) {
+    alert("Invalid JSON");
+  }
+}
+
+function editAndResend(id) {
+  dialogOpen = true;
+  document.getElementById("dialog-overlay").className = "dialog-overlay active";
+  document.getElementById("dialog").innerHTML =
+
+ `<h2>Edit and resend packet</h2>
+  <textarea id="packetEditor"></textarea>
+  <button style="margin-top: 16px;" onclick="resendEdited(${id}, packetEditor.getValue())">Send</button>
+  <button style="margin-top: 16px;" onclick="closeDialog()">Close</button>`;
+
+  document.getElementById("packetEditor").value = JSON.stringify(allPackets[id].data, null, 2);
+
+  packetEditor = CodeMirror.fromTextArea(document.getElementById("packetEditor"), {
+    lineNumbers: false,
+    autoCloseBrackets: true,
+    theme: "darcula",
+  });
+}
+
 function updateHidden() {
   hiddenPacketsAmount = (allPackets.length - packetlist.childElementCount) - offScreenCount; // Off screen packets don't count as hidden
   document.getElementById("hiddenPackets").innerHTML = hiddenPacketsAmount + ' hidden packets';
@@ -163,4 +200,19 @@ function hideAll(id) {
   hiddenPackets.push(currentPacketType);
   deselectPacket();
   refreshPackets();
+}
+
+// Modified from W3Schools
+function openMenu(evt, MenuName, id) {
+  var i, tabcontent, tablinks;
+  tabcontent = document.getElementsByClassName("tabcontent" + id);
+  for (i = 0; i < tabcontent.length; i++) {
+    tabcontent[i].style.display = "none";
+  }
+  tablinks = document.getElementsByClassName("tablinks" + id);
+  for (i = 0; i < tablinks.length; i++) {
+    tablinks[i].className = tablinks[i].className.replace(" active", "");
+  }
+  document.getElementById(MenuName).style.display = "block";
+  evt.currentTarget.className += " active";
 }

@@ -63,7 +63,7 @@ app.on('activate', () => {
 
 ipcMain.on('startProxy', (event, arg) => {
   ipcMessage = JSON.parse(arg);
-	packetHandler.init(BrowserWindow.getAllWindows()[0], ipcMain);
+	packetHandler.init(BrowserWindow.getAllWindows()[0], ipcMain, javaProxy);
   javaProxy.startProxy(ipcMessage.connectAddress, ipcMessage.connectPort, ipcMessage.listenPort, ipcMessage.version, packetHandler.packetHandler);
   BrowserWindow.getAllWindows()[0].loadFile('html/mainPage/index.html');
 });

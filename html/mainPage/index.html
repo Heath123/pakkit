@@ -10,8 +10,19 @@
     <link href="../jsonTree.css" rel="stylesheet" />
     <link href="../jsonTreeCustom.css" rel="stylesheet" />
     <script src="../js/split.min.js"></script>
+    <link rel=stylesheet href="../codemirror/lib/codemirror.css">
+    <script src="../codemirror/lib/codemirror.js"></script>
+    <script src="../codemirror/mode/javascript/javascript.js"></script>
+    <script src="../codemirror/addon/edit/closebrackets.js"></script>
+    <link rel="stylesheet" href="../codemirror/theme/darcula.css">
   </head>
   <body class="noPacketSelected">
+    <div id="dialog-overlay" class="dialog-overlay">
+      <div class="dialog" id="dialog">
+
+      </div>
+    </div>
+
     <div class="topbar-colour"></div>
 
     <div class="topbar">
@@ -19,47 +30,29 @@
 
     <!-- W3Schools code !-->
     <div class="tab">
-      <button class="tablinks active" onclick="openMenu(event, 'Main')">Main</button>
-      <button class="tablinks" onclick="openMenu(event, 'Packet')">Packet</button>
-      <button class="tablinks" onclick="openMenu(event, 'Filtering')">Filtering</button>
+      <button class="tablinks-topmenu active" onclick="openMenu(event, 'Main', '-topmenu')">Main</button>
+      <button class="tablinks-topmenu" onclick="openMenu(event, 'Packet', '-topmenu')">Packet</button>
+      <button class="tablinks-topmenu" onclick="openMenu(event, 'Filtering', '-topmenu')">Filtering</button>
     </div>
 
-    <div id="Main" class="tabcontent" style="display: block;">
+    <div id="Main" class="tabcontent tabcontent-topmenu" style="display: block;">
       <div class="whenNoPacketSelected">
         <div style="padding: 8px 0;">Please select a packet!</div>
       </div>
       <div class="whenPacketSelected">
         <div style="padding: 8px 0;">Quick actions</div>
         <button style="width: 200px;" onclick="hideAll(currentPacket)">Hide all packets of this type</button>
-        <button style="width: 200px;">Edit and resend</button>
+        <button style="width: 200px;" onclick="editAndResend(currentPacket)">Edit and resend</button>
       </div>
     </div>
 
-    <div id="Packet" class="tabcontent">
+    <div id="Packet" class="tabcontent tabcontent-topmenu">
       <h3>Packet</h3>
     </div>
 
-    <div id="Filtering" class="tabcontent">
+    <div id="Filtering" class="tabcontent tabcontent-topmenu">
       <h3>Filtering</h3>
     </div>
-
-    <script>
-    function openMenu(evt, MenuName) {
-      var i, tabcontent, tablinks;
-      tabcontent = document.getElementsByClassName("tabcontent");
-      for (i = 0; i < tabcontent.length; i++) {
-        tabcontent[i].style.display = "none";
-      }
-      tablinks = document.getElementsByClassName("tablinks");
-      for (i = 0; i < tablinks.length; i++) {
-        tablinks[i].className = tablinks[i].className.replace(" active", "");
-      }
-      document.getElementById(MenuName).style.display = "block";
-      evt.currentTarget.className += " active";
-    }
-    </script>
-
-
 
     </div>
     <div class="container">
@@ -75,11 +68,15 @@
           </div>
         </div>
         <div id="sidebar" class="split">
-          <div class="toolbar">
-
+          <div class="toolbar tab">
+            <button class="tablinks-rightpanel active" onclick="openMenu(event, 'tree', '-rightpanel')">Data</button>
+            <!-- <button class="tablinks-rightpanel" onclick="openMenu(event, 'test', '-rightpanel')">Tab 2</button> !-->
           </div>
           <div class="box" id="sidebar-box">
-            <div id="tree">
+            <div class="tabcontent tabcontent-rightpanel" style="display: block;" id="tree">
+
+            </div>
+            <div class="tabcontent tabcontent-rightpanel" id="test">
 
             </div>
           </div>
