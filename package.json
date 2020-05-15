@@ -3,7 +3,7 @@
   "productName": "pakkit",
   "version": "1.0.0",
   "description": "A packet monitor for Minecraft Java and Minecraft Bedrock",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
     "start": "electron-forge start",
     "package": "electron-forge package",
