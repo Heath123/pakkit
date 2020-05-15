@@ -1,4 +1,5 @@
 const { ipcRenderer } = require('electron');
+// const escapeHtml = require('escape-html'); Already defined in my custonmised version of jsonTree (I just added HTML escaping)
 
 currentPacket = undefined;
 hiddenPackets = []; // TODO: Handle this in index.js and re-request
@@ -10,10 +11,14 @@ Split(['#packets', '#sidebar'], {
 
 packetlist = document.getElementById("packetlist");
 sidebar = document.getElementById("sidebar-box");
+treeElement = document.getElementById("tree");
+
+var tree = jsonTree.create({}, treeElement);
+treeElement.firstElementChild.innerHTML = "No packet selected!"
 
 ipcRenderer.on('packetDetails', (event, arg) => {
   ipcMessage = JSON.parse(arg);
-  var tree = jsonTreeViewer.parse(JSON.stringify(ipcMessage.data), sidebar);
+  tree.loadData(ipcMessage.data);
   // sidebar.innerHTML = `<div style="padding: 10px;">${JSON.stringify(ipcMessage.data)}</div>`;
 });
 
@@ -28,10 +33,10 @@ ipcRenderer.on('packet', (event, arg) => {
   if (packetlist.childElementCount > 100) {
    packetlist.removeChild(packetlist.childNodes[0]);
   }
-  packetlist.innerHTML += `<li id="packet${ipcMessage.id}" onclick="packetClick(${ipcMessage.id})" class="packet ${ipcMessage.direction}">
-               <span class="id">${ipcMessage.packetId}</span>
-               <span class="name">${ipcMessage.packetName}</span>
-               <span class="data">${ipcMessage.data}</span>
+  packetlist.innerHTML += `<li id="packet${escapeHtml(ipcMessage.id)}" onclick="packetClick(${ipcMessage.id})" class="packet ${ipcMessage.direction}">
+               <span class="id">${escapeHtml(ipcMessage.packetId)}</span>
+               <span class="name">${escapeHtml(ipcMessage.packetName)}</span>
+               <span class="data">${escapeHtml(ipcMessage.data)}</span>
              </li>`; // TODO: Fix this mess
 });
 

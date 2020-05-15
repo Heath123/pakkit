@@ -54,6 +54,7 @@
   "dependencies": {
     "electron-context-menu": "^2.0.1",
     "electron-squirrel-startup": "^1.0.0",
+    "escape-html": "^1.0.3",
     "minecraft-protocol": "^1.11.0",
     "source-map-support": "^0.5.19"
   }

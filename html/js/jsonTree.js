@@ -4,7 +4,10 @@
  *
  * Copyright 2017 Vera Lobacheva (http://iamvera.com)
  * Released under the MIT license (LICENSE.txt)
+ * Modied for Pakkit because the original seems to be abandoned and doesn't escape HTML properly
  */
+
+const escapeHtml = require('escape-html');
 
 var jsonTree = (function() {
 
@@ -224,12 +227,12 @@ var jsonTree = (function() {
                 var str = '\
                     <span class="jsontree_label-wrapper">\
                         <span class="jsontree_label">"' +
-                            label +
+                            escapeHtml(label) +
                         '"</span> : \
                     </span>\
                     <span class="jsontree_value-wrapper">\
                         <span class="jsontree_value jsontree_value_' + self.type + '">' +
-                            val +
+                            escapeHtml(val) +
                         '</span>' +
                         (!isLast ? ',' : '') +
                     '</span>';
@@ -445,10 +448,10 @@ var jsonTree = (function() {
                     str = '\
                         <div class="jsontree_value-wrapper">\
                             <div class="jsontree_value jsontree_value_' + self.type + '">\
-                                <b>' + sym[0] + '</b>\
+                                <b>' + escapeHtml(sym[0]) + '</b>\
                                 <span class="jsontree_show-more">&hellip;</span>\
                                 <ul class="jsontree_child-nodes"></ul>\
-                                <b>' + sym[1] + '</b>' +
+                                <b>' + escapeHtml(sym[1]) + '</b>' +
                             '</div>' + comma +
                         '</div>';
 
@@ -457,7 +460,7 @@ var jsonTree = (function() {
                         <span class="jsontree_label-wrapper">\
                             <span class="jsontree_label">' +
                                 '<span class="jsontree_expand-button"></span>' +
-                                '"' + label +
+                                '"' + escapeHtml(label) +
                             '"</span> : \
                         </span>' + str;
                 }
