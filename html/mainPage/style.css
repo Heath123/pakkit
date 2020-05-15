@@ -44,10 +44,10 @@ div.toolbar {
   margin: 0;
 }
 
-.packet:nth-child(odd) {
+ul.packetlist.evenNumberHidden .packet:nth-child(odd), ul.packetlist.oddNumberHidden .packet:nth-child(even)  {
   background: #202020;
 }
-.packet:nth-child(even) {
+ul.packetlist.evenNumberHidden .packet:nth-child(even), ul.packetlist.oddNumberHidden .packet:nth-child(odd)  {
   background: #282828;
 }
 

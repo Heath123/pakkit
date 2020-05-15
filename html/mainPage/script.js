@@ -48,12 +48,22 @@ function trimData(data) { // Function to trim the size of stringified data for p
 
 function refreshPackets() {
   packetlist.innerHTML = "";
-  for (i = allPackets.length - 100; i < allPackets.length; i++) {
-    addPacketToDOM(allPackets[i]);
+  packetsToAdd = [];
+  var i;
+  var packetsAdded = 0;
+  for (i = allPackets.length - 1; packetsAdded < 100 && !(i == -1); i--) {
+    if (!hiddenPackets.includes(allPackets[i].meta.name)) {
+      packetsToAdd.push(allPackets[i]);
+      packetsAdded++;
+    }
   }
+  packetsToAdd.forEach(function(packet) {
+    addPacketToDOM(packet);
+  });
 }
 
 function addPacketToDOM(packet) {
+  wasScrolledToBottom = (packetlist.parentElement.scrollTop >= (packetlist.parentElement.scrollHeight - packetlist.parentElement.offsetHeight));
   if (hiddenPackets.includes(packet.meta.name)) {
     updateHidden();
     return;
@@ -67,6 +77,14 @@ function addPacketToDOM(packet) {
                <span class="name">${escapeHtml(packet.meta.name)}</span>
                <span class="data">${escapeHtml(trimData(packet.data))}</span>
              </li>`; // TODO: Fix this mess
+  if (wasScrolledToBottom) {
+    packetlist.parentElement.scrollTop = packetlist.parentElement.scrollHeight;
+  }
+  if (offScreenCount % 2 == 0) {
+    packetlist.className = "packetlist evenNumberHidden";
+  } else {
+    packetlist.className = "packetlist oddNumberHidden";
+  }
   updateHidden();
 }
 
@@ -123,6 +141,7 @@ function showAllPackets() {
   hiddenPackets = [];
   refreshPackets();
   // Since we're showing all packets any not shown will be off screen
+  // This needs to be done
   offScreenCount = allPackets.length - packetlist.childElementCount;
   updateHidden();
 }
