@@ -131,6 +131,10 @@ div.dialog {
   height: 260px;
 }
 
+.packetLink {
+  text-decoration: none;
+}
+
 
 
 

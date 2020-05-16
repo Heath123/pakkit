@@ -11,7 +11,11 @@ exports.init = function(window, passedIpcMain, passedJavaProxy) {
 
   ipcMain.on('injectPacket', (event, arg) => {
     ipcMessage = JSON.parse(arg);
-    passedJavaProxy.writeToClient(ipcMessage.meta, ipcMessage.data);
+    if (ipcMessage.direction == "clientbound") {
+      passedJavaProxy.writeToClient(ipcMessage.meta, ipcMessage.data);
+    } else {
+      passedJavaProxy.writeToServer(ipcMessage.meta, ipcMessage.data);
+    }
   });
 }
 

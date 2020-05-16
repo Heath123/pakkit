@@ -1,25 +1,52 @@
-const { app, BrowserWindow, ipcMain } = require('electron')
+const { app, BrowserWindow, ipcMain, clipboard, Menu } = require('electron')
+
 const javaProxy = require('./proxy/java/proxy.js')
-const contextMenu = require('electron-context-menu');
+// const contextMenu = require('electron-context-menu');
 const packetHandler = require('./packetHandler.js');
 
-contextMenu({
-	prepend: (defaultActions, params, browserWindow) => [
+const electronLocalshortcut = require('electron-localshortcut');
+
+/* contextMenu({
+	menu: (defaultActions, params, browserWindow) => [ */
+function makeMenu(direction, text, id) {
+	return Menu.buildFromTemplate([
 		{
-			label: 'Rainbow',
-			// Only show it when right-clicking images
-			visible: params.mediaType === 'image'
+			icon: `icons/${direction}.png`,
+			label: text,
+			enabled: false
 		},
 		{
-			label: 'Search Google for “{selection}”',
-			// Only show it when right-clicking text
-			visible: params.selectionText.trim().length > 0,
+			type: 'separator'
+		},
+		{
+			label: "Copy JSON data",
 			click: () => {
-				shell.openExternal(`https://google.com/search?q=${encodeURIComponent(params.selectionText)}`);
+				BrowserWindow.getAllWindows()[0].send('copyPacketData', JSON.stringify({
+					// Packet ID from link URL
+					id: id
+				}));
+			}
+		},
+		{
+			label: "Edit and resend",
+			click: () => {
+				BrowserWindow.getAllWindows()[0].send('editAndResend', JSON.stringify({
+					// Packet ID from link URL
+					id: id
+				}));
+			}
+		},
+		{
+			label: "Hide all packets of this type",
+			click: () => {
+				BrowserWindow.getAllWindows()[0].send('hideAllOfType', JSON.stringify({
+					// Packet ID from link URL
+					id: id
+				}));
 			}
 		}
-	]
-});
+	]);
+}
 
 function createWindow () {
   // Create the browser window.
@@ -30,13 +57,21 @@ function createWindow () {
     webPreferences: {
       nodeIntegration: true
     },
-    icon: 'icon.png' // TODO: Add this
+    icon: 'resources/app/icons/icon.png' // TODO: Add this
   })
   win.setMenu(null);
   // and load the index.html of the app.
   win.loadFile('html/startPage/index.html')
   // Open the DevTools.
   // win.webContents.openDevTools()
+	electronLocalshortcut.register(win, 'F12', () => {
+	  win.openDevTools();
+	});
+
+	/* win.webContents.on('context-menu', (event, params) => {
+		console.log(event);
+		console.log(params);
+	}); */
 }
 
 // This method will be called when Electron has finished
@@ -66,6 +101,16 @@ ipcMain.on('startProxy', (event, arg) => {
 	packetHandler.init(BrowserWindow.getAllWindows()[0], ipcMain, javaProxy);
   javaProxy.startProxy(ipcMessage.connectAddress, ipcMessage.connectPort, ipcMessage.listenPort, ipcMessage.version, packetHandler.packetHandler);
   BrowserWindow.getAllWindows()[0].loadFile('html/mainPage/index.html');
+});
+
+ipcMain.on('copyToClipboard', (event, arg) => {
+	clipboard.writeText(arg, 'selection')
+});
+
+ipcMain.on('contextMenu', (event, arg) => {
+	ipcMessage = JSON.parse(arg);
+	console.log(ipcMessage);
+	makeMenu(ipcMessage.direction, ipcMessage.text, ipcMessage.id).popup(BrowserWindow.getAllWindows()[0]);
 });
 
 // In this file you can include the rest of your app's specific main process

@@ -5,11 +5,16 @@ const mc = require('minecraft-protocol')
 const states = mc.states
 
 var realClient;
+var realServer;
+var toClientMappings;
+var toServerMappings;
+var storedCallback;
 
 exports.startProxy = function(host, port, listenPort, version, callback) {
+  storedCallback = callback;
   const mcdata = require('minecraft-data')(version) // Used to get packets, may remove if I find a better way
-  const toClientMappings = mcdata.protocol.play.toClient.types.packet[1][0].type[1].mappings;
-  const toServerMappings = mcdata.protocol.play.toServer.types.packet[1][0].type[1].mappings;
+  toClientMappings = mcdata.protocol.play.toClient.types.packet[1][0].type[1].mappings;
+  toServerMappings = mcdata.protocol.play.toServer.types.packet[1][0].type[1].mappings;
 
   if (host.indexOf(':') !== -1) {
     port = host.substring(host.indexOf(':') + 1)
@@ -47,6 +52,7 @@ exports.startProxy = function(host, port, listenPort, version, callback) {
       keepAlive: false,
       version: version
     })
+    realServer = targetClient;
     client.on('packet', function (data, meta) {
       if (targetClient.state === states.PLAY && meta.state === states.PLAY) {
         id = Object.keys(toServerMappings).find(key => toServerMappings[key] === meta.name);
@@ -124,4 +130,12 @@ exports.startProxy = function(host, port, listenPort, version, callback) {
 
 exports.writeToClient = function(meta, data) {
   realClient.write(meta.name, data);
+  id = Object.keys(toClientMappings).find(key => toClientMappings[key] === meta.name);
+  storedCallback("clientbound", meta, data, id); // TODO: indicator for injected packets
+}
+
+exports.writeToServer = function(meta, data) {
+  realServer.write(meta.name, data);
+  id = Object.keys(toServerMappings).find(key => toServerMappings[key] === meta.name);
+  storedCallback("serverbound", meta, data, id);
 }
