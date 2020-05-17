@@ -1,17 +1,23 @@
 const { app, BrowserWindow, ipcMain, clipboard, Menu } = require('electron')
-
 const javaProxy = require('./proxy/java/proxy.js')
-// const contextMenu = require('electron-context-menu');
 const packetHandler = require('./packetHandler.js');
-
 const electronLocalshortcut = require('electron-localshortcut');
+const fs = require("fs");
+
+if (fs.existsSync("resources/app")) {
+	// Packaged with electron-forge
+  var resourcesPath = "resources/app/";
+} else {
+	// npm start
+	var resourcesPath = "";
+}
 
 /* contextMenu({
 	menu: (defaultActions, params, browserWindow) => [ */
 function makeMenu(direction, text, id) {
 	return Menu.buildFromTemplate([
 		{
-			icon: `icons/${direction}.png`,
+			icon: resourcesPath + `icons/${direction}.png`,
 			label: text,
 			enabled: false
 		},
@@ -57,7 +63,7 @@ function createWindow () {
     webPreferences: {
       nodeIntegration: true
     },
-    icon: 'resources/app/icons/icon.png' // TODO: Add this
+    icon: resourcesPath + 'icons/icon.png'
   })
   win.setMenu(null);
   // and load the index.html of the app.

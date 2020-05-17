@@ -9,10 +9,11 @@ var dialogOpen = false;
 
 var allPackets = [];
 var allPacketsHTML = [];
+packetsUpdated = true;
 
 Split(['#packets', '#sidebar'], {
     minSize: [50, 75],
-})
+});
 
 packetlist = document.getElementById("packetlist");
 sidebar = document.getElementById("sidebar-box");
@@ -50,6 +51,7 @@ function trimData(data) { // Function to trim the size of stringified data for p
 }); All handled here in the renderer now */
 
 function refreshPackets() {
+  var wasScrolledToBottom = (packetlist.parentElement.scrollTop >= (packetlist.parentElement.scrollHeight - packetlist.parentElement.offsetHeight));
   /* packetlist.innerHTML = "";
   packetsToAdd = [];
   var i;
@@ -59,32 +61,39 @@ function refreshPackets() {
       packetsToAdd.push(allPackets[i]);
       packetsAdded++;
     }
+  } */
+  allPackets.forEach(function(packet) {
+    // noUpdate is true as we want to manually update at the end
+    addPacketToDOM(packet, true);
+  });
+  clusterize.update(allPacketsHTML);
+  if (wasScrolledToBottom) {
+    packetlist.parentElement.scrollTop = packetlist.parentElement.scrollHeight;
   }
-  packetsToAdd.forEach(function(packet) {
-    addPacketToDOM(packet);
-  }); */
 }
 
-function addPacketToDOM(packet) {
-  wasScrolledToBottom = (packetlist.parentElement.scrollTop >= (packetlist.parentElement.scrollHeight - packetlist.parentElement.offsetHeight));
+function addPacketToDOM(packet, noUpdate) {
+  if (!noUpdate) {
+    var wasScrolledToBottom = (packetlist.parentElement.scrollTop >= (packetlist.parentElement.scrollHeight - packetlist.parentElement.offsetHeight));
+  }
   if (hiddenPackets.includes(packet.meta.name)) {
     updateHidden();
     return;
   }
-  /* if (packetlist.childElementCount > 300) {
-   packetlist.removeChild(packetlist.childNodes[0]);
-   offScreenCount += 1;
- } */
-clusterize.append([
- `<li href="#test" src="test.png" id="packet${packet.uid}" onclick="packetClick(${packet.uid})" class="packet ${packet.direction}">
-    <span class="id">${escapeHtml(packet.hexIdString)}</span>
-    <span class="name">${escapeHtml(packet.meta.name)}</span>
-    <span class="data">${escapeHtml(trimData(packet.data))}</span>
-  </li>`]); // TODO: Fix this mess
-  // packetlist.style.paddingTop =  offScreenCount * 30 + "px"; // TODO: Make it so you can view these packets
-  if (wasScrolledToBottom) {
-    packetlist.parentElement.scrollTop = packetlist.parentElement.scrollHeight;
+  allPacketsHTML.push([
+   `<li href="#test" src="test.png" id="packet${packet.uid}" onclick="packetClick(${packet.uid})" class="packet ${packet.direction}">
+      <span class="id">${escapeHtml(packet.hexIdString)}</span>
+      <span class="name">${escapeHtml(packet.meta.name)}</span>
+      <span class="data">${escapeHtml(trimData(packet.data))}</span>
+    </li>`]);
+  if (!noUpdate) {
+    clusterize.append(allPacketsHTML.slice(-1)[0]);
+    if (wasScrolledToBottom) {
+      packetlist.parentElement.scrollTop = packetlist.parentElement.scrollHeight;
+    }
   }
+  packetsUpdated = true;
+    // packetlist.style.paddingTop =  offScreenCount * 30 + "px"; // TODO: Make it so you can view these packets
   /* if (offScreenCount % 2 == 0) {
     packetlist.className = "packetlist evenNumberHidden";
   } else {
@@ -98,8 +107,26 @@ ipcRenderer.on('packet', (event, arg) => {
   ipcMessage = JSON.parse(arg);
   allPackets.push(ipcMessage);
   ipcMessage.uid = allPackets.length - 1;
-  addPacketToDOM(ipcMessage);
+  addPacketToDOM(ipcMessage, true);
 });
+
+// Update every 0.05 seconds
+// TODO: Find a better way without updating on every packet (which causes lag)
+window.setInterval(function() {
+  if (packetsUpdated) {
+    var wasScrolledToBottom = (packetlist.parentElement.scrollTop >= (packetlist.parentElement.scrollHeight - packetlist.parentElement.offsetHeight));
+    console.log(wasScrolledToBottom, (packetlist.parentElement.scrollHeight - packetlist.parentElement.offsetHeight) - packetlist.parentElement.scrollTop);
+    clusterize.update(allPacketsHTML);
+    if (wasScrolledToBottom) {
+      packetlist.parentElement.scrollTop = packetlist.parentElement.scrollHeight;
+      var wasScrolledToBottom = (packetlist.parentElement.scrollTop >= (packetlist.parentElement.scrollHeight - packetlist.parentElement.offsetHeight));
+      if (!wasScrolledToBottom) {
+        debugger;
+      }
+    }
+    packetsUpdated = false;
+  }
+}, 50);
 
 ipcRenderer.on('copyPacketData', (event, arg) => {
   ipcMessage = JSON.parse(arg);
@@ -149,7 +176,7 @@ ipcRenderer.on('editAndResend', (event, arg) => { // Context menu
 });
 
 function updateHidden() {
-  hiddenPacketsAmount = (allPackets.length - packetlist.childElementCount) /* - offScreenCount */; // Off screen packets don't count as hidden
+  hiddenPacketsAmount = (allPackets.length - allPacketsHTML.length);
   document.getElementById("hiddenPackets").innerHTML = hiddenPacketsAmount + ' hidden packets';
   if (hiddenPacketsAmount != 0) {
      document.getElementById("hiddenPackets").innerHTML += ' (<a href="#" onclick="showAllPackets()">show all</a>)'
@@ -165,8 +192,7 @@ function deselectPacket() {
 
 function clearPackets() {
   allPackets = [];
-  // offScreenCount = 0;
-  packetlist.innerHTML = "";
+  allPacketsHTML = [];
   deselectPacket();
   clusterize.update([]);
 }
@@ -174,9 +200,6 @@ function clearPackets() {
 function showAllPackets() {
   hiddenPackets = [];
   refreshPackets();
-  // Since we're showing all packets any not shown will be off screen
-  // This needs to be done
-  // offScreenCount = allPackets.length - packetlist.childElementCount;
   updateHidden();
 }
 
@@ -189,7 +212,6 @@ function packetClick(id) {
 }
 
 function hideAll(id) {
-  // TODO: Better solution
   hiddenPackets.push(currentPacketType);
   deselectPacket();
   refreshPackets();
