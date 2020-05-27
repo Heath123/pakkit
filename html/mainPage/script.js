@@ -2,9 +2,21 @@ const { ipcRenderer } = require('electron');
 const Clusterize = require('clusterize.js');
 // const escapeHtml = require('escape-html'); Already defined in my customised version of jsonTree (I just added HTML escaping)
 
+const proxyCapabilities = JSON.parse(ipcRenderer.sendSync('proxyCapabilities', ''));
+
+if (!proxyCapabilities.modifyPackets) {
+  document.getElementById("editAndResend").style.display = "none";
+}
+
 var currentPacket = undefined;
 var currentPacketType = undefined;
-var hiddenPackets = []; // ["update_time", "position", "position", "keep_alive", "keep_alive", "rel_entity_move", "position_look", "look", "position_look", "map_chunk", "update_light", "entity_action", "entity_update_attributes", "unload_chunk", "unload_chunk", "update_view_position", "entity_metadata"];
+var hiddenPackets = [
+  // TODO: Do this properly
+  // JE
+  "update_time", "position", "position", "keep_alive", "keep_alive", "rel_entity_move", "position_look", "look", "position_look", "map_chunk", "update_light", "entity_action", "entity_update_attributes", "unload_chunk", "unload_chunk", "update_view_position", "entity_metadata",
+  // BE
+  "network_stack_latency_packet", "level_chunk_packet", "move_player_packet", "player_auth_input_packet", "network_chunk_publisher_update_packet", "client_cache_blob_status_packet", "client_cache_miss_response_packet", "move_entity_delta_packet", "set_entity_data_packet", "set_time_packet", "set_entity_data_packet", "set_entity_motion_packet", "add_entity_packet", "level_event_packet", "level_sound_event2_packet", "update_attributes_packet", "entity_event_packet", "remove_entity_packet", "mob_armor_equipment_packet", "mob_equipment_packet", "update_block_packet", "player_action_packet"
+];
 var dialogOpen = false;
 
 var allPackets = [];
@@ -62,6 +74,7 @@ function refreshPackets() {
       packetsAdded++;
     }
   } */
+  var allPacketsHTML = [];
   allPackets.forEach(function(packet) {
     // noUpdate is true as we want to manually update at the end
     addPacketToDOM(packet, true);
@@ -86,12 +99,12 @@ function addPacketToDOM(packet, noUpdate) {
       <span class="name">${escapeHtml(packet.meta.name)}</span>
       <span class="data">${escapeHtml(trimData(packet.data))}</span>
     </li>`]);
-  if (!noUpdate) {
+  /* if (!noUpdate) {
     clusterize.append(allPacketsHTML.slice(-1)[0]);
     if (wasScrolledToBottom) {
       packetlist.parentElement.scrollTop = packetlist.parentElement.scrollHeight;
     }
-  }
+  } */
   packetsUpdated = true;
     // packetlist.style.paddingTop =  offScreenCount * 30 + "px"; // TODO: Make it so you can view these packets
   /* if (offScreenCount % 2 == 0) {
@@ -152,6 +165,11 @@ function resendEdited(id, newValue) {
 }
 
 function editAndResend(id) {
+  if (!proxyCapabilities.modifyPackets) {
+    alert("Edit and Resend is unavailable");
+    return;
+  }
+
   dialogOpen = true;
   document.getElementById("dialog-overlay").className = "dialog-overlay active";
   document.getElementById("dialog").innerHTML =

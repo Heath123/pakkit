@@ -1,16 +1,26 @@
 const { app, BrowserWindow, ipcMain, clipboard, Menu } = require('electron')
-const javaProxy = require('./proxy/java/proxy.js')
+
+const javaProxy = require('./proxy/java/proxy.js');
+const bedrockProxy = require('./proxy/bedrock/proxy.js');
 const packetHandler = require('./packetHandler.js');
+const setupDataFolder = require('./setupDataFolder.js');
+
 const electronLocalshortcut = require('electron-localshortcut');
 const fs = require("fs");
+
+var proxy;
 
 if (fs.existsSync("resources/app")) {
 	// Packaged with electron-forge
   var resourcesPath = "resources/app/";
 } else {
 	// npm start
-	var resourcesPath = "";
+	var resourcesPath = "./";
 }
+
+osDataFolder = app.getPath("appData");
+
+dataFolder = setupDataFolder.setup(osDataFolder, resourcesPath);
 
 /* contextMenu({
 	menu: (defaultActions, params, browserWindow) => [ */
@@ -40,7 +50,8 @@ function makeMenu(direction, text, id) {
 					// Packet ID from link URL
 					id: id
 				}));
-			}
+			},
+      visible: proxy.capabilities.modifyPackets
 		},
 		{
 			label: "Hide all packets of this type",
@@ -90,7 +101,8 @@ app.on('window-all-closed', () => {
   // On macOS it is common for applications and their menu bar
   // to stay active until the user quits explicitly with Cmd + Q
   if (process.platform !== 'darwin') {
-    app.quit()
+    proxy.end();
+    app.quit();
   }
 })
 
@@ -104,10 +116,20 @@ app.on('activate', () => {
 
 ipcMain.on('startProxy', (event, arg) => {
   ipcMessage = JSON.parse(arg);
-	packetHandler.init(BrowserWindow.getAllWindows()[0], ipcMain, javaProxy);
-  javaProxy.startProxy(ipcMessage.connectAddress, ipcMessage.connectPort, ipcMessage.listenPort, ipcMessage.version, packetHandler.packetHandler);
+  if (ipcMessage.platform == "java") {
+    proxy = javaProxy;
+  } else {
+    proxy = bedrockProxy;
+  }
+	packetHandler.init(BrowserWindow.getAllWindows()[0], ipcMain, proxy);
+  proxy.startProxy(ipcMessage.connectAddress, ipcMessage.connectPort, ipcMessage.listenPort, ipcMessage.version, packetHandler.packetHandler, dataFolder);
   BrowserWindow.getAllWindows()[0].loadFile('html/mainPage/index.html');
 });
+
+ipcMain.on('proxyCapabilities', (event, arg) => {
+  event.returnValue = JSON.stringify(proxy.capabilities);
+})
+
 
 ipcMain.on('copyToClipboard', (event, arg) => {
 	clipboard.writeText(arg, 'selection')

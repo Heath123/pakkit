@@ -10,7 +10,11 @@ var toClientMappings;
 var toServerMappings;
 var storedCallback;
 
-exports.startProxy = function(host, port, listenPort, version, callback) {
+exports.capabilities = {
+  modifyPackets: true
+}
+
+exports.startProxy = function(host, port, listenPort, version, callback, dataFolder) {
   storedCallback = callback;
   const mcdata = require('minecraft-data')(version) // Used to get packets, may remove if I find a better way
   toClientMappings = mcdata.protocol.play.toClient.types.packet[1][0].type[1].mappings;
@@ -27,7 +31,7 @@ exports.startProxy = function(host, port, listenPort, version, callback) {
     keepAlive: false,
     version: version
   })
-  console.log("Proxy started!");
+  console.log("Proxy started (Java)!");
   srv.on('login', function (client) {
     realClient = client;
     const addr = client.socket.remoteAddress
@@ -127,6 +131,8 @@ exports.startProxy = function(host, port, listenPort, version, callback) {
     })
   })
 }
+
+exports.end = function() {}
 
 exports.writeToClient = function(meta, data) {
   realClient.write(meta.name, data);

@@ -135,7 +135,15 @@ div.dialog {
   text-decoration: none;
 }
 
-
+#tabcontent {
+  box-sizing: border-box;
+  position: fixed;
+  height: calc(100% - 48px);
+  width: calc(100% - 16px);
+  z-index: 1;
+  display: block;
+  background: rgb(36, 36, 36);
+}
 
 
 

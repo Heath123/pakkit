@@ -4,7 +4,7 @@
  *
  * Copyright 2017 Vera Lobacheva (http://iamvera.com)
  * Released under the MIT license (LICENSE.txt)
- * Modied for Pakkit because the original seems to be abandoned and doesn't escape HTML properly
+ * Modified for Pakkit because the original seems to be abandoned and doesn't escape HTML properly
  */
 
 const escapeHtml = require('escape-html');
@@ -226,9 +226,9 @@ var jsonTree = (function() {
             template = function(label, val) {
                 var str = '\
                     <span class="jsontree_label-wrapper">\
-                        <span class="jsontree_label">"' +
-                            escapeHtml(label) +
-                        '"</span> : \
+                        <span class="jsontree_label">' +
+                            escapeHtml(JSON.stringify(label)) +
+                        '</span> : \
                     </span>\
                     <span class="jsontree_value-wrapper">\
                         <span class="jsontree_value jsontree_value_' + self.type + '">' +

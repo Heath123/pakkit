@@ -1,20 +1,20 @@
 var mainWindow;
 var ipcMain;
-var javaProxy;
+var proxy;
 
-exports.init = function(window, passedIpcMain, passedJavaProxy) {
+exports.init = function(window, passedIpcMain, passedProxy) {
   mainWindow = window;
   ipcMain = passedIpcMain;
-  javaProxy = passedJavaProxy;
+  proxy = passedProxy;
 
   console.log("init");
 
   ipcMain.on('injectPacket', (event, arg) => {
     ipcMessage = JSON.parse(arg);
     if (ipcMessage.direction == "clientbound") {
-      passedJavaProxy.writeToClient(ipcMessage.meta, ipcMessage.data);
+      passedProxy.writeToClient(ipcMessage.meta, ipcMessage.data);
     } else {
-      passedJavaProxy.writeToServer(ipcMessage.meta, ipcMessage.data);
+      passedProxy.writeToServer(ipcMessage.meta, ipcMessage.data);
     }
   });
 }
