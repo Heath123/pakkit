@@ -18,7 +18,8 @@
   color: #F00;
 }
 .jsontree_value_string {
-  color: #0F0
+  color: #0F0;
+  white-space: pre;
 }
 .jsontree_value_boolean {
   color: #ff7600;

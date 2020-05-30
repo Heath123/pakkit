@@ -17,20 +17,41 @@ function processPacket(text) {
     return;
   }
   name = text.split("-")[1].split("(")[0].trim();
-  data = "(" + text.split("(").slice(1).join("(");
+  str = "(" + text.split("(").slice(1).join("(");
+
+  out = "";
+  indentlevel = 0;
+  for (var i = 0; i < str.length; i++) {
+    if (str.charAt(i) == ")" || str.charAt(i) == "}" || str.charAt(i) == "]") {
+      indentlevel -= 1;
+      if (indentlevel < 0) {
+        indentlevel = 0;
+      }
+      out += "\n" + " ".repeat(indentlevel * 2);
+    }
+    out += str.charAt(i);
+    if (str.charAt(i) == "(" || str.charAt(i) == "{" || str.charAt(i) == "[") {
+      indentlevel += 1;
+      out += "\n" + " ".repeat(indentlevel * 2);
+    }
+    if (str.charAt(i) == ",") {
+      out += "\n" + " ".repeat(indentlevel * 2 - 1);
+    }
+  }
 
   // https://stackoverflow.com/questions/5582228/insert-space-before-capital-letters
-  name = name.replace(/([A-Z])/g, ' $1').trim().toLowerCase().split(" ").join("_");
+  name = name.replace(/([A-Z])/g, ' $1').trim().toLowerCase().split(" ").join("_").replace("_packet", "");
 
   if (text.startsWith("[CLIENT BOUND]")) {
-    storedCallback("clientbound", {name: name}, {data: data}, "");
+    storedCallback("clientbound", {name: name}, {data: out}, "");
   } else if (text.startsWith("[SERVER BOUND]")) {
-    storedCallback("serverbound", {name: name}, {data: data}, "");
+    storedCallback("serverbound", {name: name}, {data: out}, "");
   }
 }
 
 exports.capabilities = {
-  modifyPackets: false
+  modifyPackets: false,
+  jsonData: false
 }
 
 exports.startProxy = function(host, port, listenPort, version, callback, dataFolder) {

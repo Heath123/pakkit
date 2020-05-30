@@ -11,7 +11,8 @@ var toServerMappings;
 var storedCallback;
 
 exports.capabilities = {
-  modifyPackets: true
+  modifyPackets: true,
+  jsonData: true
 }
 
 exports.startProxy = function(host, port, listenPort, version, callback, dataFolder) {

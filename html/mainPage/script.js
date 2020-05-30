@@ -15,7 +15,7 @@ var hiddenPackets = [
   // JE
   "update_time", "position", "position", "keep_alive", "keep_alive", "rel_entity_move", "position_look", "look", "position_look", "map_chunk", "update_light", "entity_action", "entity_update_attributes", "unload_chunk", "unload_chunk", "update_view_position", "entity_metadata",
   // BE
-  "network_stack_latency_packet", "level_chunk_packet", "move_player_packet", "player_auth_input_packet", "network_chunk_publisher_update_packet", "client_cache_blob_status_packet", "client_cache_miss_response_packet", "move_entity_delta_packet", "set_entity_data_packet", "set_time_packet", "set_entity_data_packet", "set_entity_motion_packet", "add_entity_packet", "level_event_packet", "level_sound_event2_packet", "update_attributes_packet", "entity_event_packet", "remove_entity_packet", "mob_armor_equipment_packet", "mob_equipment_packet", "update_block_packet", "player_action_packet"
+  "network_stack_latency", "level_chunk", "move_player", "player_auth_input", "network_chunk_publisher_update", "client_cache_blob_status", "client_cache_miss_response", "move_entity_delta", "set_entity_data", "set_time", "set_entity_data", "set_entity_motion", /* "add_entity", */ "level_event", "level_sound_event2", "update_attributes", "entity_event", "remove_entity", "mob_armor_equipment", "mob_equipment", "update_block", "player_action", "move_entity_absolute"
 ];
 var dialogOpen = false;
 
@@ -225,8 +225,18 @@ function packetClick(id) {
   currentPacket = id;
   currentPacketType = document.getElementById("packet" + id).children[1].innerText;
   document.body.className = "packetSelected";
-  // sidebar.innerHTML = '<div style="padding: 10px;">Loading packet data...</div>';
-  tree.loadData(allPackets[id].data);
+  if (proxyCapabilities.jsonData) {
+    sidebar.innerHTML = '<div style="padding: 10px;">Loading packet data...</div>';
+    tree.loadData(allPackets[id].data);
+  } else {
+    treeElement.innerText = allPackets[id].data.data;
+    treeElement.style = `
+    color: #0F0;
+    white-space: pre;
+    font-family: 'PT Mono', monospace;
+    font-size: 14px;
+    display: block;`
+  }
 }
 
 function hideAll(id) {
