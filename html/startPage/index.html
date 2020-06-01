@@ -11,24 +11,58 @@
   </head>
   <body>
     <h1 class='title'>pakkit</h1>
-    pakkit is an advanced packet monitor proxy for Minecraft: Java Edition nd Minecraft: Bedrock Edition based on node-minecraft-protocol and ProxyPass.
+    pakkit is an advanced packet monitor proxy for Minecraft: Java Edition and Minecraft: Bedrock Edition based on node-minecraft-protocol and ProxyPass.
     <br><br>
     <form onsubmit="startProxy(event)">
       <p>
         <label for="platform">Platform:</label>
-        <select id="platform" style="width: 191px;">
+        <select id="platform" style="width: 191px;" onchange="platformChange()">
           <option value="java">Java Edition</option>
           <option value="bedrock">Bedrock Edition (beta)</option>
         </select>
       </p>
       <br>
       <p>
-        <label for="version">Version (Java Edition only):</label>
+        <label for="version">Version:</label>
         <select id="version" style="width: 191px;">
-          <option value="1.15.2">1.15.2 (latest)</option>
+          <option value="20w13b">20w13b</option>
+          <option value="1.15.2">1.15.2 (latest stable)</option>
+          <option value="1.15.1">1.15.1</option>
+          <option value="1.15">1.15</option>
           <option value="1.14.4">1.14.4</option>
+          <option value="1.14.3">1.14.3</option>
+          <option value="1.14.1">1.14.1</option>
+          <option value="1.14">1.14</option>
           <option value="1.13.2">1.13.2</option>
+          <option value="1.13.2-pre2">1.13.2-pre2</option>
+          <option value="1.13.2-pre1">1.13.2-pre1</option>
+          <option value="1.13.1">1.13.1</option>
+          <option value="1.13">1.13</option>
+          <option value="17w50a">17w50a</option>
           <option value="1.12.2">1.12.2</option>
+          <option value="1.12.1">1.12.1</option>
+          <option value="1.12">1.12</option>
+          <option value="1.12-pre4">1.12-pre4</option>
+          <option value="17w18b">17w18b</option>
+          <option value="17w15a">17w15a</option>
+          <option value="1.11.2">1.11.2</option>
+          <option value="1.11">1.11</option>
+          <option value="16w35a">16w35a</option>
+          <option value="1.10.2">1.10.2</option>
+          <option value="1.10.1">1.10.1</option>
+          <option value="1.10">1.10</option>
+          <option value="1.10-pre1">1.10-pre1</option>
+          <option value="16w20a">16w20a</option>
+          <option value="1.9.4">1.9.4</option>
+          <option value="1.9.2">1.9.2</option>
+          <option value="1.9.1-pre2">1.9.1-pre2</option>
+          <option value="1.9">1.9</option>
+          <option value="15w40b">15w40b</option>
+          <option value="1.8.8">1.8.8</option>
+          <option value="1.7.10">1.7.10</option>
+        </select>
+        <select id="version-bedrock" disabled style="width: 191px; display: none;">
+          <option value="1.15.2">1.14.60 (latest)</option>
         </select>
       </p>
       <br><br>
