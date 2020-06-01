@@ -147,7 +147,9 @@ window.setInterval(function() {
 
 ipcRenderer.on('copyPacketData', (event, arg) => {
   ipcMessage = JSON.parse(arg);
-  ipcRenderer.send('copyToClipboard', JSON.stringify(allPackets[ipcMessage.id].data, null, 2));
+  data = allPackets[ipcMessage.id].data;
+  data = proxyCapabilities.jsonData ? JSON.stringify(data, null, 2) : data.data;
+  ipcRenderer.send('copyToClipboard', data);
 });
 
 function closeDialog() {
@@ -230,7 +232,7 @@ function packetClick(id) {
   currentPacketType = document.getElementById("packet" + id).children[1].innerText;
   document.body.className = "packetSelected";
   if (proxyCapabilities.jsonData) {
-    sidebar.innerHTML = '<div style="padding: 10px;">Loading packet data...</div>';
+    // sidebar.innerHTML = '<div style="padding: 10px;">Loading packet data...</div>';
     tree.loadData(allPackets[id].data);
   } else {
     treeElement.innerText = allPackets[id].data.data;

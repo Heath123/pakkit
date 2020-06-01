@@ -10,42 +10,46 @@ var timeFrozen;
 // This whole thing is messy for now.
 
 function processPacket(text) {
-  if (!(text.startsWith("[CLIENT BOUND]") || text.startsWith("[SERVER BOUND]"))) {
-    if (text.trim() != "") {
-      console.log("ProxyPass output:", text.trim());
-    }
-    return;
-  }
-  name = text.split("-")[1].split("(")[0].trim();
-  str = "(" + text.split("(").slice(1).join("(");
-
-  out = "";
-  indentlevel = 0;
-  for (var i = 0; i < str.length; i++) {
-    if (str.charAt(i) == ")" || str.charAt(i) == "}" || str.charAt(i) == "]") {
-      indentlevel -= 1;
-      if (indentlevel < 0) {
-        indentlevel = 0;
+  try {
+    if (!(text.startsWith("[CLIENT BOUND]") || text.startsWith("[SERVER BOUND]"))) {
+      if (text.trim() != "") {
+        console.log("ProxyPass output:", text.trim());
       }
-      out += "\n" + " ".repeat(indentlevel * 2);
+      return;
     }
-    out += str.charAt(i);
-    if (str.charAt(i) == "(" || str.charAt(i) == "{" || str.charAt(i) == "[") {
-      indentlevel += 1;
-      out += "\n" + " ".repeat(indentlevel * 2);
-    }
-    if (str.charAt(i) == ",") {
-      out += "\n" + " ".repeat(indentlevel * 2 - 1);
-    }
-  }
+    name = text.split("-")[1].split("(")[0].trim();
+    str = "(" + text.split("(").slice(1).join("(");
 
-  // https://stackoverflow.com/questions/5582228/insert-space-before-capital-letters
-  name = name.replace(/([A-Z])/g, ' $1').trim().toLowerCase().split(" ").join("_").replace("_packet", "");
+    out = "";
+    indentlevel = 0;
+    for (var i = 0; i < str.length; i++) {
+      if (str.charAt(i) == ")" || str.charAt(i) == "}" || str.charAt(i) == "]") {
+        indentlevel -= 1;
+        if (indentlevel < 0) {
+          indentlevel = 0;
+        }
+        out += "\n" + " ".repeat(indentlevel * 2);
+      }
+      out += str.charAt(i);
+      if (str.charAt(i) == "(" || str.charAt(i) == "{" || str.charAt(i) == "[") {
+        indentlevel += 1;
+        out += "\n" + " ".repeat(indentlevel * 2);
+      }
+      if (str.charAt(i) == ",") {
+        out += "\n" + " ".repeat(indentlevel * 2 - 1);
+      }
+    }
 
-  if (text.startsWith("[CLIENT BOUND]")) {
-    storedCallback("clientbound", {name: name}, {data: out}, "");
-  } else if (text.startsWith("[SERVER BOUND]")) {
-    storedCallback("serverbound", {name: name}, {data: out}, "");
+    // https://stackoverflow.com/questions/5582228/insert-space-before-capital-letters
+    name = name.replace(/([A-Z])/g, ' $1').trim().toLowerCase().split(" ").join("_").replace("_packet", "");
+
+    if (text.startsWith("[CLIENT BOUND]")) {
+      storedCallback("clientbound", {name: name}, {data: out}, "");
+    } else if (text.startsWith("[SERVER BOUND]")) {
+      storedCallback("serverbound", {name: name}, {data: out}, "");
+    }
+  } catch (err) {
+    console.error(err);
   }
 }
 
@@ -90,6 +94,7 @@ exports.startProxy = function(host, port, listenPort, version, callback, dataFol
     console.log('Child Process STDERR: '+stderr);
   });*/
   child.stdout.setEncoding('utf8');
+  child.stderr.setEncoding('utf8');
   child.stdout.on('data', (chunk) => {
     try {
       mayBeFrozen = false; // New messages mean it isn't froxen
@@ -106,12 +111,20 @@ exports.startProxy = function(host, port, listenPort, version, callback, dataFol
     }
   });
   child.stderr.on('data', (chunk) => {
-    console.log("ProxyPass error:", chunk.trim());
+    try {
+      console.log("ProxyPass error:", chunk.trim());
+    } catch (err) {
+      console.error(err);
+    }
   });
   // since these are streams, you can pipe them elsewhere
   // child.stderr.pipe(dest);
   child.on('close', (code) => {
-    console.log(`child process exited with code ${code}`);
+    if (code) {
+      console.log(`child process exited with code ${code} - restarting...`);
+      exports.end();
+      exports.startProxy(host, port, listenPort, version, callback, dataFolder);
+    }
   });
 
   /* exec("java -jar proxypass-pakkit.jar", function (error, stdout, stderr){

@@ -35,7 +35,7 @@ function makeMenu(direction, text, id) {
 			type: 'separator'
 		},
 		{
-			label: "Copy JSON data",
+			label: proxy.capabilities.jsonData ? "Copy JSON data" : "Copy data",
 			click: () => {
 				BrowserWindow.getAllWindows()[0].send('copyPacketData', JSON.stringify({
 					// Packet ID from link URL
@@ -134,7 +134,7 @@ ipcMain.on('proxyCapabilities', (event, arg) => {
 
 
 ipcMain.on('copyToClipboard', (event, arg) => {
-	clipboard.writeText(arg, 'selection')
+	clipboard.writeText(arg);
 });
 
 ipcMain.on('contextMenu', (event, arg) => {
