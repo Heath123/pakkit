@@ -1,7 +1,7 @@
 const { app, BrowserWindow, ipcMain, clipboard, Menu } = require('electron')
 
 const javaProxy = require('./proxy/java/proxy.js');
-const bedrockProxy = require('./proxy/bedrock/proxy.js');
+const bedrockProxy = require('./proxy/bedrock-gophertunnel/proxy.js');
 const packetHandler = require('./packetHandler.js');
 const setupDataFolder = require('./setupDataFolder.js');
 
