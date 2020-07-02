@@ -213,3 +213,10 @@ div.dialog {
   /* border: 1px solid #ccc; */
   border-top: none;
 }
+
+.tabcontent.fullpage {
+  position: relative;
+  z-index: 1;
+  background: #242424;
+  height: calc(100vh - 52px);
+}

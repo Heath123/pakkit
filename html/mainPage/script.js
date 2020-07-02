@@ -1,3 +1,18 @@
+/*
+box.onclick = function() {
+  if (!box.checked) {
+    return
+  }
+  if (window.wasIn) {
+    window.wasIn = false;
+  } else {
+    box.checked = false;
+    box.indeterminate = true;
+    window.wasIn = true;
+  }
+}
+*/
+
 const { ipcRenderer } = require('electron');
 const Clusterize = require('clusterize.js');
 // const escapeHtml = require('escape-html'); Already defined in my customised version of jsonTree (I just added HTML escaping)
