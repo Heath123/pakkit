@@ -6,6 +6,7 @@ pipeline {
     stages {
         stage('build') {
             steps {
+                sh 'rm -r out || true'
                 sh 'npm install'
                 sh 'npx electron-forge package --platform win32'
                 sh 'npx electron-forge package --platform linux'
