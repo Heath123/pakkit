@@ -4,7 +4,7 @@
 # pakkit
 
 A WIP packet monitor for Minecraft written in Electron.
-[Download](https://ci.rtm516.co.uk/job/pakkit/job/master/)
+[Download](https://ci.rtm516.co.uk/job/pakkit/job/master/) (thanks @rtm516 for running the CI)
 
 # Running manually
 
