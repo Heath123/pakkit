@@ -23,11 +23,11 @@ pipeline {
                     withCredentials([usernamePassword(credentialsId: 'GitHubPAToken', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
                         sh 'export GITHUB_TOKEN=$TOKEN'
                         sh 'echo "Creating a new release in github"'
-                        sh 'github-release release --user ${GITHUB_ORGANIZATION} --repo ${GITHUB_REPO} --tag ${VERSION_NAME} --name "${VERSION_NAME}"'
+                        sh 'github-release release --user Heath123 --repo pakkit --tag v${BUILD_NUMBER} --name "Jenkins build ${BUILD_NUMBER}"'
                         sh 'echo "Uploading the artifacts into github"'
-                        sh 'github-release upload --user ${GITHUB_ORGANIZATION} --repo ${GITHUB_REPO} --tag ${VERSION_NAME} --name "pakkit-windows-x64.zip" --file out/pakkit-windows-x64.zip'
-                        sh 'github-release upload --user ${GITHUB_ORGANIZATION} --repo ${GITHUB_REPO} --tag ${VERSION_NAME} --name "pakkit-linux-x64.zip" --file out/pakkit-linux-x64.zip'
-                        sh 'github-release upload --user ${GITHUB_ORGANIZATION} --repo ${GITHUB_REPO} --tag ${VERSION_NAME} --name "pakkit-macos-x64.zip" --file out/pakkit-macos-x64.zip'
+                        sh 'github-release upload --user Heath123 --repo pakkit --tag v${BUILD_NUMBER} --name "pakkit-windows-x64.zip" --file out/pakkit-windows-x64.zip'
+                        sh 'github-release upload --user Heath123 --repo pakkit --tag v${BUILD_NUMBER} --name "pakkit-linux-x64.zip" --file out/pakkit-linux-x64.zip'
+                        sh 'github-release upload --user Heath123 --repo pakkit --tag v${BUILD_NUMBER} --name "pakkit-macos-x64.zip" --file out/pakkit-macos-x64.zip'
                     }
                 }
             }
