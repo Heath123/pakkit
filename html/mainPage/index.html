@@ -15,6 +15,7 @@
     <script src="../codemirror/lib/codemirror.js"></script>
     <script src="../codemirror/mode/javascript/javascript.js"></script>
     <script src="../codemirror/addon/edit/closebrackets.js"></script>
+    <script src="../codemirror/addon/display/autorefresh.js"></script>
     <link rel="stylesheet" href="../codemirror/theme/darcula.css">
   </head>
   <body class="noPacketSelected">
@@ -34,6 +35,7 @@
       <button class="tablinks-topmenu active" onclick="openMenu(event, 'Main', '-topmenu')">Main</button>
       <button class="tablinks-topmenu" onclick="openMenu(event, 'Packet', '-topmenu')">Packet</button>
       <button class="tablinks-topmenu" onclick="openMenu(event, 'Filtering', '-topmenu')">Filtering</button>
+      <button class="tablinks-topmenu" onclick="openMenu(event, 'Scripting', '-topmenu')">Scripting</button>
     </div>
 
     <div id="Main" class="tabcontent tabcontent-topmenu" style="display: block;">
@@ -53,6 +55,27 @@
 
     <div id="Filtering" class="tabcontent tabcontent-topmenu fullpage">
       <h3>Filtering</h3>
+      Coming soon
+      <!-- Tick the box to show packets
+      <br><br>
+      <div class="box" style="height: calc(100% - 108px);">
+        <ul class="packetlist" id="filtering-packets">
+          
+        </ul>
+      </div> !-->
+    </div>
+
+    <div id="Scripting" class="tabcontent tabcontent-topmenu fullpage">
+      <h3>Scripting (beta)</h3>
+      Scripting allows you to modify and inject packets on-the-fly
+      <br><br>
+      <input type="checkbox" id="enableScripting" name="enableScripting" onchange="updateScript(true)">
+      <label for="enableScripting">Enable scripting</label>
+      <br><br>
+      <textarea id="scriptEditor">
+      </textarea>
+      <br>
+      <a href="#" onclick="resetScriptEditor()">Reset</a>
     </div>
 
     </div>

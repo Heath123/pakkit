@@ -4,22 +4,22 @@ const mc = require('minecraft-protocol')
 
 const states = mc.states
 
-var realClient;
-var realServer;
-var toClientMappings;
-var toServerMappings;
-var storedCallback;
+var realClient
+var realServer
+var toClientMappings
+var toServerMappings
+var storedCallback
 
 exports.capabilities = {
   modifyPackets: true,
   jsonData: true
 }
 
-exports.startProxy = function(host, port, listenPort, version, callback, dataFolder) {
-  storedCallback = callback;
+exports.startProxy = function (host, port, listenPort, version, callback, dataFolder) {
+  storedCallback = callback
   const mcdata = require('minecraft-data')(version) // Used to get packets, may remove if I find a better way
-  toClientMappings = mcdata.protocol.play.toClient.types.packet[1][0].type[1].mappings;
-  toServerMappings = mcdata.protocol.play.toServer.types.packet[1][0].type[1].mappings;
+  toClientMappings = mcdata.protocol.play.toClient.types.packet[1][0].type[1].mappings
+  toServerMappings = mcdata.protocol.play.toServer.types.packet[1][0].type[1].mappings
 
   if (host.indexOf(':') !== -1) {
     port = host.substring(host.indexOf(':') + 1)
@@ -32,9 +32,9 @@ exports.startProxy = function(host, port, listenPort, version, callback, dataFol
     keepAlive: false,
     version: version
   })
-  console.log("Proxy started (Java)!");
+  console.log('Proxy started (Java)!')
   srv.on('login', function (client) {
-    realClient = client;
+    realClient = client
     const addr = client.socket.remoteAddress
     console.log('Incoming connection', '(' + addr + ')')
     let endedClient = false
@@ -57,30 +57,26 @@ exports.startProxy = function(host, port, listenPort, version, callback, dataFol
       keepAlive: false,
       version: version
     })
-    realServer = targetClient;
+    realServer = targetClient
     client.on('packet', function (data, meta) {
       if (targetClient.state === states.PLAY && meta.state === states.PLAY) {
-        id = Object.keys(toServerMappings).find(key => toServerMappings[key] === meta.name);
-        callback("serverbound", meta, data, id);
-        /* if (shouldDump(meta.name, 'o')) {
-          console.log('client->server:',
-            client.state + ' ' + meta.name + ' :',
-            JSON.stringify(data))
-        } */
-        if (!endedTargetClient) { targetClient.write(meta.name, data) }
+        const id = Object.keys(toServerMappings).find(key => toServerMappings[key] === meta.name)
+        const direction = 'serverbound' // Stops standardjs complaining (no-callback-literal)
+        // callback(direction, meta, data, id)
+        if (!endedTargetClient) {
+          // targetClient.write(meta.name, data)
+          callback(direction, meta, data, id)
+        }
       }
     })
     targetClient.on('packet', function (data, meta) {
       if (meta.state === states.PLAY && client.state === states.PLAY) {
-        /* if (shouldDump(meta.name, 'i')) {
-          console.log('client<-server:',
-            targetClient.state + '.' + meta.name + ' :' +
-            JSON.stringify(data))
-        } */
-        id = Object.keys(toClientMappings).find(key => toClientMappings[key] === meta.name);
-        callback("clientbound", meta, data, id);
+        const id = Object.keys(toClientMappings).find(key => toClientMappings[key] === meta.name)
+        const direction = 'clientbound' // Stops standardjs complaining (no-callback-literal)
+        // callback(direction, meta, data, id)
         if (!endedClient) {
-          client.write(meta.name, data)
+          // client.write(meta.name, data)
+          callback(direction, meta, data, id)
           if (meta.name === 'set_compression') {
             client.compressionThreshold = data.threshold
           } // Set compression
@@ -133,16 +129,20 @@ exports.startProxy = function(host, port, listenPort, version, callback, dataFol
   })
 }
 
-exports.end = function() {}
+exports.end = function () {}
 
-exports.writeToClient = function(meta, data) {
-  realClient.write(meta.name, data);
-  id = Object.keys(toClientMappings).find(key => toClientMappings[key] === meta.name);
-  storedCallback("clientbound", meta, data, id); // TODO: indicator for injected packets
+exports.writeToClient = function (meta, data, noCallback) {
+  realClient.write(meta.name, data)
+  const id = Object.keys(toClientMappings).find(key => toClientMappings[key] === meta.name)
+  if (!noCallback) {
+    storedCallback('clientbound', meta, data, id) // TODO: indicator for injected packets
+  }
 }
 
-exports.writeToServer = function(meta, data) {
-  realServer.write(meta.name, data);
-  id = Object.keys(toServerMappings).find(key => toServerMappings[key] === meta.name);
-  storedCallback("serverbound", meta, data, id);
+exports.writeToServer = function (meta, data, noCallback) {
+  realServer.write(meta.name, data)
+  const id = Object.keys(toServerMappings).find(key => toServerMappings[key] === meta.name)
+  if (!noCallback) {
+    storedCallback('serverbound', meta, data, id)
+  }
 }

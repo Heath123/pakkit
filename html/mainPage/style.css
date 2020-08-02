@@ -131,6 +131,10 @@ div.dialog {
   height: 260px;
 }
 
+div#Scripting .CodeMirror.CodeMirror {
+  height: calc(100% - 185px);
+}
+
 .packetLink {
   text-decoration: none;
 }

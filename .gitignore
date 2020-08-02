@@ -2,3 +2,7 @@ node_modules/
 node_modules_windows/
 start.bat
 out/
+start.sh
+.idea
+.vscode
+quick_start.sh
