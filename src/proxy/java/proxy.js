@@ -140,6 +140,9 @@ exports.writeToClient = function (meta, data, noCallback) {
 }
 
 exports.writeToServer = function (meta, data, noCallback) {
+  if (typeof meta === 'string') {
+    meta = { name: meta }
+  }
   realServer.write(meta.name, data)
   const id = Object.keys(toServerMappings).find(key => toServerMappings[key] === meta.name)
   if (!noCallback) {
