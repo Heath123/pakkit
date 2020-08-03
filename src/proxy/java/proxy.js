@@ -132,6 +132,9 @@ exports.startProxy = function (host, port, listenPort, version, callback, dataFo
 exports.end = function () {}
 
 exports.writeToClient = function (meta, data, noCallback) {
+  if (typeof meta === 'string') {
+    meta = { name: meta }
+  }
   realClient.write(meta.name, data)
   const id = Object.keys(toClientMappings).find(key => toClientMappings[key] === meta.name)
   if (!noCallback) {
