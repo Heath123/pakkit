@@ -31,6 +31,20 @@ if (!proxyCapabilities.modifyPackets) {
 // let currentPacket Not currently used
 let currentPacketType
 
+let lastFilter = ''
+const filterInput = document.getElementById('filter')
+
+function updateFilter () {
+  const newValue = filterInput.value
+  if (lastFilter !== newValue) {
+    lastFilter = newValue
+    deselectPacket()
+    refreshPackets()
+  }
+}
+
+setInterval(updateFilter, 100)
+
 // TODO: Seperate them like this
 /* let hiddenPackets = {
   server: {}, client: {}
@@ -79,7 +93,7 @@ window.scriptEditor = CodeMirror.fromTextArea(document.getElementById('scriptEdi
 })
 resetScriptEditor()
 
-function updateScript(fromCheckbox) {
+function updateScript (fromCheckbox) {
   if (!((fromCheckbox === true) || document.getElementById('enableScripting').checked)) return
   ipcRenderer.send('scriptStateChange', JSON.stringify({ //
     scriptingEnabled: document.getElementById('enableScripting').checked,
@@ -172,11 +186,28 @@ function refreshPackets () {
   }
 }
 
+function isHiddenByFilter (packet) {
+  if (lastFilter === '') {
+    return false
+  }
+  console.log('Filter applied')
+  if (packet.meta.name.includes(lastFilter)) {
+    console.log(packet.meta.name, 'includes', lastFilter)
+    return false
+  }
+  /* if (JSON.stringify(packet.data).includes(lastFilter)) {
+    return false
+  } */
+  return true
+}
+
 function addPacketToDOM (packet, noUpdate) {
   /* if (!noUpdate) {
     var wasScrolledToBottom = (packetlist.parentElement.scrollTop >= (packetlist.parentElement.scrollHeight - packetlist.parentElement.offsetHeight))
   } */
-  if (hiddenPackets.includes(packet.meta.name)) {
+  const hiddenByFilter = isHiddenByFilter(packet)
+
+  if (hiddenPackets.includes(packet.meta.name) || hiddenByFilter) {
     updateHidden()
     return
   }

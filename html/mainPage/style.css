@@ -12,7 +12,7 @@ body {
 }
 
 .container {
-  height: calc(100% - 120px);
+  height: calc(100% - 154px);
 }
 
 .split, .gutter.gutter-horizontal {
@@ -223,4 +223,14 @@ div#Scripting .CodeMirror.CodeMirror {
   z-index: 1;
   background: #242424;
   height: calc(100vh - 52px);
+}
+
+div.search {
+  height: 34px;
+}
+
+input.filter {
+  box-sizing: border-box;
+  height: 28px;
+  width: 100%;
 }
