@@ -45,6 +45,7 @@
     "electron-squirrel-startup": "^1.0.0",
     "escape-html": "^1.0.3",
     "md5-file": "^5.0.0",
+    "minecraft-data": "^2.69.1",
     "minecraft-protocol": "^1.17.0",
     "node-eval": "^2.0.0",
     "source-map-support": "^0.5.19"
