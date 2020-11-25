@@ -8,7 +8,6 @@ A WIP packet monitor for Minecraft written in Electron.
 
 # Running manually
 
-This is recommended as the release packages will be a bit outdated.<br>
 You need node.js and npm installed. It should work on all OSes that are supported by node.js and Electron.
 
 - Clone the repo
