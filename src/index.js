@@ -18,7 +18,7 @@ const osDataFolder = app.getPath('appData')
 const dataFolder = setupDataFolder.setup(osDataFolder, resourcesPath)
 
 function makeMenu (direction, text, id) {
-  return Menu.buildFromTemplate([
+  let menuData = [
     {
       icon: resourcesPath + `icons/${direction}.png`,
       label: text,
@@ -55,7 +55,23 @@ function makeMenu (direction, text, id) {
         }))
       }
     }
-  ])
+  ]
+
+  if (text.split(' ')[1] === 'position' && direction === 'clientbound') {
+    menuData.splice(3, 0,
+      {
+          label: 'Copy teleport as command',
+          click: () => {
+            BrowserWindow.getAllWindows()[0].send('copyTeleportCommand', JSON.stringify({
+              // Packet ID from link URL
+              id: id
+            }))
+          }
+        }
+    )
+  }
+
+  return Menu.buildFromTemplate(menuData)
 }
 
 function createWindow () {
