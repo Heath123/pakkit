@@ -69,7 +69,7 @@
       <h3>Scripting (beta)</h3>
       Scripting allows you to modify and inject packets on-the-fly
       <br><br>
-      <input type="checkbox" id="enableScripting" name="enableScripting" onchange="updateScript(true)">
+      <input type="checkbox" id="enableScripting" name="enableScripting" onchange="scripting.updateScript(true)">
       <label for="enableScripting">Enable scripting</label>
       <br><br>
       <textarea id="scriptEditor">
@@ -112,6 +112,6 @@
         </div>
     </div>
     <script src="../js/jsonTree.js"></script>
-    <script src="script.js"></script>
+    <script src="js/main.js"></script>
   </body>
 </html>
