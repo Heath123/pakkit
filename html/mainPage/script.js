@@ -272,8 +272,8 @@ ipcRenderer.on('copyTeleportCommand', (event, arg) => {
   data = '/tp @p ' + ((data.flags & 0x01) ? '~' : '') + data.x
                    + ((data.flags & 0x02) ? ' ~' : ' ') + data.y
                    + ((data.flags & 0x04) ? ' ~' : ' ') + data.z
-                   + ((data.flags & 0x08) ? ' ~' : ' ') + data.yaw
                    + ((data.flags & 0x10) ? ' ~' : ' ') + data.pitch
+                   + ((data.flags & 0x08) ? ' ~' : ' ') + data.yaw
   ipcRenderer.send('copyToClipboard', data)
 })
 
