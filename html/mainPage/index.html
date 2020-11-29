@@ -69,7 +69,7 @@
       <h3>Scripting (beta)</h3>
       Scripting allows you to modify and inject packets on-the-fly
       <br><br>
-      <input type="checkbox" id="enableScripting" name="enableScripting" onchange="scripting.updateScript(true)">
+      <input type="checkbox" id="enableScripting" name="enableScripting" onchange="sharedVars.scripting.updateScript(true)">
       <label for="enableScripting">Enable scripting</label>
       <br><br>
       <textarea id="scriptEditor">
@@ -81,14 +81,14 @@
     </div>
 
     <div class="search">
-      <input type="text" class="filter" id="filter" placeholder="Filter by name" onkeyup="updateFilter()">
+      <input type="text" class="filter" id="filter" placeholder="Filter by name (coming soon)" onkeyup="updateFilter()" disabled>
     </div>
 
     <div class="container">
         <div id="packets" class="split">
           <div class="toolbar">
              <a href="#" onclick="clearPackets()">Clear</a>
-             <span id="hiddenPackets"></span>
+             <!-- <span id="hiddenPackets"></span> Removed for now -->
           </div>
           <div class="box clusterize-scroll">
             <ul class="packetlist clusterize-content" id="packetlist">

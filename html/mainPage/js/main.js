@@ -15,7 +15,6 @@ box.onclick = function() {
 }
 */
 
-const { ipcRenderer } = require('electron')
 const Clusterize = require('clusterize.js')
 
 // const mcdata = require('minecraft-data')('1.16.1') // TODO: Multiple versons!!!!!!!!!!!!!!!!!!!!!!!
@@ -23,60 +22,65 @@ const Clusterize = require('clusterize.js')
 // const toServerPackets = mcdata.protocol.play.toServer.types.packet[1][0].type[1].mappings
 // const escapeHtml = require('escape-html'); Already defined in my customised version of jsonTree (I just added HTML escaping)
 
-const proxyCapabilities = JSON.parse(ipcRenderer.sendSync('proxyCapabilities', ''))
-
-if (!proxyCapabilities.modifyPackets) {
-  document.getElementById('editAndResend').style.display = 'none'
-}
-
-// let currentPacket Not currently used
+let currentPacket
 let currentPacketType
 
 let lastFilter = ''
 const filterInput = document.getElementById('filter')
 
 function updateFilter () {
-  const newValue = filterInput.value
+  // TODO
+  /* const newValue = filterInput.value
   if (lastFilter !== newValue) {
     lastFilter = newValue
     deselectPacket()
     refreshPackets()
-  }
+  } */
 }
 
 setInterval(updateFilter, 100)
 
-// TODO: Separate them like this
-/* let hiddenPackets = {
-  server: {}, client: {}
-} */
-
-let hiddenPackets = [
+/* let hiddenPackets = [
   // TODO: Do this properly
   // JE
   'update_time', 'position', 'position', 'keep_alive', 'keep_alive', 'rel_entity_move', 'position_look', 'look', 'position_look', 'map_chunk', 'update_light', 'entity_action', 'entity_update_attributes', 'unload_chunk', 'unload_chunk', 'update_view_position', 'entity_metadata',
   // BE
-  'network_stack_latency', 'level_chunk', 'move_player', 'player_auth_input', 'network_chunk_publisher_update', 'client_cache_blob_status', 'client_cache_miss_response', 'move_entity_delta', 'set_entity_data', 'set_time', 'set_entity_data', 'set_entity_motion', /* "add_entity", */ 'level_event', 'level_sound_event2', 'update_attributes', 'entity_event', 'remove_entity', 'mob_armor_equipment', 'mob_equipment', 'update_block', 'player_action', 'move_entity_absolute'
-]
+  'network_stack_latency', 'level_chunk', 'move_player', 'player_auth_input', 'network_chunk_publisher_update', 'client_cache_blob_status', 'client_cache_miss_response', 'move_entity_delta', 'set_entity_data', 'set_time', 'set_entity_data', 'set_entity_motion', /* "add_entity", *//* 'level_event', 'level_sound_event2', 'update_attributes', 'entity_event', 'remove_entity', 'mob_armor_equipment', 'mob_equipment', 'update_block', 'player_action', 'move_entity_absolute'
+] */
 
 // let dialogOpen = false Not currently used
 
-let allPackets = []
-let allPacketsHTML = []
-let packetsUpdated = true
+sharedVars = {
+  allPackets: [],
+  allPacketsHTML: [],
+  proxyCapabilities : {},
+  ipcRenderer: require('electron').ipcRenderer,
+  packetList: document.getElementById('packetlist'),
+  // TODO: add defaults for Bedrock
+  hiddenPackets: {
+    serverbound: ["position","position_look","look","keep_alive","entity_action"],
+    clientbound: ["keep_alive","update_time","rel_entity_move","entity_teleport","map_chunk","update_light","update_view_position","entity_metadata","entity_update_attributes","unload_chunk","entity_velocity","entity_move_look","entity_head_rotation"]
+  },
+  scripting: undefined
+}
+
+sharedVars.proxyCapabilities = JSON.parse(sharedVars.ipcRenderer.sendSync('proxyCapabilities', ''))
+
+if (!sharedVars.proxyCapabilities.modifyPackets) {
+  document.getElementById('editAndResend').style.display = 'none'
+}
 
 Split(['#packets', '#sidebar'], {
   minSize: [50, 75]
 })
 
-const scripting = require('./js/scripting.js')
-scripting.setup()
-const packetDom = require('./js/packetDom.js')
-packetDom.setup(ipcRenderer, proxyCapabilities)
-const ipcHandler = require('./js/ipcHandler.js')
-ipcHandler.setup(ipcRenderer, allPackets, proxyCapabilities)
+sharedVars.scripting = require('./js/scripting.js')
+sharedVars.scripting.setup(sharedVars)
+sharedVars.packetDom = require('./js/packetDom.js')
+sharedVars.packetDom.setup(sharedVars)
+sharedVars.ipcHandler = require('./js/ipcHandler.js')
+sharedVars.ipcHandler.setup(sharedVars)
 
-const packetList = document.getElementById('packetlist')
 // const filteringPackets = document.getElementById('filtering-packets')
 // const sidebar = document.getElementById('sidebar-box')
 
@@ -84,10 +88,10 @@ const packetList = document.getElementById('packetlist')
 /* function addPacketsToFiltering (packetsObject, direction) {
   for (var key in packetsObject) {
     if (packetsObject.hasOwnProperty(key)) {
-      console.log(!hiddenPackets.includes(packetsObject[key]))
+      console.log(!sharedVars.hiddenPackets.includes(packetsObject[key]))
       filteringPackets.innerHTML +=
      `<li id="${escapeHtml(packetsObject[key])}" class="packet ${direction}">
-        <input type="checkbox" ${!hiddenPackets.includes(packetsObject[key]) ? 'checked' : ''}></input>
+        <input type="checkbox" ${!sharedVars.hiddenPackets.includes(packetsObject[key]) ? 'checked' : ''}></input>
         <span class="id">${escapeHtml(key)}</span>
         <span class="name">${escapeHtml(packetsObject[key])}</span>
       </li>`
@@ -104,18 +108,18 @@ addPacketsToFiltering(toClientPackets, 'clientbound') */
 // Update every 0.05 seconds
 // TODO: Find a better way without updating on every packet (which causes lag)
 window.setInterval(function () {
-  if (packetsUpdated) {
-    const wasScrolledToBottom = (packetList.parentElement.scrollTop >= (packetList.parentElement.scrollHeight - packetList.parentElement.offsetHeight))
-    console.log(wasScrolledToBottom, (packetList.parentElement.scrollHeight - packetList.parentElement.offsetHeight) - packetList.parentElement.scrollTop)
-    clusterize.update(allPacketsHTML)
+  if (sharedVars.packetsUpdated) {
+    const diff = (sharedVars.packetList.parentElement.scrollHeight - sharedVars.packetList.parentElement.offsetHeight) - sharedVars.packetList.parentElement.scrollTop;
+    const wasScrolledToBottom = diff < 5 // If it was scrolled to the bottom or almost scrolled to the bottom
+    clusterize.update(sharedVars.allPacketsHTML)
     if (wasScrolledToBottom) {
-      packetList.parentElement.scrollTop = packetList.parentElement.scrollHeight
-      /* wasScrolledToBottom = (packetlist.parentElement.scrollTop >= (packetlist.parentElement.scrollHeight - packetlist.parentElement.offsetHeight))
-      if (!wasScrolledToBottom) {
-        debugger
-      } */
+      sharedVars.packetList.parentElement.scrollTop = sharedVars.packetList.parentElement.scrollHeight
+      // Also update it later - hacky workaround for scroll bar being "left behind"
+      setTimeout(() => {
+        sharedVars.packetList.parentElement.scrollTop = sharedVars.packetList.parentElement.scrollHeight
+      }, 10)
     }
-    packetsUpdated = false
+    sharedVars.packetsUpdated = false
   }
 }, 50)
 
@@ -127,10 +131,10 @@ window.closeDialog = function () { // window. stops standardjs from complaining
 
 window.resendEdited = function (id, newValue) {
   try {
-    ipcRenderer.send('injectPacket', JSON.stringify({
-      meta: allPackets[id].meta,
+    sharedVars.ipcRenderer.send('injectPacket', JSON.stringify({
+      meta: sharedVars.allPackets[id].meta,
       data: JSON.parse(newValue),
-      direction: allPackets[id].direction
+      direction: sharedVars.allPackets[id].direction
     }))
   } catch (err) {
     alert('Invalid JSON')
@@ -138,7 +142,7 @@ window.resendEdited = function (id, newValue) {
 }
 
 function editAndResend (id) {
-  if (!proxyCapabilities.modifyPackets) {
+  if (!sharedVars.proxyCapabilities.modifyPackets) {
     alert('Edit and Resend is unavailable')
     return
   }
@@ -152,7 +156,7 @@ function editAndResend (id) {
   <button style="margin-top: 16px;" onclick="resendEdited(${id}, packetEditor.getValue())">Send</button>
   <button style="margin-top: 16px;" onclick="closeDialog()">Close</button>`
 
-  document.getElementById('packetEditor').value = JSON.stringify(allPackets[id].data, null, 2)
+  document.getElementById('packetEditor').value = JSON.stringify(sharedVars.allPackets[id].data, null, 2)
 
   window.packetEditor = CodeMirror.fromTextArea(document.getElementById('packetEditor'), { // window. stops standardjs from complaining
     lineNumbers: false,
@@ -161,48 +165,40 @@ function editAndResend (id) {
   })
 }
 
-ipcRenderer.on('editAndResend', (event, arg) => { // Context menu
+sharedVars.ipcRenderer.on('editAndResend', (event, arg) => { // Context menu
   const ipcMessage = JSON.parse(arg)
   editAndResend(ipcMessage.id)
 })
 
-function updateHidden () {
-  const hiddenPacketsAmount = (allPackets.length - allPacketsHTML.length)
-  document.getElementById('hiddenPackets').innerHTML = hiddenPacketsAmount + ' hidden packets'
-  if (hiddenPacketsAmount !== 0) {
-    document.getElementById('hiddenPackets').innerHTML += ' (<a href="#" onclick="showAllPackets()">show all</a>)'
-  }
-}
-
 function deselectPacket () {
-  // currentPacket = undefined
+  currentPacket = undefined
   currentPacketType = undefined
-  treeElement.firstElementChild.innerHTML = 'No packet selected!'
+  sharedVars.packetDom.getTreeElement().firstElementChild.innerHTML = 'No packet selected!'
   document.body.className = 'noPacketSelected'
 }
 
 window.clearPackets = function () { // window. stops standardjs from complaining
-  allPackets = []
-  allPacketsHTML = []
+  sharedVars.allPackets = []
+  sharedVars.allPacketsHTML = []
   deselectPacket()
+  sharedVars.packetsUpdated = true
+  // TODO: Doesn't seem to work? When removing line above it doesn't do anything until the next packet
   clusterize.update([])
 }
 
 window.showAllPackets = function () { // window. stops standardjs from complaining
-  hiddenPackets = []
-  refreshPackets()
-  updateHidden()
+  sharedVars.hiddenPackets = []
 }
 
 window.packetClick = function (id) { // window. stops standardjs from complaining
-                                     // currentPacket = id
+  currentPacket = id
   currentPacketType = document.getElementById('packet' + id).children[1].innerText
   document.body.className = 'packetSelected'
-  if (proxyCapabilities.jsonData) {
+  if (sharedVars.proxyCapabilities.jsonData) {
     // sidebar.innerHTML = '<div style="padding: 10px;">Loading packet data...</div>';
-    packetDom.getTree().loadData(allPackets[id].data)
+    sharedVars.packetDom.getTree().loadData(sharedVars.allPackets[id].data)
   } else {
-    treeElement.innerText = allPackets[id].data.data
+    treeElement.innerText = sharedVars.allPackets[id].data.data
     treeElement.style = `
     color: #0F0;
     white-space: pre;
@@ -213,12 +209,10 @@ window.packetClick = function (id) { // window. stops standardjs from complainin
 }
 
 function hideAll (id) {
-  hiddenPackets.push(currentPacketType)
-  deselectPacket()
-  refreshPackets()
+  sharedVars.hiddenPackets[sharedVars.allPackets[id].direction].push(sharedVars.allPackets[id].meta.name)
 }
 
-ipcRenderer.on('hideAllOfType', (event, arg) => { // Context menu
+sharedVars.ipcRenderer.on('hideAllOfType', (event, arg) => { // Context menu
   const ipcMessage = JSON.parse(arg)
   hideAll(ipcMessage.id)
 })
@@ -246,7 +240,7 @@ document.body.addEventListener('contextmenu', (event) => {
   if (!target || target.tagName !== 'LI') {
     return
   };
-  ipcRenderer.send('contextMenu', JSON.stringify({
+  sharedVars.ipcRenderer.send('contextMenu', JSON.stringify({
     direction: target.className.split(' ')[1],
     text: target.children[0].innerText + ' ' + target.children[1].innerText,
     id: target.id.replace('packet', '')
@@ -254,7 +248,7 @@ document.body.addEventListener('contextmenu', (event) => {
 })
 
 var clusterize = new Clusterize({
-  rows: allPacketsHTML,
-  scrollElem: packetList.parentElement,
-  contentElem: packetList
+  rows: sharedVars.allPacketsHTML,
+  scrollElem: sharedVars.packetList.parentElement,
+  contentElem: sharedVars.packetList
 })

@@ -1,12 +1,16 @@
+let sharedVars
+
 exports.updateScript = function (fromCheckbox) {
   if (!((fromCheckbox === true) || document.getElementById('enableScripting').checked)) return
-  ipcRenderer.send('scriptStateChange', JSON.stringify({ //
+  sharedVars.ipcRenderer.send('scriptStateChange', JSON.stringify({ //
     scriptingEnabled: document.getElementById('enableScripting').checked,
     script: window.scriptEditor.getDoc().getValue()
   }))
 }
 
-exports.setup = function () {
+exports.setup = function (passedSharedVars) {
+  sharedVars = passedSharedVars
+
   const defaultScript = `// See the node-minecraft-protocol docs
 // When editing your scripts, disable scripting or disconnect so
 // you don't get lots of errors.

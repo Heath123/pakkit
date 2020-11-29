@@ -1,121 +1,98 @@
 let tree
+let treeElement
+let sharedVars
 
-exports.setup = function (ipcRenderer, proxyCapabilities) {
-  const treeElement = document.getElementById('tree')
-
-  tree = jsonTree.create({}, treeElement)
-  treeElement.firstElementChild.innerHTML = 'No packet selected!'
-
-  function trimData (data) { // Function to trim the size of stringified data for previews
-    let newData
-    if (proxyCapabilities.jsonData) {
-      newData = Object.assign({}, data)
-      Object.entries(newData).forEach(function (entry) {
-        try {
-          if (JSON.stringify(entry[1]).length > 15) {
-            if (typeof entry[1] === 'number') {
-              newData[entry[0]] = Math.round((entry[1] + Number.EPSILON) * 100) / 100
-            } else {
-              newData[entry[0]] = '...'
-            }
+function trimData (data) { // Function to trim the size of stringified data for previews
+  let newData
+  if (sharedVars.proxyCapabilities.jsonData) {
+    newData = Object.assign({}, data)
+    Object.entries(newData).forEach(function (entry) {
+      try {
+        if (JSON.stringify(entry[1]).length > 15) {
+          if (typeof entry[1] === 'number') {
+            newData[entry[0]] = Math.round((entry[1] + Number.EPSILON) * 100) / 100
+          } else {
+            newData[entry[0]] = '...'
           }
-        } catch (err) {
-
         }
-      })
-      newData = JSON.stringify(newData)
-    } else {
-      newData = data.data
-    }
-    if (newData.length > 750) {
-      newData = newData.slice(0, 750)
-    }
-    return newData
-  }
+      } catch (err) {
 
-  /* ipcRenderer.on('packetDetails', (event, arg) => {
-    ipcMessage = JSON.parse(arg);
-    tree.loadData(ipcMessage.data);
-    // sidebar.innerHTML = `<div style="padding: 10px;">${JSON.stringify(ipcMessage.data)}</div>`;
-  }); All handled here in the renderer now */
-
-  function refreshPackets () {
-    const wasScrolledToBottom = (packetlist.parentElement.scrollTop >= (packetlist.parentElement.scrollHeight - packetlist.parentElement.offsetHeight))
-    /* packetlist.innerHTML = "";
-    packetsToAdd = [];
-    var i;
-    var packetsAdded = 0;
-    for (i = allPackets.length - 1; packetsAdded < 300 && !(i == -1); i--) {
-      if (!hiddenPackets.includes(allPackets[i].meta.name)) {
-        packetsToAdd.push(allPackets[i]);
-        packetsAdded++;
       }
-    } */
-    var allPacketsHTML = []
-    allPackets.forEach(function (packet) {
-      // noUpdate is true as we want to manually update at the end
-      addPacketToDOM(packet, true)
     })
-    clusterize.update(allPacketsHTML)
-    if (wasScrolledToBottom) {
-      packetlist.parentElement.scrollTop = packetlist.parentElement.scrollHeight
-    }
+    newData = JSON.stringify(newData)
+  } else {
+    newData = data.data
   }
-
-  function isHiddenByFilter (packet) {
-    if (lastFilter === '') {
-      return false
-    }
-    console.log('Filter applied')
-    if (packet.meta.name.includes(lastFilter)) {
-      console.log(packet.meta.name, 'includes', lastFilter)
-      return false
-    }
-    /* if (JSON.stringify(packet.data).includes(lastFilter)) {
-      return false
-    } */
-    return true
+  if (newData.length > 750) {
+    newData = newData.slice(0, 750)
   }
+  return newData
+}
 
-  function addPacketToDOM (packet, noUpdate) {
-    /* if (!noUpdate) {
-      var wasScrolledToBottom = (packetlist.parentElement.scrollTop >= (packetlist.parentElement.scrollHeight - packetlist.parentElement.offsetHeight))
-    } */
-    const hiddenByFilter = isHiddenByFilter(packet)
-
-    if (hiddenPackets.includes(packet.meta.name) || hiddenByFilter) {
-      updateHidden()
-      return
-    }
-    allPacketsHTML.push([
-      `<li id="packet${packet.uid}" onclick="packetClick(${packet.uid})" class="packet ${packet.direction}">
+function addPacketToDOM (packet) {
+  sharedVars.allPacketsHTML.push([
+    `<li id="packet${packet.uid}" onclick="packetClick(${packet.uid})" class="packet ${packet.direction}">
         <span class="id">${escapeHtml(packet.hexIdString)}</span>
         <span class="name">${escapeHtml(packet.meta.name)}</span>
         <span class="data">${escapeHtml(trimData(packet.data))}</span>
       </li>`])
-    /* if (!noUpdate) {
-      clusterize.append(allPacketsHTML.slice(-1)[0]);
-      if (wasScrolledToBottom) {
-        packetlist.parentElement.scrollTop = packetlist.parentElement.scrollHeight;
-      }
-    } */
-    packetsUpdated = true
-    // packetlist.style.paddingTop =  offScreenCount * 30 + "px"; // TODO: Make it so you can view these packets
-    /* if (offScreenCount % 2 == 0) {
-      packetlist.className = "packetlist evenNumberHidden";
-    } else {
-      packetlist.className = "packetlist oddNumberHidden";
-    } Maybe add back but differently */
+  /* if (!noUpdate) {
+    clusterize.append(sharedVars.allPacketsHTML.slice(-1)[0]);
+    if (wasScrolledToBottom) {
+      sharedVars.packetList.parentElement.scrollTop = sharedVars.packetList.parentElement.scrollHeight;
+    }
+  } */
+  sharedVars.packetsUpdated = true
 
-    updateHidden()
-  }
+  updateHidden()
+}
 
-  ipcRenderer.on('packet', (event, arg) => {
-    const ipcMessage = JSON.parse(arg)
-    allPackets.push(ipcMessage)
-    ipcMessage.uid = allPackets.length - 1
-    addPacketToDOM(ipcMessage, true)
+function refreshPackets () {
+  // TODO: Is this needed?
+  /* const wasScrolledToBottom = (sharedVars.packetList.parentElement.scrollTop >= (sharedVars.packetList.parentElement.scrollHeight - sharedVars.packetList.parentElement.offsetHeight))
+
+  sharedVars.allPacketsHTML = []
+  sharedVars.allPackets.forEach(function (packet) {
+    // noUpdate is true as we want to manually update at the end
+    addPacketToDOM(packet, true)
   })
+  clusterize.update(sharedVars.allPacketsHTML)
+  /if (wasScrolledToBottom) {
+    sharedVars.packetList.parentElement.scrollTop = sharedVars.packetList.parentElement.scrollHeight
+  } */
+}
+
+function updateHidden() {
+  // TODO: make it work
+  /* hiddenPacketsAmount = (sharedVars.allPackets.length - sharedVars.allPacketsHTML.length);
+  document.getElementById("hiddenPackets").innerHTML = hiddenPacketsAmount + ' hidden packets';
+  if (hiddenPacketsAmount != 0) {
+     document.getElementById("hiddenPackets").innerHTML += ' (<a href="#" onclick="showAllPackets()">show all</a>)'
+  } */
+}
+
+exports.setup = function (passedSharedVars) {
+  sharedVars = passedSharedVars
+
+  treeElement = document.getElementById('tree')
+  tree = jsonTree.create({}, treeElement)
+
+  treeElement.firstElementChild.innerHTML = 'No packet selected!'
+}
+
+exports.addPacket = function (data) {
+  if (sharedVars.hiddenPackets[data.direction].includes(data.meta.name)) {
+    return
+  }
+  sharedVars.allPackets.push(data)
+  data.uid = sharedVars.allPackets.length - 1
+  addPacketToDOM(data)
+}
+
+// TODO: use shared var
+
+exports.getTreeElement = function () {
+  return treeElement
 }
 
 exports.getTree = function () {
