@@ -16,6 +16,7 @@ box.onclick = function() {
 */
 
 const Clusterize = require('clusterize.js')
+const filteringLogic = require('./js/filteringLogic.js')
 
 // const mcdata = require('minecraft-data')('1.16.1') // TODO: Multiple versons!!!!!!!!!!!!!!!!!!!!!!!
 // const toClientPackets = mcdata.protocol.play.toClient.types.packet[1][0].type[1].mappings
@@ -25,17 +26,26 @@ const Clusterize = require('clusterize.js')
 let currentPacket
 let currentPacketType
 
-let lastFilter = ''
 const filterInput = document.getElementById('filter')
 
 function updateFilter () {
   // TODO
-  /* const newValue = filterInput.value
-  if (lastFilter !== newValue) {
-    lastFilter = newValue
+  const newValue = filterInput.value
+  if (sharedVars.lastFilter !== newValue) {
+    sharedVars.lastFilter = newValue
     deselectPacket()
-    refreshPackets()
-  } */
+    sharedVars.allPacketsHTML.forEach(function(item, index, array) {
+      if (!filteringLogic.packetFilteredByFilterBox(sharedVars.allPackets[index], newValue)) {
+        // If it's hidden, show it
+        array[index] = [item[0].replace('filter-hidden', 'filter-shown')]
+      } else {
+        // If it's shown, hide it
+        array[index] = [item[0].replace('filter-shown', 'filter-hidden')]
+      }
+    })
+    clusterize.update(sharedVars.allPacketsHTML)
+    clusterize.refresh()
+  }
 }
 
 setInterval(updateFilter, 100)
@@ -45,7 +55,7 @@ setInterval(updateFilter, 100)
   // JE
   'update_time', 'position', 'position', 'keep_alive', 'keep_alive', 'rel_entity_move', 'position_look', 'look', 'position_look', 'map_chunk', 'update_light', 'entity_action', 'entity_update_attributes', 'unload_chunk', 'unload_chunk', 'update_view_position', 'entity_metadata',
   // BE
-  'network_stack_latency', 'level_chunk', 'move_player', 'player_auth_input', 'network_chunk_publisher_update', 'client_cache_blob_status', 'client_cache_miss_response', 'move_entity_delta', 'set_entity_data', 'set_time', 'set_entity_data', 'set_entity_motion', /* "add_entity", *//* 'level_event', 'level_sound_event2', 'update_attributes', 'entity_event', 'remove_entity', 'mob_armor_equipment', 'mob_equipment', 'update_block', 'player_action', 'move_entity_absolute'
+  'network_stack_latency', 'level_chunk', 'move_player', 'player_auth_input', 'network_chunk_publishehexr_update', 'client_cache_blob_status', 'client_cache_miss_response', 'move_entity_delta', 'set_entity_data', 'set_time', 'set_entity_data', 'set_entity_motion', /* "add_entity", *//* 'level_event', 'level_sound_event2', 'update_attributes', 'entity_event', 'remove_entity', 'mob_armor_equipment', 'mob_equipment', 'update_block', 'player_action', 'move_entity_absolute'
 ] */
 
 // let dialogOpen = false Not currently used
@@ -61,7 +71,8 @@ sharedVars = {
     serverbound: ["position","position_look","look","keep_alive","entity_action"],
     clientbound: ["keep_alive","update_time","rel_entity_move","entity_teleport","map_chunk","update_light","update_view_position","entity_metadata","entity_update_attributes","unload_chunk","entity_velocity","entity_move_look","entity_head_rotation"]
   },
-  scripting: undefined
+  scripting: undefined,
+  lastFilter: ''
 }
 
 sharedVars.proxyCapabilities = JSON.parse(sharedVars.ipcRenderer.sendSync('proxyCapabilities', ''))

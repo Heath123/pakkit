@@ -2,6 +2,8 @@ let tree
 let treeElement
 let sharedVars
 
+const filteringLogic = require('./filteringLogic.js')
+
 function trimData (data) { // Function to trim the size of stringified data for previews
   let newData
   if (sharedVars.proxyCapabilities.jsonData) {
@@ -31,7 +33,9 @@ function trimData (data) { // Function to trim the size of stringified data for 
 
 function addPacketToDOM (packet) {
   sharedVars.allPacketsHTML.push([
-    `<li id="packet${packet.uid}" onclick="packetClick(${packet.uid})" class="packet ${packet.direction}">
+    `<li id="packet${packet.uid}" onclick="packetClick(${packet.uid})" class="packet ${
+      filteringLogic.packetFilteredByFilterBox(packet, sharedVars.lastFilter) ? 'filter-hidden' : 'filter-shown'
+    } ${packet.direction}">
         <span class="id">${escapeHtml(packet.hexIdString)}</span>
         <span class="name">${escapeHtml(packet.meta.name)}</span>
         <span class="data">${escapeHtml(trimData(packet.data))}</span>

@@ -56,6 +56,11 @@ div.toolbar {
   text-overflow: ellipsis;
     color: rgba(255, 255, 255, 0.5);
 }
+
+.packet.filter-hidden {
+  display: none;
+}
+
 .packet.serverbound::before {
   content: "▲";
   color: #00FF00;
