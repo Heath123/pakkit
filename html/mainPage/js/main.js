@@ -18,15 +18,38 @@ box.onclick = function() {
 const Clusterize = require('clusterize.js')
 const filteringLogic = require('./js/filteringLogic.js')
 
-// const mcdata = require('minecraft-data')('1.16.1') // TODO: Multiple versons!!!!!!!!!!!!!!!!!!!!!!!
-// const toClientPackets = mcdata.protocol.play.toClient.types.packet[1][0].type[1].mappings
-// const toServerPackets = mcdata.protocol.play.toServer.types.packet[1][0].type[1].mappings
+const mcdata = require('minecraft-data')('1.16.4') // TODO: Multiple versions!!!!!!!!!!!!!!!!!!!!!!! (important)
+const toClientPackets = mcdata.protocol.play.toClient.types.packet[1][0].type[1].mappings
+const toServerPackets = mcdata.protocol.play.toServer.types.packet[1][0].type[1].mappings
 // const escapeHtml = require('escape-html'); Already defined in my customised version of jsonTree (I just added HTML escaping)
 
 let currentPacket
 let currentPacketType
 
 const filterInput = document.getElementById('filter')
+
+// Cleaned up from https://css-tricks.com/indeterminate-checkboxes/
+function toggleCheckbox (box, packetName, direction) {
+  // TODO: collapsing with indeterminate state
+  /* if (box.readOnly) {
+    box.checked = false
+    box.readOnly = false
+  } else if (!box.checked) {
+    box.readOnly = true
+    box.indeterminate = true
+  } */
+
+  // console.log('Toggled visibility of', packetName, 'to', box.checked)
+  const index = sharedVars.hiddenPackets[direction].indexOf(packetName)
+  const currentlyHidden = index !== -1
+  if (box.checked && currentlyHidden) {
+    // Remove it from the hidden packets
+    sharedVars.hiddenPackets[direction].splice(index, 1)
+  } else if (!box.checked && !currentlyHidden) {
+    // Add it to the hidden packets
+    sharedVars.hiddenPackets[direction].push(packetName)
+  }
+}
 
 function updateFilter () {
   // TODO
@@ -55,7 +78,7 @@ setInterval(updateFilter, 100)
   // JE
   'update_time', 'position', 'position', 'keep_alive', 'keep_alive', 'rel_entity_move', 'position_look', 'look', 'position_look', 'map_chunk', 'update_light', 'entity_action', 'entity_update_attributes', 'unload_chunk', 'unload_chunk', 'update_view_position', 'entity_metadata',
   // BE
-  'network_stack_latency', 'level_chunk', 'move_player', 'player_auth_input', 'network_chunk_publishehexr_update', 'client_cache_blob_status', 'client_cache_miss_response', 'move_entity_delta', 'set_entity_data', 'set_time', 'set_entity_data', 'set_entity_motion', /* "add_entity", *//* 'level_event', 'level_sound_event2', 'update_attributes', 'entity_event', 'remove_entity', 'mob_armor_equipment', 'mob_equipment', 'update_block', 'player_action', 'move_entity_absolute'
+  'network_stack_latency', 'level_chunk', 'move_player', 'player_auth_input', 'network_chunk_publisher_update', 'client_cache_blob_status', 'client_cache_miss_response', 'move_entity_delta', 'set_entity_data', 'set_time', 'set_entity_data', 'set_entity_motion', /* "add_entity", *//* 'level_event', 'level_sound_event2', 'update_attributes', 'entity_event', 'remove_entity', 'mob_armor_equipment', 'mob_equipment', 'update_block', 'player_action', 'move_entity_absolute'
 ] */
 
 // let dialogOpen = false Not currently used
@@ -92,17 +115,29 @@ sharedVars.packetDom.setup(sharedVars)
 sharedVars.ipcHandler = require('./js/ipcHandler.js')
 sharedVars.ipcHandler.setup(sharedVars)
 
-// const filteringPackets = document.getElementById('filtering-packets')
 // const sidebar = document.getElementById('sidebar-box')
 
+
+
+
+
+
+
+
+
+
+// TODO: move to own file
+const filteringPackets = document.getElementById('filtering-packets')
+
 // Filtering - coming soon
-/* function addPacketsToFiltering (packetsObject, direction) {
-  for (var key in packetsObject) {
+function addPacketsToFiltering (packetsObject, direction) {
+  for (const key in packetsObject) {
     if (packetsObject.hasOwnProperty(key)) {
-      console.log(!sharedVars.hiddenPackets.includes(packetsObject[key]))
+      console.log(!sharedVars.hiddenPackets[direction].includes(packetsObject[key]))
       filteringPackets.innerHTML +=
-     `<li id="${escapeHtml(packetsObject[key])}" class="packet ${direction}">
-        <input type="checkbox" ${!sharedVars.hiddenPackets.includes(packetsObject[key]) ? 'checked' : ''}></input>
+     `<li id="${packetsObject[key].replace(/"/g, "&#39;") + '-' + direction}" class="packet ${direction}">
+        <input type="checkbox" ${!sharedVars.hiddenPackets[direction].includes(packetsObject[key]) ? 'checked' : ''}
+            onclick="toggleCheckbox(this, ${JSON.stringify(packetsObject[key]).replace(/"/g, "&#39;")}, '${direction}')"/>
         <span class="id">${escapeHtml(key)}</span>
         <span class="name">${escapeHtml(packetsObject[key])}</span>
       </li>`
@@ -111,8 +146,14 @@ sharedVars.ipcHandler.setup(sharedVars)
   }
 }
 
+
+
+
+
+
+
 addPacketsToFiltering(toServerPackets, 'serverbound')
-addPacketsToFiltering(toClientPackets, 'clientbound') */
+addPacketsToFiltering(toClientPackets, 'clientbound')
 
 
 
@@ -220,7 +261,14 @@ window.packetClick = function (id) { // window. stops standardjs from complainin
 }
 
 function hideAll (id) {
-  sharedVars.hiddenPackets[sharedVars.allPackets[id].direction].push(sharedVars.allPackets[id].meta.name)
+  const packet = sharedVars.allPackets[id]
+  if (sharedVars.hiddenPackets[packet.direction].indexOf(packet.meta.name) === -1) {
+    sharedVars.hiddenPackets[packet.direction].push(packet.meta.name)
+  }
+  const checkbox = document.getElementById(packet.meta.name + '-' + packet.direction).firstElementChild
+  checkbox.checked = false
+  checkbox.readOnly = false
+  checkbox.indeterminate = false
 }
 
 sharedVars.ipcRenderer.on('hideAllOfType', (event, arg) => { // Context menu
