@@ -18,9 +18,6 @@ box.onclick = function() {
 const Clusterize = require('clusterize.js')
 const filteringLogic = require('./js/filteringLogic.js')
 
-const mcdata = require('minecraft-data')('1.16.4') // TODO: Multiple versions!!!!!!!!!!!!!!!!!!!!!!! (important)
-const toClientPackets = mcdata.protocol.play.toClient.types.packet[1][0].type[1].mappings
-const toServerPackets = mcdata.protocol.play.toServer.types.packet[1][0].type[1].mappings
 // const escapeHtml = require('escape-html'); Already defined in my customised version of jsonTree (I just added HTML escaping)
 
 let currentPacket
@@ -83,22 +80,24 @@ setInterval(updateFilter, 100)
 
 // let dialogOpen = false Not currently used
 
+const defaultHiddenPackets = {
+  serverbound: ["position","position_look","look","keep_alive","entity_action"],
+    clientbound: ["keep_alive","update_time","rel_entity_move","entity_teleport","map_chunk","update_light","update_view_position","entity_metadata","entity_update_attributes","unload_chunk","entity_velocity","entity_move_look","entity_head_rotation"]
+},
+
 sharedVars = {
   allPackets: [],
   allPacketsHTML: [],
   proxyCapabilities : {},
   ipcRenderer: require('electron').ipcRenderer,
   packetList: document.getElementById('packetlist'),
-  // TODO: add defaults for Bedrock
-  hiddenPackets: {
-    serverbound: ["position","position_look","look","keep_alive","entity_action"],
-    clientbound: ["keep_alive","update_time","rel_entity_move","entity_teleport","map_chunk","update_light","update_view_position","entity_metadata","entity_update_attributes","unload_chunk","entity_velocity","entity_move_look","entity_head_rotation"]
-  },
+  hiddenPackets: Object.assign({}, defaultHiddenPackets),
   scripting: undefined,
   lastFilter: ''
 }
 
 sharedVars.proxyCapabilities = JSON.parse(sharedVars.ipcRenderer.sendSync('proxyCapabilities', ''))
+console.log(sharedVars.proxyCapabilities)
 
 if (!sharedVars.proxyCapabilities.modifyPackets) {
   document.getElementById('editAndResend').style.display = 'none'
@@ -129,8 +128,32 @@ sharedVars.ipcHandler.setup(sharedVars)
 // TODO: move to own file
 const filteringPackets = document.getElementById('filtering-packets')
 
+function updateFilteringTab () {
+  for (const item of filteringPackets.children) {
+    const name = item.children[2].textContent
+
+    const checkbox = item.firstElementChild
+    checkbox.readOnly = false
+    checkbox.indeterminate = false
+    let isShown = true
+    if (item.className.includes('serverbound') &&
+      sharedVars.hiddenPackets['serverbound'].includes(name)) {
+      isShown = false
+    } else if (item.className.includes('clientbound') &&
+      sharedVars.hiddenPackets['clientbound'].includes(name)) {
+      isShown = false
+    }
+
+    checkbox.checked = isShown
+  }
+}
+
+const allServerboundPackets = []
+const allClientboundPackets = []
+
 // Filtering - coming soon
-function addPacketsToFiltering (packetsObject, direction) {
+function addPacketsToFiltering (packetsObject, direction, appendTo) {
+  console.log('packets', packetsObject)
   for (const key in packetsObject) {
     if (packetsObject.hasOwnProperty(key)) {
       console.log(!sharedVars.hiddenPackets[direction].includes(packetsObject[key]))
@@ -142,6 +165,7 @@ function addPacketsToFiltering (packetsObject, direction) {
         <span class="name">${escapeHtml(packetsObject[key])}</span>
       </li>`
       console.log(key + ' -> ' + packetsObject[key])
+      appendTo.push(packetsObject[key])
     }
   }
 }
@@ -152,8 +176,8 @@ function addPacketsToFiltering (packetsObject, direction) {
 
 
 
-addPacketsToFiltering(toServerPackets, 'serverbound')
-addPacketsToFiltering(toClientPackets, 'clientbound')
+addPacketsToFiltering(sharedVars.proxyCapabilities.serverboundPackets, 'serverbound', allServerboundPackets)
+addPacketsToFiltering(sharedVars.proxyCapabilities.clientboundPackets, 'clientbound', allClientboundPackets)
 
 
 

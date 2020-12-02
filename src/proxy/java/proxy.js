@@ -12,7 +12,9 @@ var storedCallback
 
 exports.capabilities = {
   modifyPackets: true,
-  jsonData: true
+  jsonData: true,
+  clientboundPackets: [],
+  serverboundPackets: []
 }
 
 exports.startProxy = function (host, port, listenPort, version, callback, dataFolder) {
@@ -20,6 +22,9 @@ exports.startProxy = function (host, port, listenPort, version, callback, dataFo
   const mcdata = require('minecraft-data')(version) // Used to get packets, may remove if I find a better way
   toClientMappings = mcdata.protocol.play.toClient.types.packet[1][0].type[1].mappings
   toServerMappings = mcdata.protocol.play.toServer.types.packet[1][0].type[1].mappings
+
+  exports.capabilities.clientboundPackets = mcdata.protocol.play.toClient.types.packet[1][0].type[1].mappings
+  exports.capabilities.serverboundPackets = mcdata.protocol.play.toServer.types.packet[1][0].type[1].mappings
 
   if (host.indexOf(':') !== -1) {
     port = host.substring(host.indexOf(':') + 1)
