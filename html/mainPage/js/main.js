@@ -58,29 +58,36 @@ function toggleCheckbox (box, packetName, direction) {
     // Add it to the hidden packets
     sharedVars.hiddenPackets[direction].push(packetName)
   }
+
+  updateFiltering()
 }
 
-function updateFilter () {
-  // TODO
+function updateFilterBox () {
   const newValue = filterInput.value
   if (sharedVars.lastFilter !== newValue) {
     sharedVars.lastFilter = newValue
     deselectPacket()
-    sharedVars.allPacketsHTML.forEach(function(item, index, array) {
-      if (!filteringLogic.packetFilteredByFilterBox(sharedVars.allPackets[index], newValue)) {
-        // If it's hidden, show it
-        array[index] = [item[0].replace('filter-hidden', 'filter-shown')]
-      } else {
-        // If it's shown, hide it
-        array[index] = [item[0].replace('filter-shown', 'filter-hidden')]
-      }
-    })
-    wrappedClusterizeUpdate(sharedVars.allPacketsHTML)
-    clusterize.refresh()
+    updateFiltering()
   }
 }
 
-setInterval(updateFilter, 100)
+function updateFiltering () {
+  sharedVars.allPacketsHTML.forEach(function(item, index, array) {
+    if (!filteringLogic.packetFilteredByFilterBox(sharedVars.allPackets[index],
+      sharedVars.lastFilter,
+      sharedVars.hiddenPackets)) {
+      // If it's hidden, show it
+      array[index] = [item[0].replace('filter-hidden', 'filter-shown')]
+    } else {
+      // If it's shown, hide it
+      array[index] = [item[0].replace('filter-shown', 'filter-hidden')]
+    }
+  })
+  wrappedClusterizeUpdate(sharedVars.allPacketsHTML)
+  clusterize.refresh()
+}
+
+setInterval(updateFilterBox, 100)
 
 /* let hiddenPackets = [
   // TODO: Do this properly
@@ -305,6 +312,7 @@ function hideAll (id) {
   checkbox.checked = false
   checkbox.readOnly = false
   checkbox.indeterminate = false
+  updateFiltering()
 }
 
 sharedVars.ipcRenderer.on('hideAllOfType', (event, arg) => { // Context menu

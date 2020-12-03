@@ -34,7 +34,7 @@ function trimData (data) { // Function to trim the size of stringified data for 
 function addPacketToDOM (packet) {
   sharedVars.allPacketsHTML.push([
     `<li id="packet${packet.uid}" onclick="packetClick(${packet.uid})" class="packet ${packet.direction} ${
-      filteringLogic.packetFilteredByFilterBox(packet, sharedVars.lastFilter) ? 'filter-hidden' : 'filter-shown'
+      filteringLogic.packetFilteredByFilterBox(packet, sharedVars.lastFilter, sharedVars.hiddenPackets) ? 'filter-hidden' : 'filter-shown'
     }">
         <span class="id">${escapeHtml(packet.hexIdString)}</span>
         <span class="name">${escapeHtml(packet.meta.name)}</span>
@@ -85,9 +85,6 @@ exports.setup = function (passedSharedVars) {
 }
 
 exports.addPacket = function (data) {
-  if (sharedVars.hiddenPackets[data.direction].includes(data.meta.name)) {
-    return
-  }
   sharedVars.allPackets.push(data)
   data.uid = sharedVars.allPackets.length - 1
   addPacketToDOM(data)
