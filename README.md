@@ -16,6 +16,8 @@ You need node.js and npm installed. It should work on all OSes that are supporte
 
 # Screenshots
 
-![image](https://user-images.githubusercontent.com/13787163/97088639-2cbdb600-162a-11eb-92ec-4f15f9ddc534.png)
+![Main screen](https://user-images.githubusercontent.com/13787163/101089192-bf982b80-35ac-11eb-85e2-956c84fe3274.png)
+![Filtering](https://user-images.githubusercontent.com/13787163/101089234-cc1c8400-35ac-11eb-85dc-921330f2b3dd.png)
+![Scripting](https://user-images.githubusercontent.com/13787163/101089267-d50d5580-35ac-11eb-9fa6-8ea4242e887f.png)
 
 Logo from https://www.needpix.com/photo/72249/package-parcel-packet-box-cardboard-icon
