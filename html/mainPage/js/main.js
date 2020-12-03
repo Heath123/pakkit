@@ -25,6 +25,18 @@ let currentPacketType
 
 const filterInput = document.getElementById('filter')
 
+// Should improve performance by excluding hidden packets
+function wrappedClusterizeUpdate (htmlArray) {
+  const newArray = []
+  for (const item of htmlArray) {
+    if (!item[0]
+      .match(/<li .* class=".*filter-hidden">/)) {
+      newArray.push(item)
+    }
+  }
+  clusterize.update(newArray)
+}
+
 // Cleaned up from https://css-tricks.com/indeterminate-checkboxes/
 function toggleCheckbox (box, packetName, direction) {
   // TODO: collapsing with indeterminate state
@@ -63,7 +75,7 @@ function updateFilter () {
         array[index] = [item[0].replace('filter-shown', 'filter-hidden')]
       }
     })
-    clusterize.update(sharedVars.allPacketsHTML)
+    wrappedClusterizeUpdate(sharedVars.allPacketsHTML)
     clusterize.refresh()
   }
 }
@@ -187,7 +199,7 @@ window.setInterval(function () {
   if (sharedVars.packetsUpdated) {
     const diff = (sharedVars.packetList.parentElement.scrollHeight - sharedVars.packetList.parentElement.offsetHeight) - sharedVars.packetList.parentElement.scrollTop;
     const wasScrolledToBottom = diff < 5 // If it was scrolled to the bottom or almost scrolled to the bottom
-    clusterize.update(sharedVars.allPacketsHTML)
+    wrappedClusterizeUpdate(sharedVars.allPacketsHTML)
     if (wasScrolledToBottom) {
       sharedVars.packetList.parentElement.scrollTop = sharedVars.packetList.parentElement.scrollHeight
       // Also update it later - hacky workaround for scroll bar being "left behind"
@@ -259,7 +271,7 @@ window.clearPackets = function () { // window. stops standardjs from complaining
   deselectPacket()
   sharedVars.packetsUpdated = true
   // TODO: Doesn't seem to work? When removing line above it doesn't do anything until the next packet
-  clusterize.update([])
+  wrappedClusterizeUpdate([])
 }
 
 window.showAllPackets = function () { // window. stops standardjs from complaining
