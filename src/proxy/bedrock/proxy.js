@@ -58,7 +58,7 @@ exports.capabilities = {
   jsonData: false
 }
 
-exports.startProxy = function (host, port, listenPort, version, callback, dataFolder) {
+exports.startProxy = function (host, port, listenPort, version, authConsent, callback, dataFolder) {
   storedCallback = callback
   fs.writeFileSync(dataFolder + '/proxypass/config.yml', `
   proxy:

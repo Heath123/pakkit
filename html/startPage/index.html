@@ -85,6 +85,13 @@
         <label for="listen-port">Listen port:</label>
         <input type="text" name="listen-port" id="listen-port" value="25566" placeholder="25566">
       </p>
+      <div id="consent-box" style="display: none;">
+        <br>
+        <p>
+          <label for="consent">Consent</label>
+          <input id="consent" type="checkbox" value="consent"> Allow pakkit to use my auth token from launcher_profiles.json for logging in to online mode servers (can be revoked by pressing F12 and typing <code>localStorage.authConsentGiven = false</code>)
+        </p>
+      </div>
       <br>
       <p>
         <label for="start"></label>

@@ -8,6 +8,10 @@ new customTitlebar.Titlebar({
     backgroundColor: customTitlebar.Color.fromHex('#FFF')
 }); */
 
+if (localStorage.getItem('authConsentGiven') !== 'true') {
+  document.getElementById('consent-box').style.display = 'contents'
+}
+
 var isLoading = false
 
 let connectAddress
@@ -87,7 +91,11 @@ window.startProxy = function (event) {
     connectPort = (connectPort === '') ? '25565' : connectPort
     listenPort = (listenPort === '') ? '25566' : listenPort
   }
+  if (document.getElementById('consent').checked) {
+    localStorage.setItem('authConsentGiven', 'true')
+  }
   ipcRenderer.send('startProxy', JSON.stringify({
+    consent: localStorage.getItem('authConsentGiven') === 'true',
     connectAddress: connectAddress,
     connectPort: connectPort,
     listenPort: listenPort,

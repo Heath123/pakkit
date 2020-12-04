@@ -46,7 +46,8 @@
     "escape-html": "^1.0.3",
     "md5-file": "^5.0.0",
     "minecraft-data": "^2.70.2",
-    "minecraft-protocol": "^1.19.0",
+    "minecraft-folder-path": "^1.1.0",
+    "minecraft-protocol": "github:Heath123/node-minecraft-protocol#ph0t0shop",
     "node-eval": "^2.0.0",
     "source-map-support": "^0.5.19"
   }

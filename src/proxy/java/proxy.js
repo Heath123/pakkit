@@ -1,6 +1,7 @@
 // Modified from https://github.com/PrismarineJS/node-minecraft-protocol/blob/master/examples/proxy/proxy.js
 
 const mc = require('minecraft-protocol')
+const minecraftFolder = require('minecraft-folder-path')
 
 const states = mc.states
 
@@ -17,7 +18,7 @@ exports.capabilities = {
   serverboundPackets: []
 }
 
-exports.startProxy = function (host, port, listenPort, version, callback, dataFolder) {
+exports.startProxy = function (host, port, listenPort, version, authConsent, callback, dataFolder) {
   storedCallback = callback
   const mcdata = require('minecraft-data')(version) // Used to get packets, may remove if I find a better way
   toClientMappings = mcdata.protocol.play.toClient.types.packet[1][0].type[1].mappings
@@ -55,12 +56,18 @@ exports.startProxy = function (host, port, listenPort, version, callback, dataFo
       console.log(err.stack)
       if (!endedTargetClient) { targetClient.end('Error') }
     })
+    if (authConsent) {
+      console.log('Will attempt to use launcher_profiles.json for online mode login data')
+    } else {
+      console.warn('Consent not given to use launcher_profiles.json - online mode will not work')
+    }
     const targetClient = mc.createClient({
       host: host,
       port: port,
       username: client.username,
       keepAlive: false,
-      version: version
+      version: version,
+      profilesFolder: authConsent ? minecraftFolder : undefined
     })
     realServer = targetClient
     client.on('packet', function (data, meta) {
