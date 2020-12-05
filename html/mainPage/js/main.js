@@ -31,6 +31,7 @@ function wrappedClusterizeUpdate (htmlArray) {
   for (const item of htmlArray) {
     if (!item[0]
       .match(/<li .* class=".*filter-hidden">/)) {
+
       newArray.push(item)
     }
   }
@@ -337,12 +338,20 @@ window.openMenu = function (evt, MenuName, id) { // window. stops standardjs fro
 
 document.body.addEventListener('contextmenu', (event) => {
   let target = event.srcElement
+
   if (target.tagName !== 'LI') {
     target = target.parentElement
   }
+
   if (!target || target.tagName !== 'LI') {
     return
-  };
+  }
+
+  // Don't allow right clicking in the filtering tab or on other places
+  if (target.parentElement.parentElement.id !== 'packetcontainer') {
+    return
+  }
+
   sharedVars.ipcRenderer.send('contextMenu', JSON.stringify({
     direction: target.className.split(' ')[1],
     text: target.children[0].innerText + ' ' + target.children[1].innerText,
@@ -353,5 +362,6 @@ document.body.addEventListener('contextmenu', (event) => {
 var clusterize = new Clusterize({
   rows: sharedVars.allPacketsHTML,
   scrollElem: sharedVars.packetList.parentElement,
-  contentElem: sharedVars.packetList
+  contentElem: sharedVars.packetList,
+  no_data_text: ''
 })

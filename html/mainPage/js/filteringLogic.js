@@ -10,3 +10,7 @@ exports.packetFilteredByFilterBox = function (packet, filter, hiddenPackets) {
   const comparisonString = packet.hexIdString + ' ' + packet.meta.name + ' ' + JSON.stringify(packet.data)
   return !comparisonString.includes(filter)
 }
+
+exports.packetCollapsed = function (packet, filter, hiddenPackets) {
+  return packet.meta.name === 'position'
+}

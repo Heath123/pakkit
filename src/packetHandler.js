@@ -24,8 +24,6 @@ exports.init = function (window, passedIpcMain, passedProxy) {
   ipcMain = passedIpcMain
   proxy = passedProxy
 
-  console.log('init')
-
   ipcMain.on('injectPacket', (event, arg) => {
     const ipcMessage = JSON.parse(arg)
     if (ipcMessage.direction === 'clientbound') {

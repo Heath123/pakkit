@@ -1,4 +1,5 @@
 const { app, BrowserWindow, ipcMain, clipboard, Menu } = require('electron')
+app.allowRendererProcessReuse = true
 
 const javaProxy = require('./proxy/java/proxy.js')
 const bedrockProxy = require('./proxy/bedrock/proxy.js')
@@ -18,6 +19,11 @@ const osDataFolder = app.getPath('appData')
 const dataFolder = setupDataFolder.setup(osDataFolder, resourcesPath)
 
 function makeMenu (direction, text, id) {
+  if (direction !== 'clientbound' && direction !== 'serverbound') {
+    // This probably isn't a packet
+    return
+  }
+
   let menuData = [
     {
       icon: resourcesPath + `icons/${direction}.png`,
@@ -142,7 +148,6 @@ ipcMain.on('copyToClipboard', (event, arg) => {
 
 ipcMain.on('contextMenu', (event, arg) => {
   const ipcMessage = JSON.parse(arg)
-  console.log(ipcMessage)
   makeMenu(ipcMessage.direction, ipcMessage.text, ipcMessage.id).popup(BrowserWindow.getAllWindows()[0])
 })
 
