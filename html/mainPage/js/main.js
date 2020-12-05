@@ -25,14 +25,25 @@ let currentPacketType
 
 const filterInput = document.getElementById('filter')
 
-// Should improve performance by excluding hidden packets
+// Should improve performance by excluding hidden packets, and also collapses packets
+// (maybe I should put that part somewhere else)
 function wrappedClusterizeUpdate (htmlArray) {
   const newArray = []
-  for (const item of htmlArray) {
-    if (!item[0]
-      .match(/<li .* class=".*filter-hidden">/)) {
-
+  const visiblePacketIndexes = []
+  for (let i = 0; i < htmlArray.length; i++) {
+    const item = htmlArray[i]
+    if (!item[0].match(/<li .* class=".*filter-hidden">/)) {
+      if (visiblePacketIndexes.length !== 0) {
+        const previousVisiblePacket = sharedVars.allPackets[visiblePacketIndexes[visiblePacketIndexes.length - 1]]
+        const packet = sharedVars.allPackets[i]
+        // Same as previous
+        if (filteringLogic.packetCollapsed(previousVisiblePacket, packet, sharedVars.collapsedPackets)) {
+          newArray[newArray.length - 1] = [filteringLogic.buildOrIncrementHeader(packet, newArray[newArray.length - 1][0])]
+          continue
+        }
+      }
       newArray.push(item)
+      visiblePacketIndexes.push(i)
     }
   }
   clusterize.update(newArray)
@@ -40,24 +51,33 @@ function wrappedClusterizeUpdate (htmlArray) {
 
 // Cleaned up from https://css-tricks.com/indeterminate-checkboxes/
 function toggleCheckbox (box, packetName, direction) {
-  // TODO: collapsing with indeterminate state
-  /* if (box.readOnly) {
+  if (box.readOnly) {
     box.checked = false
     box.readOnly = false
   } else if (!box.checked) {
     box.readOnly = true
     box.indeterminate = true
-  } */
+  }
 
   // console.log('Toggled visibility of', packetName, 'to', box.checked)
   const index = sharedVars.hiddenPackets[direction].indexOf(packetName)
   const currentlyHidden = index !== -1
-  if (box.checked && currentlyHidden) {
+  if ((box.checked || box.indeterminate) && currentlyHidden) {
     // Remove it from the hidden packets
     sharedVars.hiddenPackets[direction].splice(index, 1)
-  } else if (!box.checked && !currentlyHidden) {
+  } else if (!(box.checked || box.indeterminate) && !currentlyHidden) {
     // Add it to the hidden packets
     sharedVars.hiddenPackets[direction].push(packetName)
+  }
+
+  const index2 = sharedVars.collapsedPackets[direction].indexOf(packetName)
+  const currentlyCollapsed = index2 !== -1
+  if (!box.indeterminate && currentlyCollapsed) {
+    // Remove it from the collapsed packets
+    sharedVars.collapsedPackets[direction].splice(index, 1)
+  } else if (box.indeterminate && !currentlyCollapsed) {
+    // Add it to the hidden packets
+    sharedVars.collapsedPackets[direction].push(packetName)
   }
 
   updateFiltering()
@@ -101,9 +121,14 @@ setInterval(updateFilterBox, 100)
 // let dialogOpen = false Not currently used
 
 const defaultHiddenPackets = {
-  serverbound: ["position","position_look","look","keep_alive","entity_action"],
-    clientbound: ["keep_alive","update_time","rel_entity_move","entity_teleport","map_chunk","update_light","update_view_position","entity_metadata","entity_update_attributes","unload_chunk","entity_velocity","entity_move_look","entity_head_rotation"]
-},
+  serverbound: [/*"position"*/,"position_look","look","keep_alive","entity_action"],
+  clientbound: ["keep_alive","update_time","rel_entity_move","entity_teleport","map_chunk","update_light","update_view_position","entity_metadata","entity_update_attributes","unload_chunk","entity_velocity","entity_move_look","entity_head_rotation"]
+}
+
+const defaultCollapsedPackets = {
+  serverbound: ["position"],
+  clientbound: []
+}
 
 sharedVars = {
   allPackets: [],
@@ -112,6 +137,7 @@ sharedVars = {
   ipcRenderer: require('electron').ipcRenderer,
   packetList: document.getElementById('packetlist'),
   hiddenPackets: Object.assign({}, defaultHiddenPackets),
+  collapsedPackets: Object.assign({}, defaultCollapsedPackets),
   scripting: undefined,
   lastFilter: ''
 }
@@ -176,15 +202,15 @@ function addPacketsToFiltering (packetsObject, direction, appendTo) {
   console.log('packets', packetsObject)
   for (const key in packetsObject) {
     if (packetsObject.hasOwnProperty(key)) {
-      console.log(!sharedVars.hiddenPackets[direction].includes(packetsObject[key]))
       filteringPackets.innerHTML +=
      `<li id="${packetsObject[key].replace(/"/g, "&#39;") + '-' + direction}" class="packet ${direction}">
-        <input type="checkbox" ${!sharedVars.hiddenPackets[direction].includes(packetsObject[key]) ? 'checked' : ''}
+        <input type="checkbox"
+            ${(!sharedVars.hiddenPackets[direction].includes(packetsObject[key]) && !sharedVars.collapsedPackets[direction].includes(packetsObject[key])) ? 'checked' : ''}
+            ${sharedVars.collapsedPackets[direction].includes(packetsObject[key]) ? 'class="collapsed-checkbox"' : ''}
             onclick="toggleCheckbox(this, ${JSON.stringify(packetsObject[key]).replace(/"/g, "&#39;")}, '${direction}')"/>
         <span class="id">${escapeHtml(key)}</span>
         <span class="name">${escapeHtml(packetsObject[key])}</span>
       </li>`
-      console.log(key + ' -> ' + packetsObject[key])
       appendTo.push(packetsObject[key])
     }
   }
@@ -199,7 +225,14 @@ function addPacketsToFiltering (packetsObject, direction, appendTo) {
 addPacketsToFiltering(sharedVars.proxyCapabilities.serverboundPackets, 'serverbound', allServerboundPackets)
 addPacketsToFiltering(sharedVars.proxyCapabilities.clientboundPackets, 'clientbound', allClientboundPackets)
 
-
+for (const element of document.getElementsByClassName('collapsed-checkbox')) {
+  // Set checkbox to indeterminate
+  element.indeterminate = true
+  // Used as a flag fro the 3-state code
+  element.readOnly = true
+  // Remove class
+  element.className = ''
+}
 
 // Update every 0.05 seconds
 // TODO: Find a better way without updating on every packet (which causes lag)

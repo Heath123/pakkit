@@ -54,11 +54,23 @@ div.toolbar {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-    color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .packet.filter-hidden {
   display: none;
+}
+
+.packet.header {
+  background: rgb(45, 45, 45);
+  border-radius: 10px;
+}
+
+span.header-count {
+  background: #505050;
+  color: white;
+  border-radius: 10px;
+  padding: 0 5px 0 5px;
 }
 
 .packet.serverbound::before {
