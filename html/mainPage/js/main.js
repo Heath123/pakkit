@@ -46,7 +46,8 @@ function wrappedClusterizeUpdate (htmlArray) {
             newArray[newArray.length - 1] = [result.newHtml]
             continue
           } else {
-            // TODO
+            // Make last packet have grouped class
+            newArray[newArray.length - 1] = [newArray[newArray.length - 1][0].replace('filter-shown', 'filter-shown grouped')]
             // Insert header
             newArray.splice(newArray.length - 1, 0, [result.newHtml])
             const firstPacket = packet
@@ -64,8 +65,8 @@ function wrappedClusterizeUpdate (htmlArray) {
               newArray.push([item[0].replace('filter-shown', 'filter-shown grouped')])
               i++
             }
-            console.log('Still collapsed?' , filteringLogic.packetCollapsed(firstPacket, packet, sharedVars.collapsedPackets), firstPacket, packet)
-            console.log('Before end?', i < htmlArray.length)
+            newArray.push([item[0].replace('filter-shown', 'filter-shown grouped-last')])
+            continue
           }
         }
       }

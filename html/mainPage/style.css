@@ -75,6 +75,11 @@ div.toolbar {
   background: rgb(50, 50, 50);
 }
 
+.packet.grouped-last {
+  background: rgb(50, 50, 50);
+  border-radius: 0 0 10px 10px;
+}
+
 span.header-count {
   background: #505050;
   color: white;
