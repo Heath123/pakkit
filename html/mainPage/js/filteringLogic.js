@@ -18,18 +18,26 @@ exports.packetCollapsed = function (packet1, packet2, collapsedPackets) {
     && packet1.direction === packet2.direction
 }
 
-exports.buildOrIncrementHeader = function (packet, existingHtml) {
-  if (existingHtml.match(/<li .* class=".*header">/)) {
+exports.buildOrIncrementHeader = function (packet, existingHtml, groupId, expandedGroups) {
+  if (existingHtml.match(/<li .* class=".*header/)) {
     // Increment existing header
     const countRegex = /<span class="header-count">([0-9]*)<\/span>/
     const incrementedNum = +countRegex.exec(existingHtml)[1] + 1
-    return existingHtml.replace(countRegex, `<span class="header-count">${incrementedNum}</span>`)
+    return {
+      newHtml: existingHtml.replace(countRegex, `<span class="header-count">${incrementedNum}</span>`),
+      shouldReplace: !expandedGroups.includes(groupId),
+      newGroupId: groupId
+    }
   } else {
     // Build new header
-    return `<li id="packet1" onclick="packetClick(1)" class="packet serverbound header">
-              ▶ <span class="header-count">2</span>
-              <span class="id">${packet.hexIdString}</span> <!-- TODO -->
-              <span class="name">${packet.meta.name}</span>
-            </li>`
+    return {
+      newHtml: `<li id="group${groupId}" onclick="groupClick(${groupId})" class="packet serverbound ${expandedGroups.includes(groupId) ? 'header-expanded' : 'header'}">
+                  ${expandedGroups.includes(groupId) ? '▾' : '▸'} <span class="header-count">2</span>
+                  <span class="id">${packet.hexIdString}</span> <!-- TODO -->
+                  <span class="name">${packet.meta.name}</span>
+                </li>`,
+      shouldReplace: !expandedGroups.includes(groupId),
+      newGroupId: groupId + 1
+    }
   }
 }

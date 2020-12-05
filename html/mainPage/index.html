@@ -66,16 +66,16 @@
       <button style="margin-left: 8px;" onclick="sharedVars.hiddenPackets = {
         serverbound: allServerboundPackets, clientbound: allClientboundPackets
       }
-      updateFiltering()">Hide all</button>
+      updateFilteringTab()">Hide all</button>
 
       <button style="margin-left: 8px;" onclick="sharedVars.hiddenPackets = Object.assign({}, defaultHiddenPackets)
-      updateFiltering()">Defaults</button>
+      updateFilteringTab()">Defaults</button>
 
       <button style="margin-left: 8px;" onclick="sharedVars.hiddenPackets = {
         serverbound: ['query_block_nbt','set_difficulty','client_command','settings','tab_complete','transaction','enchant_item','window_click','close_window','custom_payload','edit_book','query_entity_nbt','use_entity','generate_structure','keep_alive','lock_difficulty','pick_item','craft_recipe_request','block_dig','entity_action','steer_vehicle','displayed_recipe','recipe_book','name_item','resource_pack_receive','advancement_tab','select_trade','set_beacon_effect','held_item_slot','update_command_block','update_command_block_minecart','set_creative_slot','update_jigsaw_block','update_structure_block','update_sign','arm_animation','spectate','block_place','use_item'],
         clientbound: ['spawn_entity','spawn_entity_experience_orb','spawn_entity_living','spawn_entity_painting','named_entity_spawn','animation','statistics','acknowledge_player_digging','block_break_animation','tile_entity_data','block_action','block_change','boss_bar','difficulty','tab_complete','declare_commands','transaction','close_window','window_items','craft_progress_bar','set_slot','set_cooldown','custom_payload','named_sound_effect','kick_disconnect','entity_status','explosion','unload_chunk','game_state_change','open_horse_window','keep_alive','map_chunk','world_event','world_particles','update_light','login','map','trade_list','rel_entity_move','entity_move_look','entity_look','entity','open_book','open_window','open_sign_entity','craft_recipe_response','abilities','combat_event','unlock_recipes','entity_destroy','remove_entity_effect','resource_pack_send','entity_head_rotation','multi_block_change','select_advancement_tab','world_border','camera','held_item_slot','update_view_position','update_view_distance','scoreboard_display_objective','entity_metadata','attach_entity','entity_velocity','entity_equipment','experience','update_health','scoreboard_objective','set_passengers','teams','scoreboard_score','update_time','title','entity_sound_effect','sound_effect','stop_sound','playerlist_header','nbt_query_response','collect','entity_teleport','advancements','entity_update_attributes','declare_recipes','tags','entity_effect']
       }
-      updateFiltering()">Preset: Player movement</button>
+      updateFilteringTab()">Preset: Player movement</button>
 
       <br><br>
       <div class="box" style="height: calc(100% - 118px);">

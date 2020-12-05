@@ -28,18 +28,45 @@ const filterInput = document.getElementById('filter')
 // Should improve performance by excluding hidden packets, and also collapses packets
 // (maybe I should put that part somewhere else)
 function wrappedClusterizeUpdate (htmlArray) {
+  let groupId = 0
   const newArray = []
   const visiblePacketIndexes = []
   for (let i = 0; i < htmlArray.length; i++) {
-    const item = htmlArray[i]
+    let item = htmlArray[i]
     if (!item[0].match(/<li .* class=".*filter-hidden">/)) {
       if (visiblePacketIndexes.length !== 0) {
         const previousVisiblePacket = sharedVars.allPackets[visiblePacketIndexes[visiblePacketIndexes.length - 1]]
-        const packet = sharedVars.allPackets[i]
+        let packet = sharedVars.allPackets[i]
         // Same as previous
         if (filteringLogic.packetCollapsed(previousVisiblePacket, packet, sharedVars.collapsedPackets)) {
-          newArray[newArray.length - 1] = [filteringLogic.buildOrIncrementHeader(packet, newArray[newArray.length - 1][0])]
-          continue
+          const result = filteringLogic.buildOrIncrementHeader(packet, newArray[newArray.length - 1][0], groupId, sharedVars.expandedGroups)
+          groupId = result.newGroupId
+          if (result.shouldReplace) {
+            // Replace previous and current with header
+            newArray[newArray.length - 1] = [result.newHtml]
+            continue
+          } else {
+            // TODO
+            // Insert header
+            newArray.splice(newArray.length - 1, 0, [result.newHtml])
+            const firstPacket = packet
+            while (filteringLogic.packetCollapsed(firstPacket, packet, sharedVars.collapsedPackets) &&
+              i < htmlArray.length) {
+              // debugger
+              if (htmlArray[i][0].match(/<li .* class=".*filter-hidden">/)) {
+                // If hidden, ignore
+                i++
+                continue
+              }
+              item = htmlArray[i]
+              packet = sharedVars.allPackets[i]
+              // TODO: More robust replace?
+              newArray.push([item[0].replace('filter-shown', 'filter-shown grouped')])
+              i++
+            }
+            console.log('Still collapsed?' , filteringLogic.packetCollapsed(firstPacket, packet, sharedVars.collapsedPackets), firstPacket, packet)
+            console.log('Before end?', i < htmlArray.length)
+          }
         }
       }
       newArray.push(item)
@@ -139,7 +166,8 @@ sharedVars = {
   hiddenPackets: Object.assign({}, defaultHiddenPackets),
   collapsedPackets: Object.assign({}, defaultCollapsedPackets),
   scripting: undefined,
-  lastFilter: ''
+  lastFilter: '',
+  expandedGroups: [] // TODO: Does this need to be shared?
 }
 
 sharedVars.proxyCapabilities = JSON.parse(sharedVars.ipcRenderer.sendSync('proxyCapabilities', ''))
@@ -192,6 +220,8 @@ function updateFilteringTab () {
 
     checkbox.checked = isShown
   }
+
+  updateFiltering()
 }
 
 const allServerboundPackets = []
@@ -309,15 +339,17 @@ function deselectPacket () {
 window.clearPackets = function () { // window. stops standardjs from complaining
   sharedVars.allPackets = []
   sharedVars.allPacketsHTML = []
+  sharedVars.expandedGroups = []
   deselectPacket()
   sharedVars.packetsUpdated = true
   // TODO: Doesn't seem to work? When removing line above it doesn't do anything until the next packet
   wrappedClusterizeUpdate([])
 }
 
-window.showAllPackets = function () { // window. stops standardjs from complaining
-  sharedVars.hiddenPackets = []
-}
+// TODO: Add back
+/* window.showAllPackets = function () { // window. stops standardjs from complaining
+  sharedVars.hiddenPackets =
+} */
 
 window.packetClick = function (id) { // window. stops standardjs from complaining
   currentPacket = id
@@ -335,6 +367,19 @@ window.packetClick = function (id) { // window. stops standardjs from complainin
     font-size: 14px;
     display: block;`
   }
+}
+
+window.groupClick = function (id) { // window. stops standardjs from complaining
+  console.log('Clicked group', id)
+  debugger
+  if (sharedVars.expandedGroups.includes(id)) {
+    const index = sharedVars.expandedGroups.indexOf(id)
+    sharedVars.expandedGroups.splice(index, 1)
+  } else {
+    sharedVars.expandedGroups.push(id)
+  }
+  wrappedClusterizeUpdate(sharedVars.allPacketsHTML)
+  clusterize.refresh()
 }
 
 function hideAll (id) {

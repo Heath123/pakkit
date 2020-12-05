@@ -66,6 +66,15 @@ div.toolbar {
   border-radius: 10px;
 }
 
+.packet.header-expanded {
+  background: rgb(45, 45, 45);
+  border-radius: 10px 10px 0 0;
+}
+
+.packet.grouped {
+  background: rgb(50, 50, 50);
+}
+
 span.header-count {
   background: #505050;
   color: white;
