@@ -151,5 +151,10 @@ ipcMain.on('contextMenu', (event, arg) => {
   makeMenu(ipcMessage.direction, ipcMessage.text, ipcMessage.id).popup(BrowserWindow.getAllWindows()[0])
 })
 
+ipcMain.on('relaunchApp', (event, arg) => {
+  app.relaunch()
+  app.exit()
+})
+
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.

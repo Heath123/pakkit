@@ -1,137 +1,145 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width">
+    <meta content="width=device-width" name="viewport">
     <title>pakkit</title>
-    <link href="style.css" rel="stylesheet" type="text/css" />
-    <link href="../scrollbar.css" rel="stylesheet" type="text/css" />
-    <link href="../shared.css" rel="stylesheet" type="text/css" />
-    <link href="../clusterize.css" rel="stylesheet" type="text/css" />
-    <link href="../jsonTree.css" rel="stylesheet" />
-    <link href="../jsonTreeCustom.css" rel="stylesheet" />
+    <link href="style.css" rel="stylesheet" type="text/css"/>
+    <link href="../scrollbar.css" rel="stylesheet" type="text/css"/>
+    <link href="../shared.css" rel="stylesheet" type="text/css"/>
+    <link href="../clusterize.css" rel="stylesheet" type="text/css"/>
+    <link href="../jsonTree.css" rel="stylesheet"/>
+    <link href="../jsonTreeCustom.css" rel="stylesheet"/>
     <script src="../js/split.min.js"></script>
-    <link rel=stylesheet href="../codemirror/lib/codemirror.css">
+    <link href="../codemirror/lib/codemirror.css" rel=stylesheet>
     <script src="../codemirror/lib/codemirror.js"></script>
     <script src="../codemirror/mode/javascript/javascript.js"></script>
     <script src="../codemirror/addon/edit/closebrackets.js"></script>
     <script src="../codemirror/addon/display/autorefresh.js"></script>
-    <link rel="stylesheet" href="../codemirror/theme/darcula.css">
-  </head>
-  <body class="noPacketSelected">
-    <div id="dialog-overlay" class="dialog-overlay">
-      <div class="dialog" id="dialog">
+    <link href="../codemirror/theme/darcula.css" rel="stylesheet">
+</head>
+<body class="noPacketSelected">
+<div class="dialog-overlay" id="dialog-overlay">
+    <div class="dialog" id="dialog">
 
-      </div>
     </div>
+</div>
 
-    <div class="topbar-colour"></div>
+<div class="topbar-colour"></div>
 
-    <div class="topbar">
+<div class="topbar">
 
 
     <!-- W3Schools code !-->
     <div class="tab">
-      <button class="tablinks-topmenu active" onclick="openMenu(event, 'Main', '-topmenu')">Main</button>
-      <button class="tablinks-topmenu" onclick="openMenu(event, 'Packet', '-topmenu')">Packet</button>
-      <button class="tablinks-topmenu" onclick="openMenu(event, 'Filtering', '-topmenu')">Filtering</button>
-      <button class="tablinks-topmenu" onclick="openMenu(event, 'Scripting', '-topmenu')">Scripting</button>
+        <button class="back-button" onclick="sharedVars.ipcRenderer.send('relaunchApp', '')">&lt;</button>
+        <button class="tab-button tablinks-topmenu active" onclick="openMenu(event, 'Main', '-topmenu')">Main</button>
+        <button class="tab-button tablinks-topmenu" onclick="openMenu(event, 'Packet', '-topmenu')">Packet</button>
+        <button class="tab-button tablinks-topmenu" onclick="openMenu(event, 'Filtering', '-topmenu')">Filtering</button>
+        <button class="tab-button tablinks-topmenu" onclick="openMenu(event, 'Scripting', '-topmenu')">Scripting</button>
     </div>
 
-    <div id="Main" class="tabcontent tabcontent-topmenu" style="display: block;">
-      <div class="whenNoPacketSelected">
-        <div style="padding: 8px 0;">Please select a packet!</div>
-      </div>
-      <div class="whenPacketSelected">
-        <div style="padding: 8px 0;">Quick actions</div>
-        <button style="width: 200px;" onclick="hideAll(currentPacket)">Hide all packets of this type</button>
-        <button id="editAndResend" style="width: 200px;" onclick="editAndResend(currentPacket)">Edit and resend</button>
-      </div>
+    <div class="tabcontent tabcontent-topmenu" id="Main" style="display: block;">
+        <div class="whenNoPacketSelected">
+            <div style="padding: 8px 0;">Please select a packet!</div>
+        </div>
+        <div class="whenPacketSelected">
+            <div style="padding: 8px 0;">Quick actions</div>
+            <button onclick="hideAll(currentPacket)" style="width: 200px;">Hide all packets of this type</button>
+            <button id="editAndResend" onclick="editAndResend(currentPacket)" style="width: 200px;">Edit and resend
+            </button>
+        </div>
     </div>
 
-    <div id="Packet" class="tabcontent tabcontent-topmenu">
-      <h3>Packet</h3>
+    <div class="tabcontent tabcontent-topmenu" id="Packet">
+        <h3>Packet</h3>
     </div>
 
-    <div id="Filtering" class="tabcontent tabcontent-topmenu fullpage">
-      <h3>Filtering</h3>
-      Tick the box to show packets
+    <div class="tabcontent tabcontent-topmenu fullpage" id="Filtering">
+        <h3>Filtering</h3>
+        Tick the box to show packets
 
-      <button style="margin-left: 16px;" onclick="sharedVars.hiddenPackets = {
+        <button onclick="sharedVars.hiddenPackets = {
         serverbound: [], clientbound: []
       }
-      updateFilteringTab()">Show all</button>
+      updateFilteringTab()" style="margin-left: 16px;">Show all
+        </button>
 
-      <!-- TODO: More dynamic and clean method of doing this -->
-      <button style="margin-left: 8px;" onclick="sharedVars.hiddenPackets = {
+        <!-- TODO: More dynamic and clean method of doing this -->
+        <button onclick="sharedVars.hiddenPackets = {
         serverbound: allServerboundPackets, clientbound: allClientboundPackets
       }
-      updateFilteringTab()">Hide all</button>
+      updateFilteringTab()" style="margin-left: 8px;">Hide all
+        </button>
 
-      <button style="margin-left: 8px;" onclick="sharedVars.hiddenPackets = Object.assign({}, defaultHiddenPackets)
-      updateFilteringTab()">Defaults</button>
+        <button onclick="sharedVars.hiddenPackets = Object.assign({}, defaultHiddenPackets)
+      updateFilteringTab()" style="margin-left: 8px;">Defaults
+        </button>
 
-      <button style="margin-left: 8px;" onclick="sharedVars.hiddenPackets = {
+        <button onclick="sharedVars.hiddenPackets = {
         serverbound: ['query_block_nbt','set_difficulty','client_command','settings','tab_complete','transaction','enchant_item','window_click','close_window','custom_payload','edit_book','query_entity_nbt','use_entity','generate_structure','keep_alive','lock_difficulty','pick_item','craft_recipe_request','block_dig','entity_action','steer_vehicle','displayed_recipe','recipe_book','name_item','resource_pack_receive','advancement_tab','select_trade','set_beacon_effect','held_item_slot','update_command_block','update_command_block_minecart','set_creative_slot','update_jigsaw_block','update_structure_block','update_sign','arm_animation','spectate','block_place','use_item'],
         clientbound: ['spawn_entity','spawn_entity_experience_orb','spawn_entity_living','spawn_entity_painting','named_entity_spawn','animation','statistics','acknowledge_player_digging','block_break_animation','tile_entity_data','block_action','block_change','boss_bar','difficulty','tab_complete','declare_commands','transaction','close_window','window_items','craft_progress_bar','set_slot','set_cooldown','custom_payload','named_sound_effect','kick_disconnect','entity_status','explosion','unload_chunk','game_state_change','open_horse_window','keep_alive','map_chunk','world_event','world_particles','update_light','login','map','trade_list','rel_entity_move','entity_move_look','entity_look','entity','open_book','open_window','open_sign_entity','craft_recipe_response','abilities','combat_event','unlock_recipes','entity_destroy','remove_entity_effect','resource_pack_send','entity_head_rotation','multi_block_change','select_advancement_tab','world_border','camera','held_item_slot','update_view_position','update_view_distance','scoreboard_display_objective','entity_metadata','attach_entity','entity_velocity','entity_equipment','experience','update_health','scoreboard_objective','set_passengers','teams','scoreboard_score','update_time','title','entity_sound_effect','sound_effect','stop_sound','playerlist_header','nbt_query_response','collect','entity_teleport','advancements','entity_update_attributes','declare_recipes','tags','entity_effect']
       }
-      updateFilteringTab()">Preset: Player movement</button>
+      updateFilteringTab()" style="margin-left: 8px;">Preset: Player movement
+        </button>
 
-      <br><br>
-      <div class="box" style="height: calc(100% - 118px);">
-        <ul class="packetlist" id="filtering-packets">
-          
-        </ul>
-      </div>
+        <br><br>
+        <div class="box" style="height: calc(100% - 118px);">
+            <ul class="packetlist" id="filtering-packets">
+
+            </ul>
+        </div>
     </div>
 
-    <div id="Scripting" class="tabcontent tabcontent-topmenu fullpage">
-      <h3>Scripting (beta)</h3>
-      Scripting allows you to modify and inject packets on-the-fly
-      <br><br>
-      <input type="checkbox" id="enableScripting" name="enableScripting" onchange="sharedVars.scripting.updateScript(true)">
-      <label for="enableScripting">Enable scripting</label>
-      <br><br>
-      <textarea id="scriptEditor">
+    <div class="tabcontent tabcontent-topmenu fullpage" id="Scripting">
+        <h3>Scripting (beta)</h3>
+        Scripting allows you to modify and inject packets on-the-fly
+        <br><br>
+        <input id="enableScripting" name="enableScripting" onchange="sharedVars.scripting.updateScript(true)"
+               type="checkbox">
+        <label for="enableScripting">Enable scripting</label>
+        <br><br>
+        <textarea id="scriptEditor">
       </textarea>
-      <br>
-      <a href="#" onclick="resetScriptEditor()">Reset</a>
+        <br>
+        <a href="#" onclick="resetScriptEditor()">Reset</a>
     </div>
 
-    </div>
+</div>
 
-    <div class="search">
-      <input type="text" class="filter" id="filter" placeholder="Filter by name, ID or content" onkeyup="updateFilterBox()">
-    </div>
+<div class="search">
+    <input class="filter" id="filter" onkeyup="updateFilterBox()" placeholder="Filter by name, ID or content"
+           type="text">
+</div>
 
-    <div class="container">
-        <div id="packets" class="split">
-          <div class="toolbar">
-             <a href="#" onclick="clearPackets()">Clear</a>
-             <!-- <span id="hiddenPackets"></span> Removed for now -->
-          </div>
-          <div class="box clusterize-scroll" id="packetcontainer">
+<div class="container">
+    <div class="split" id="packets">
+        <div class="toolbar">
+            <a href="#" onclick="clearPackets()">Clear</a>
+            <!-- <span id="hiddenPackets"></span> Removed for now -->
+        </div>
+        <div class="box clusterize-scroll" id="packetcontainer">
             <ul class="packetlist clusterize-content" id="packetlist">
 
             </ul>
-          </div>
         </div>
-        <div id="sidebar" class="split">
-          <div class="toolbar tab">
+    </div>
+    <div class="split" id="sidebar">
+        <div class="toolbar tab">
             <button class="tablinks-rightpanel active" onclick="openMenu(event, 'tree', '-rightpanel')">Data</button>
             <!-- <button class="tablinks-rightpanel" onclick="openMenu(event, 'test', '-rightpanel')">Tab 2</button> !-->
-          </div>
-          <div class="box" id="sidebar-box">
-            <div class="tabcontent tabcontent-rightpanel" style="display: block;" id="tree">
+        </div>
+        <div class="box" id="sidebar-box">
+            <div class="tabcontent tabcontent-rightpanel" id="tree" style="display: block;">
 
             </div>
             <div class="tabcontent tabcontent-rightpanel" id="test">
 
             </div>
-          </div>
         </div>
     </div>
-    <script src="../js/jsonTree.js"></script>
-    <script src="js/main.js"></script>
-  </body>
+</div>
+<script src="../js/jsonTree.js"></script>
+<script src="js/main.js"></script>
+</body>
 </html>

@@ -166,17 +166,24 @@ div#Scripting .CodeMirror.CodeMirror {
 /* Style the buttons inside the tab */
 .tab.tab button {
   margin: 0 2px;
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
-  color: rgba(255, 255, 255, 0.8);
-  background-color: inherit;
   float: left;
   border: none;
   outline: none;
   cursor: pointer;
-  padding: 6px 16px;
   font-size: 17px;
   background: #191919;
+}
+
+.tab-button {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  color: rgba(255, 255, 255, 0.8);
+  background-color: inherit;
+  padding: 6px 16px;
+}
+
+.back-button {
+  padding: 4px 8px;
 }
 
 .tab.tab.toolbar button {
