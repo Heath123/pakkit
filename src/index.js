@@ -7,6 +7,7 @@ const packetHandler = require('./packetHandler.js')
 const setupDataFolder = require('./setupDataFolder.js')
 
 const electronLocalShortcut = require('electron-localshortcut')
+const windowStateKeeper = require('electron-window-state')
 const fs = require('fs')
 
 let proxy // Defined later when an option is chosen
@@ -81,16 +82,29 @@ function makeMenu (direction, text, id) {
 }
 
 function createWindow () {
+  // Load the previous state with fallback to defaults
+  const mainWindowState = windowStateKeeper({
+    defaultWidth: 1000,
+    defaultHeight: 800
+  });
+
+  // Let us register listeners on the window, so we can update the state
+  // automatically (the listeners will be removed when the window is closed)
+  // and restore the maximized or full screen state
+
   // Create the browser window.
   const win = new BrowserWindow({
-    width: 800,
-    height: 600,
+    x: mainWindowState.x,
+    y: mainWindowState.y,
+    width: mainWindowState.width,
+    height: mainWindowState.height,
     // frame: false,
     webPreferences: {
       nodeIntegration: true
     },
     icon: resourcesPath + 'icons/icon.png'
   })
+
   win.setMenu(null)
   // and load the index.html of the app.
   win.loadFile('html/startPage/index.html')
@@ -99,6 +113,8 @@ function createWindow () {
   electronLocalShortcut.register(win, 'F12', () => {
     win.openDevTools()
   })
+
+  mainWindowState.manage(win)
 }
 
 // This method will be called when Electron has finished
