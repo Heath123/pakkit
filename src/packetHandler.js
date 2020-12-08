@@ -8,13 +8,13 @@ let currentScript
 let currentScriptModule
 
 const server = {
-  sendPacket: function(meta, data) {
+  sendPacket: function (meta, data) {
     proxy.writeToServer(meta, data, true)
   }
 }
 
 const client = {
-  sendPacket: function(meta, data) {
+  sendPacket: function (meta, data) {
     proxy.writeToClient(meta, data, true)
   }
 }

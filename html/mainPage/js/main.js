@@ -31,7 +31,6 @@ function wrappedClusterizeUpdate (htmlArray) {
   for (const item of htmlArray) {
     if (!item[0]
       .match(/<li .* class=".*filter-hidden">/)) {
-
       newArray.push(item)
     }
   }
@@ -61,6 +60,7 @@ function toggleCheckbox (box, packetName, direction) {
   }
 
   updateFiltering()
+  updateFilteringStorage()
 }
 
 function updateFilterBox () {
@@ -73,7 +73,7 @@ function updateFilterBox () {
 }
 
 function updateFiltering () {
-  sharedVars.allPacketsHTML.forEach(function(item, index, array) {
+  sharedVars.allPacketsHTML.forEach(function (item, index, array) {
     if (!filteringLogic.packetFilteredByFilterBox(sharedVars.allPackets[index],
       sharedVars.lastFilter,
       sharedVars.hiddenPackets)) {
@@ -101,17 +101,19 @@ setInterval(updateFilterBox, 100)
 // let dialogOpen = false Not currently used
 
 const defaultHiddenPackets = {
-  serverbound: ["position","position_look","look","keep_alive","entity_action"],
-    clientbound: ["keep_alive","update_time","rel_entity_move","entity_teleport","map_chunk","update_light","update_view_position","entity_metadata","entity_update_attributes","unload_chunk","entity_velocity","entity_move_look","entity_head_rotation"]
-},
+  serverbound: ['position', 'position_look', 'look', 'keep_alive', 'entity_action'],
+  clientbound: ['keep_alive', 'update_time', 'rel_entity_move', 'entity_teleport', 'map_chunk', 'update_light', 'update_view_position', 'entity_metadata', 'entity_update_attributes', 'unload_chunk', 'entity_velocity', 'entity_move_look', 'entity_head_rotation']
+}
 
-sharedVars = {
+const sharedVars = {
   allPackets: [],
   allPacketsHTML: [],
-  proxyCapabilities : {},
+  proxyCapabilities: {},
   ipcRenderer: require('electron').ipcRenderer,
   packetList: document.getElementById('packetlist'),
-  hiddenPackets: Object.assign({}, defaultHiddenPackets),
+  hiddenPackets: localStorage.getItem('hiddenPackets')
+    ? JSON.parse(localStorage.getItem('hiddenPackets'))
+    : Object.assign({}, defaultHiddenPackets),
   scripting: undefined,
   lastFilter: ''
 }
@@ -136,17 +138,12 @@ sharedVars.ipcHandler.setup(sharedVars)
 
 // const sidebar = document.getElementById('sidebar-box')
 
-
-
-
-
-
-
-
-
-
 // TODO: move to own file
 const filteringPackets = document.getElementById('filtering-packets')
+
+function updateFilteringStorage () {
+  localStorage.setItem('hiddenPackets', JSON.stringify(sharedVars.hiddenPackets))
+}
 
 function updateFilteringTab () {
   for (const item of filteringPackets.children) {
@@ -157,15 +154,17 @@ function updateFilteringTab () {
     checkbox.indeterminate = false
     let isShown = true
     if (item.className.includes('serverbound') &&
-      sharedVars.hiddenPackets['serverbound'].includes(name)) {
+      sharedVars.hiddenPackets.serverbound.includes(name)) {
       isShown = false
     } else if (item.className.includes('clientbound') &&
-      sharedVars.hiddenPackets['clientbound'].includes(name)) {
+      sharedVars.hiddenPackets.clientbound.includes(name)) {
       isShown = false
     }
 
     checkbox.checked = isShown
   }
+
+  updateFilteringStorage()
 }
 
 const allServerboundPackets = []
@@ -178,9 +177,9 @@ function addPacketsToFiltering (packetsObject, direction, appendTo) {
     if (packetsObject.hasOwnProperty(key)) {
       console.log(!sharedVars.hiddenPackets[direction].includes(packetsObject[key]))
       filteringPackets.innerHTML +=
-     `<li id="${packetsObject[key].replace(/"/g, "&#39;") + '-' + direction}" class="packet ${direction}">
+     `<li id="${packetsObject[key].replace(/"/g, '&#39;') + '-' + direction}" class="packet ${direction}">
         <input type="checkbox" ${!sharedVars.hiddenPackets[direction].includes(packetsObject[key]) ? 'checked' : ''}
-            onclick="toggleCheckbox(this, ${JSON.stringify(packetsObject[key]).replace(/"/g, "&#39;")}, '${direction}')"/>
+            onclick="toggleCheckbox(this, ${JSON.stringify(packetsObject[key]).replace(/"/g, '&#39;')}, '${direction}')"/>
         <span class="id">${escapeHtml(key)}</span>
         <span class="name">${escapeHtml(packetsObject[key])}</span>
       </li>`
@@ -190,22 +189,14 @@ function addPacketsToFiltering (packetsObject, direction, appendTo) {
   }
 }
 
-
-
-
-
-
-
 addPacketsToFiltering(sharedVars.proxyCapabilities.serverboundPackets, 'serverbound', allServerboundPackets)
 addPacketsToFiltering(sharedVars.proxyCapabilities.clientboundPackets, 'clientbound', allClientboundPackets)
-
-
 
 // Update every 0.05 seconds
 // TODO: Find a better way without updating on every packet (which causes lag)
 window.setInterval(function () {
   if (sharedVars.packetsUpdated) {
-    const diff = (sharedVars.packetList.parentElement.scrollHeight - sharedVars.packetList.parentElement.offsetHeight) - sharedVars.packetList.parentElement.scrollTop;
+    const diff = (sharedVars.packetList.parentElement.scrollHeight - sharedVars.packetList.parentElement.offsetHeight) - sharedVars.packetList.parentElement.scrollTop
     const wasScrolledToBottom = diff < 5 // If it was scrolled to the bottom or almost scrolled to the bottom
     wrappedClusterizeUpdate(sharedVars.allPacketsHTML)
     if (wasScrolledToBottom) {
@@ -220,7 +211,7 @@ window.setInterval(function () {
 }, 50)
 
 window.closeDialog = function () { // window. stops standardjs from complaining
-                                   // dialogOpen = false
+  // dialogOpen = false
   document.getElementById('dialog-overlay').className = 'dialog-overlay'
   document.getElementById('dialog').innerHTML = ''
 }
@@ -314,6 +305,7 @@ function hideAll (id) {
   checkbox.readOnly = false
   checkbox.indeterminate = false
   updateFiltering()
+  updateFilteringStorage()
 }
 
 sharedVars.ipcRenderer.on('hideAllOfType', (event, arg) => { // Context menu
@@ -323,7 +315,7 @@ sharedVars.ipcRenderer.on('hideAllOfType', (event, arg) => { // Context menu
 
 // Modified from W3Schools
 window.openMenu = function (evt, MenuName, id) { // window. stops standardjs from complaining
-  var i, tabcontent, tablinks
+  let i, tabcontent, tablinks
   tabcontent = document.getElementsByClassName('tabcontent' + id)
   for (i = 0; i < tabcontent.length; i++) {
     tabcontent[i].style.display = 'none'

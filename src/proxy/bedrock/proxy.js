@@ -22,7 +22,7 @@ function processPacket (text) {
 
     let out = ''
     let indentlevel = 0
-    for (var i = 0; i < str.length; i++) {
+    for (let i = 0; i < str.length; i++) {
       if (str.charAt(i) === ')' || str.charAt(i) === '}' || str.charAt(i) === ']') {
         indentlevel -= 1
         if (indentlevel < 0) {

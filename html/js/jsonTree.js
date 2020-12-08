@@ -67,8 +67,8 @@ window.jsonTree = (function () {
      * @param func {Function} - the function for each item
      */
     forEachNode: function (obj, func) {
-      var type = utils.getType(obj)
-      var isLast
+      const type = utils.getType(obj)
+      let isLast
 
       switch (type) {
         case 'array':
@@ -102,7 +102,7 @@ window.jsonTree = (function () {
      * @param Parent {Function} - a parent constructor
      */
     inherits: (function () {
-      var F = function () {}
+      const F = function () {}
 
       return function (Child, Parent) {
         F.prototype = Parent.prototype
@@ -131,7 +131,7 @@ window.jsonTree = (function () {
      * Extends some object
      */
     extend: function (targetObj, sourceObj) {
-      for (var prop in sourceObj) {
+      for (const prop in sourceObj) {
         if (Object.prototype.hasOwnProperty.call(sourceObj, prop)) {
           targetObj[prop] = sourceObj[prop]
         }
@@ -173,7 +173,7 @@ window.jsonTree = (function () {
    * @return {Node}
    */
   function Node (label, val, isLast) {
-    var nodeType = utils.getType(val)
+    const nodeType = utils.getType(val)
 
     if (nodeType in Node.CONSTRUCTORS) {
       return new Node.CONSTRUCTORS[nodeType](label, val, isLast)
@@ -218,11 +218,11 @@ window.jsonTree = (function () {
       throw new Error('This is abstract class')
     }
 
-    var self = this
-    var el = document.createElement('li')
-    var labelEl
-    var template = function (label, val) {
-      var str =
+    const self = this
+    const el = document.createElement('li')
+    let labelEl
+    const template = function (label, val) {
+      const str =
         '\n                    <span class="jsontree_label-wrapper">\n                        <span class="jsontree_label">' +
         escapeHtml(JSON.stringify(label)) +
         '</span> : \n                    </span>\n                    <span class="jsontree_value-wrapper">\n                        <span class="jsontree_value jsontree_value_' +
@@ -314,7 +314,7 @@ window.jsonTree = (function () {
         return '$'
       }
 
-      var currentPath
+      let currentPath
 
       if (this.parent.type === 'array') {
         currentPath = '[' + this.label + ']'
@@ -435,11 +435,11 @@ window.jsonTree = (function () {
       throw new Error('This is abstract class')
     }
 
-    var self = this
-    var el = document.createElement('li')
-    var template = function (label, sym) {
-      var comma = !isLast ? ',' : ''
-      var str =
+    const self = this
+    const el = document.createElement('li')
+    const template = function (label, sym) {
+      const comma = !isLast ? ',' : ''
+      let str =
           '\n                        <div class="jsontree_value-wrapper">\n                            <div class="jsontree_value jsontree_value_' +
           self.type +
           '">\n                                <b>' +
@@ -463,10 +463,10 @@ window.jsonTree = (function () {
 
       return str
     }
-    var childNodesUl
-    var labelEl
-    var moreContentEl
-    var childNodes = []
+    let childNodesUl
+    let labelEl
+    let moreContentEl
+    const childNodes = []
 
     self.label = label
     self.isComplex = true
@@ -606,7 +606,7 @@ window.jsonTree = (function () {
       this.el.classList.toggle('jsontree_node_expanded')
 
       if (isRecursive) {
-        var isExpanded = this.el.classList.contains('jsontree_node_expanded')
+        const isExpanded = this.el.classList.contains('jsontree_node_expanded')
 
         this.childNodes.forEach(function (item, i) {
           if (item.isComplex) {
@@ -778,8 +778,8 @@ window.jsonTree = (function () {
         return JSON.stringify(this.sourceJSONObj)
       }
 
-      var DELIMETER = '[%^$#$%^%]'
-      var jsonStr = JSON.stringify(this.sourceJSONObj, null, DELIMETER)
+      const DELIMETER = '[%^$#$%^%]'
+      let jsonStr = JSON.stringify(this.sourceJSONObj, null, DELIMETER)
 
       jsonStr = jsonStr.split('\n').join('<br />')
       jsonStr = jsonStr.split(DELIMETER).join('&nbsp;&nbsp;&nbsp;&nbsp;')

@@ -12,7 +12,7 @@ if (localStorage.getItem('authConsentGiven') !== 'true') {
   document.getElementById('consent-box').style.display = 'contents'
 }
 
-var isLoading = false
+let isLoading = false
 
 let connectAddress
 let connectPort
@@ -21,7 +21,7 @@ let platform
 let version
 
 loadSetting('lastPlatform', 'platform', 'platform', 'java')
-var lastPlatform = platform
+let lastPlatform = platform
 platformChange()
 loadSettings(platform)
 

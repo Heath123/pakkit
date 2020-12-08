@@ -66,7 +66,7 @@ function refreshPackets () {
   } */
 }
 
-function updateHidden() {
+function updateHidden () {
   // TODO: make it work
   /* hiddenPacketsAmount = (sharedVars.allPackets.length - sharedVars.allPacketsHTML.length);
   document.getElementById("hiddenPackets").innerHTML = hiddenPacketsAmount + ' hidden packets';

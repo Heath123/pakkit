@@ -5,11 +5,11 @@ const minecraftFolder = require('minecraft-folder-path')
 
 const states = mc.states
 
-var realClient
-var realServer
-var toClientMappings
-var toServerMappings
-var storedCallback
+let realClient
+let realServer
+let toClientMappings
+let toServerMappings
+let storedCallback
 
 exports.capabilities = {
   modifyPackets: true,

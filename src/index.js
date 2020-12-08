@@ -24,7 +24,7 @@ function makeMenu (direction, text, id) {
     return
   }
 
-  let menuData = [
+  const menuData = [
     {
       icon: resourcesPath + `icons/${direction}.png`,
       label: text,
@@ -66,14 +66,14 @@ function makeMenu (direction, text, id) {
   if (text.split(' ')[1] === 'position' && direction === 'clientbound') {
     menuData.splice(3, 0,
       {
-          label: 'Copy teleport as command',
-          click: () => {
-            BrowserWindow.getAllWindows()[0].send('copyTeleportCommand', JSON.stringify({
-              // Packet ID from link URL
-              id: id
-            }))
-          }
+        label: 'Copy teleport as command',
+        click: () => {
+          BrowserWindow.getAllWindows()[0].send('copyTeleportCommand', JSON.stringify({
+            // Packet ID from link URL
+            id: id
+          }))
         }
+      }
     )
   }
 
