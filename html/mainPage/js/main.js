@@ -15,6 +15,8 @@ box.onclick = function() {
 }
 */
 
+const axios = require('axios')
+
 const Clusterize = require('clusterize.js')
 const filteringLogic = require('./js/filteringLogic.js')
 
@@ -293,6 +295,8 @@ window.packetClick = function (id) { // window. stops standardjs from complainin
     font-size: 14px;
     display: block;`
   }
+
+  scrollWikiToCurrentPacket()
 }
 
 function hideAll (id) {
@@ -357,3 +361,97 @@ var clusterize = new Clusterize({
   contentElem: sharedVars.packetList,
   no_data_text: ''
 })
+
+// TODO: move to own file?
+async function fillWiki () {
+  let data = (await axios.get('https://wiki.vg/Protocol')).data
+// Allow it to load properly
+  data = data
+    .split('/images/')
+    .join('https://wiki.vg/images/')
+    .split('/resources/assets/')
+    .join('https://wiki.vg/resources/assets/')
+    .split('/load.php?')
+    .join('https://wiki.vg/load.php?')
+
+  document.getElementById('iframe').contentWindow.document.write(data)
+
+  var style = document.createElement('style');
+
+  style.innerHTML =
+     `::-webkit-scrollbar {
+          width: 17px;
+      }
+      
+      ::-webkit-scrollbar-thumb {
+          background: rgba(0, 0, 0, 0.3);
+          border-radius: 10px;
+      }
+      ::-webkit-scrollbar-track {
+          background: rgba(0, 0, 0, 0.2);
+          border-radius: 10px;
+      }
+      
+      ::-webkit-scrollbar-thumb:hover {
+        background: rgba(0, 0, 0, 0.5);
+      }
+      
+      ::-webkit-scrollbar-corner {
+        background: #242424;
+      }
+      
+      /* Cut off the left panel */
+      #content, #left-navigation {
+        margin-left: 0;
+      }
+      
+      #mw-panel {
+        display: none;
+      }
+      `
+
+  document.getElementById('iframe').contentDocument.head.appendChild(style)
+}
+
+fillWiki()
+
+// https://gomakethings.com/finding-the-next-and-previous-sibling-elements-that-match-a-selector-with-vanilla-js/
+function getPreviousSibling (elem, selector) {
+
+  // Get the next sibling element
+  var sibling = elem.previousElementSibling;
+
+  // If there's no selector, return the first sibling
+  if (!selector) return sibling;
+
+  // If the sibling matches our selector, use it
+  // If not, jump to the next sibling and continue the loop
+  while (sibling) {
+    if (sibling.matches(selector)) return sibling;
+    sibling = sibling.previousElementSibling;
+  }
+
+};
+
+function scrollIdIntoView (id, bound) {
+  // https://stackoverflow.com/questions/3813294/how-to-get-element-by-innertext
+  var tdTags = document.getElementById('iframe').contentDocument.getElementsByTagName("td");
+  var searchRegex = new RegExp(`^<tr>\n<td( rowspan="[0-9]*")?>${id.toUpperCase().split('0X').join('0x')}\n<\/td>\n<td( rowspan="[0-9]*")?>Play\n<\/td>\n<td( rowspan="[0-9]*")?>${bound === 'serverbound' ? 'Server' : 'Client'}\n<\/td>`, 'm')
+  var found;
+
+  for (var i = 0; i < tdTags.length; i++) {
+    // console.log(tdTags[i].parentElement.outerHTML)
+    if (tdTags[i].parentElement.outerHTML.match(searchRegex)) {
+      found = tdTags[i];
+      break;
+    }
+  }
+  getPreviousSibling(found.closest('table'), 'h4').scrollIntoView()
+}
+
+function scrollWikiToCurrentPacket () {
+  if (currentPacket) {
+    const packet = sharedVars.allPackets[currentPacket]
+    scrollIdIntoView(packet.hexIdString, packet.direction)
+  }
+}

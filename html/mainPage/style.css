@@ -26,7 +26,7 @@ body {
   cursor: ew-resize;
 }
 .box {
-  overflow-y: scroll;
+  overflow-y: auto;
   border: 1px solid #1A1A1A;
   border-radius: 10px;
   height: calc(100% - 24px); /* Take off toolbar height */
@@ -238,4 +238,10 @@ input.filter {
   box-sizing: border-box;
   height: 28px;
   width: 100%;
+}
+
+#iframe {
+  border: 0;
+  width: 100%;
+  height: 100%;
 }
