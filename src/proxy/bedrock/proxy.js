@@ -17,10 +17,10 @@ function processPacket (text) {
       }
       return
     }
-    let name = text.split('-')[1].split('(')[0].trim()
-    const str = '(' + text.split('(').slice(1).join('(')
+    let name = text.split('-')[1].split('{')[0].trim()
+    const str = '{' + text.split('{').slice(1).join('{')
 
-    let out = ''
+    /* let out = ''
     let indentlevel = 0
     for (let i = 0; i < str.length; i++) {
       if (str.charAt(i) === ')' || str.charAt(i) === '}' || str.charAt(i) === ']') {
@@ -38,7 +38,8 @@ function processPacket (text) {
       if (str.charAt(i) === ',') {
         out += '\n' + ' '.repeat(indentlevel * 2 - 1)
       }
-    }
+    } */
+    const out = str
 
     // https://stackoverflow.com/questions/5582228/insert-space-before-capital-letters
     name = name.replace(/([A-Z])/g, ' $1').trim().toLowerCase().split(' ').join('_').replace('_packet', '')
