@@ -44,10 +44,19 @@ function processPacket (text) {
     // https://stackoverflow.com/questions/5582228/insert-space-before-capital-letters
     name = name.replace(/([A-Z])/g, ' $1').trim().toLowerCase().split(' ').join('_').replace('_packet', '')
 
+    const data = JSON.parse(out)
+    const hexIdString = '0x' + data.packetId.toString(16).padStart(2, '0')
+
+    // These values are unneeded or are exposed elsewhere in the GUI
+    delete data.packetId
+    delete data.packetType
+    delete data.clientId
+    delete data.senderId
+
     if (text.startsWith('[CLIENT BOUND]')) {
-      storedCallback('clientbound', { name: name }, { data: out }, '')
+      storedCallback('clientbound', { name: name }, data, hexIdString)
     } else if (text.startsWith('[SERVER BOUND]')) {
-      storedCallback('serverbound', { name: name }, { data: out }, '')
+      storedCallback('serverbound', { name: name }, data, hexIdString)
     }
   } catch (err) {
     console.error(err)
@@ -56,7 +65,8 @@ function processPacket (text) {
 
 exports.capabilities = {
   modifyPackets: false,
-  jsonData: false
+  jsonData: true,
+  wikiVgPage: 'https://wiki.vg/Bedrock_Protocol'
 }
 
 exports.startProxy = function (host, port, listenPort, version, authConsent, callback, dataFolder) {

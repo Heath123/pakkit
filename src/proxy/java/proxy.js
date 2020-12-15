@@ -15,7 +15,9 @@ exports.capabilities = {
   modifyPackets: true,
   jsonData: true,
   clientboundPackets: [],
-  serverboundPackets: []
+  serverboundPackets: [],
+  // TODO: Only for latest, or fetch older pages
+  wikiVgPage: 'https://wiki.vg/Protocol'
 }
 
 exports.startProxy = function (host, port, listenPort, version, authConsent, callback, dataFolder) {

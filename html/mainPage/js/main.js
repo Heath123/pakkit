@@ -199,7 +199,7 @@ addPacketsToFiltering(sharedVars.proxyCapabilities.clientboundPackets, 'clientbo
 window.setInterval(function () {
   if (sharedVars.packetsUpdated) {
     const diff = (sharedVars.packetList.parentElement.scrollHeight - sharedVars.packetList.parentElement.offsetHeight) - sharedVars.packetList.parentElement.scrollTop
-    const wasScrolledToBottom = diff < 5 // If it was scrolled to the bottom or almost scrolled to the bottom
+    const wasScrolledToBottom = diff < 3 // If it was scrolled to the bottom or almost scrolled to the bottom
     wrappedClusterizeUpdate(sharedVars.allPacketsHTML)
     if (wasScrolledToBottom) {
       sharedVars.packetList.parentElement.scrollTop = sharedVars.packetList.parentElement.scrollHeight
@@ -287,8 +287,8 @@ window.packetClick = function (id) { // window. stops standardjs from complainin
     // sidebar.innerHTML = '<div style="padding: 10px;">Loading packet data...</div>';
     sharedVars.packetDom.getTree().loadData(sharedVars.allPackets[id].data)
   } else {
-    treeElement.innerText = sharedVars.allPackets[id].data.data
-    treeElement.style = `
+    sharedVars.packetDom.getTreeElement().innerText = sharedVars.allPackets[id].data.data
+    sharedVars.packetDom.getTreeElement().style = `
     color: #0F0;
     white-space: pre;
     font-family: 'PT Mono', monospace;
@@ -304,10 +304,13 @@ function hideAll (id) {
   if (sharedVars.hiddenPackets[packet.direction].indexOf(packet.meta.name) === -1) {
     sharedVars.hiddenPackets[packet.direction].push(packet.meta.name)
   }
-  const checkbox = document.getElementById(packet.meta.name + '-' + packet.direction).firstElementChild
-  checkbox.checked = false
-  checkbox.readOnly = false
-  checkbox.indeterminate = false
+  const packetElement = document.getElementById(packet.meta.name + '-' + packet.direction)
+  if (packetElement) {
+    const checkbox = packetElement.firstElementChild
+    checkbox.checked = false
+    checkbox.readOnly = false
+    checkbox.indeterminate = false
+  }
   updateFiltering()
   updateFilteringStorage()
 }
@@ -364,7 +367,7 @@ var clusterize = new Clusterize({
 
 // TODO: move to own file?
 async function fillWiki () {
-  let data = (await axios.get('https://wiki.vg/Protocol')).data
+  let data = (await axios.get(sharedVars.proxyCapabilities.wikiVgPage)).data
 // Allow it to load properly
   data = data
     .split('/images/')
@@ -374,9 +377,10 @@ async function fillWiki () {
     .split('/load.php?')
     .join('https://wiki.vg/load.php?')
 
+  // TODO: Break or modify links?
   document.getElementById('iframe').contentWindow.document.write(data)
 
-  var style = document.createElement('style');
+  const style = document.createElement('style');
 
   style.innerHTML =
      `::-webkit-scrollbar {
@@ -413,7 +417,11 @@ async function fillWiki () {
   document.getElementById('iframe').contentDocument.head.appendChild(style)
 }
 
-fillWiki()
+if (sharedVars.proxyCapabilities.wikiVgPage) {
+  fillWiki()
+} else {
+  document.getElementById('wiki-button').style.display = 'none'
+}
 
 // https://gomakethings.com/finding-the-next-and-previous-sibling-elements-that-match-a-selector-with-vanilla-js/
 function getPreviousSibling (elem, selector) {
@@ -435,9 +443,9 @@ function getPreviousSibling (elem, selector) {
 
 function scrollIdIntoView (id, bound) {
   // https://stackoverflow.com/questions/3813294/how-to-get-element-by-innertext
-  var tdTags = document.getElementById('iframe').contentDocument.getElementsByTagName("td");
-  var searchRegex = new RegExp(`^<tr>\n<td( rowspan="[0-9]*")?>${id.toUpperCase().split('0X').join('0x')}\n<\/td>\n<td( rowspan="[0-9]*")?>Play\n<\/td>\n<td( rowspan="[0-9]*")?>${bound === 'serverbound' ? 'Server' : 'Client'}\n<\/td>`, 'm')
-  var found;
+  const tdTags = document.getElementById('iframe').contentDocument.getElementsByTagName("td");
+  const searchRegex = new RegExp(`^<tr>\n<td( rowspan="[0-9]*")?>${id.toUpperCase().split('0X').join('0x')}\n<\/td>\n(<td( rowspan="[0-9]*")?>Play\n<\/td>\n)?<td( rowspan="[0-9]*")?>(${bound === 'serverbound' ? 'Server' : 'Client'}|Server &amp; Client)\n<\/td>`, 'm')
+  let found;
 
   for (var i = 0; i < tdTags.length; i++) {
     // console.log(tdTags[i].parentElement.outerHTML)
