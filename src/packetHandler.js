@@ -48,13 +48,13 @@ exports.packetHandler = function (direction, meta, data, id) {
       if (scriptingEnabled) {
         currentScriptModule.downstreamHandler(meta, data, server, client)
       } else {
-        proxy.writeToClient(meta, data, true)
+        // proxy.writeToClient(meta, data, true)
       }
     } else {
       if (scriptingEnabled) {
         currentScriptModule.upstreamHandler(meta, data, server, client)
       } else {
-        proxy.writeToServer(meta, data, true)
+        // proxy.writeToServer(meta, data, true)
       }
     }
   } catch (err) {

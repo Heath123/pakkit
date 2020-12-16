@@ -94,6 +94,7 @@ window.startProxy = function (event) {
   if (document.getElementById('consent').checked) {
     localStorage.setItem('authConsentGiven', 'true')
   }
+  // TODO: Validate data (e.g. port range)
   ipcRenderer.send('startProxy', JSON.stringify({
     consent: localStorage.getItem('authConsentGiven') === 'true',
     connectAddress: connectAddress,
