@@ -41,9 +41,10 @@ exports.init = function (window, passedIpcMain, passedProxy) {
   })
 }
 
-exports.packetHandler = function (direction, meta, data, id) {
+exports.packetHandler = function (direction, meta, data, id, raw) {
   try {
-    mainWindow.send('packet', JSON.stringify({ meta: meta, data: data, direction: direction, hexIdString: id }))
+    mainWindow.send('packet', JSON.stringify({ meta: meta, data: data, direction: direction, hexIdString: id, raw: raw }))
+    // TODO: Maybe write raw data?
     if (direction === 'clientbound') {
       if (scriptingEnabled) {
         currentScriptModule.downstreamHandler(meta, data, server, client)

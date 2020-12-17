@@ -128,6 +128,7 @@
         <div class="toolbar tab">
             <button class="tab-button tablinks-rightpanel active" onclick="openMenu(event, 'tree', '-rightpanel')">Data</button>
             <button class="tab-button tablinks-rightpanel" onclick="openMenu(event, 'wikivg', '-rightpanel'); scrollWikiToCurrentPacket()">wiki.vg</button>
+            <button class="tab-button tablinks-rightpanel" onclick="openMenu(event, 'hex', '-rightpanel'); scrollWikiToCurrentPacket()">Hex view</button>
         </div>
         <div class="box" id="sidebar-box">
             <div class="tabcontent tabcontent-rightpanel" id="tree" style="display: block;">
@@ -135,6 +136,9 @@
             </div>
             <div class="tabcontent tabcontent-rightpanel" id="wikivg" style="height: 100%; padding: 0px; overflow: hidden;">
                 <iframe id="iframe"></iframe>
+            </div>
+            <div class="tabcontent tabcontent-rightpanel" id="hex" style="height: 100%; padding: 0px; overflow: hidden;">
+                <iframe id="hex-viewer" src="../hex-viewer/hex-viewer.html" style="display: none;"></iframe>
             </div>
         </div>
     </div>

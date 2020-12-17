@@ -240,7 +240,7 @@ input.filter {
   width: 100%;
 }
 
-#iframe {
+#iframe, #hex-viewer {
   border: 0;
   width: 100%;
   height: 100%;

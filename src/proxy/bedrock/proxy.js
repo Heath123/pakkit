@@ -55,7 +55,8 @@ function processPacket (text) {
 
 exports.capabilities = {
   modifyPackets: false,
-  jsonData: false
+  jsonData: false,
+  rawData: false
 }
 
 exports.startProxy = function (host, port, listenPort, version, authConsent, callback, dataFolder) {
