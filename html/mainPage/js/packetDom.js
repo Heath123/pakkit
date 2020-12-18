@@ -32,10 +32,9 @@ function trimData (data) { // Function to trim the size of stringified data for 
 }
 
 function addPacketToDOM (packet) {
+  const isHidden = filteringLogic.packetFilteredByFilterBox(packet, sharedVars.lastFilter, sharedVars.hiddenPackets)
   sharedVars.allPacketsHTML.push([
-    `<li id="packet${packet.uid}" onclick="packetClick(${packet.uid})" class="packet ${packet.direction} ${
-      filteringLogic.packetFilteredByFilterBox(packet, sharedVars.lastFilter, sharedVars.hiddenPackets) ? 'filter-hidden' : 'filter-shown'
-    }">
+    `<li id="packet${packet.uid}" onclick="packetClick(${packet.uid})" class="packet ${packet.direction} ${isHidden ? 'filter-hidden' : 'filter-shown'}">
         <span class="id">${escapeHtml(packet.hexIdString)}</span>
         <span class="name">${escapeHtml(packet.meta.name)}</span>
         <span class="data">${escapeHtml(trimData(packet.data))}</span>
@@ -46,7 +45,9 @@ function addPacketToDOM (packet) {
       sharedVars.packetList.parentElement.scrollTop = sharedVars.packetList.parentElement.scrollHeight;
     }
   } */
-  sharedVars.packetsUpdated = true
+  if (!isHidden) {
+    sharedVars.packetsUpdated = true
+  }
 
   updateHidden()
 }
