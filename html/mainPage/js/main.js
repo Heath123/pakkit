@@ -264,6 +264,7 @@ function deselectPacket () {
   currentPacketType = undefined
   sharedVars.packetDom.getTreeElement().firstElementChild.innerHTML = 'No packet selected!'
   document.body.className = 'noPacketSelected'
+  hexViewer.style.display = 'none'
 }
 
 window.clearPackets = function () { // window. stops standardjs from complaining
@@ -278,6 +279,8 @@ window.clearPackets = function () { // window. stops standardjs from complaining
 window.showAllPackets = function () { // window. stops standardjs from complaining
   sharedVars.hiddenPackets = []
 }
+
+const hexViewer = document.getElementById('hex-viewer')
 
 window.packetClick = function (id) { // window. stops standardjs from complaining
   currentPacket = id
@@ -296,6 +299,11 @@ window.packetClick = function (id) { // window. stops standardjs from complainin
     display: block;`
   }
 
+  if (sharedVars.proxyCapabilities.rawData) {
+    hexViewer.style.display = 'block'
+    hexViewer.contentWindow.postMessage(Buffer.from(sharedVars.allPackets[id].raw))
+  }
+
   scrollWikiToCurrentPacket()
 }
 
@@ -311,6 +319,7 @@ function hideAll (id) {
     checkbox.readOnly = false
     checkbox.indeterminate = false
   }
+  deselectPacket()
   updateFiltering()
   updateFilteringStorage()
 }
@@ -460,6 +469,10 @@ function scrollIdIntoView (id, bound) {
 function scrollWikiToCurrentPacket () {
   if (currentPacket) {
     const packet = sharedVars.allPackets[currentPacket]
-    scrollIdIntoView(packet.hexIdString, packet.direction)
+    try {
+      scrollIdIntoView(packet.hexIdString, packet.direction)
+    } catch (err) {
+      console.error(err);
+    }
   }
 }

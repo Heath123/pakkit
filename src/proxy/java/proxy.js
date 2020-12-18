@@ -14,6 +14,7 @@ let storedCallback
 exports.capabilities = {
   modifyPackets: true,
   jsonData: true,
+  rawData: true,
   clientboundPackets: [],
   serverboundPackets: [],
   // TODO: Only for latest, or fetch older pages
@@ -72,35 +73,37 @@ exports.startProxy = function (host, port, listenPort, version, authConsent, cal
       profilesFolder: authConsent ? minecraftFolder : undefined
     })
     realServer = targetClient
-    client.on('packet', function (data, meta) {
+    function handleServerboundPacket (data, meta, raw) {
+      // console.log('serverbound packet', meta, data)
       if (targetClient.state === states.PLAY && meta.state === states.PLAY) {
         const id = Object.keys(toServerMappings).find(key => toServerMappings[key] === meta.name)
         const direction = 'serverbound' // Stops standardjs complaining (no-callback-literal)
         // callback(direction, meta, data, id)
         if (!endedTargetClient) {
           // targetClient.write(meta.name, data)
-          callback(direction, meta, data, id)
+          callback(direction, meta, data, id, raw)
         }
       }
-    })
-    targetClient.on('packet', function (data, meta) {
+    }
+    function handleClientboundPacket (data, meta, raw) {
       if (meta.state === states.PLAY && client.state === states.PLAY) {
         const id = Object.keys(toClientMappings).find(key => toClientMappings[key] === meta.name)
         const direction = 'clientbound' // Stops standardjs complaining (no-callback-literal)
         // callback(direction, meta, data, id)
         if (!endedClient) {
           // client.write(meta.name, data)
-          callback(direction, meta, data, id)
+          callback(direction, meta, data, id, raw)
           if (meta.name === 'set_compression') {
             client.compressionThreshold = data.threshold
           } // Set compression
         }
       }
-    })
+    }
     const bufferEqual = require('buffer-equal')
     targetClient.on('raw', function (buffer, meta) {
       if (client.state !== states.PLAY || meta.state !== states.PLAY) { return }
       const packetData = targetClient.deserializer.parsePacketBuffer(buffer).data.params
+      handleClientboundPacket(packetData, meta, [...buffer])
       const packetBuff = client.serializer.createPacketBuffer({ name: meta.name, params: packetData })
       if (!bufferEqual(buffer, packetBuff)) {
         console.log('client<-server: Error in packet ' + meta.state + '.' + meta.name)
@@ -120,6 +123,7 @@ exports.startProxy = function (host, port, listenPort, version, authConsent, cal
     client.on('raw', function (buffer, meta) {
       if (meta.state !== states.PLAY || targetClient.state !== states.PLAY) { return }
       const packetData = client.deserializer.parsePacketBuffer(buffer).data.params
+      handleServerboundPacket(packetData, meta, [...buffer])
       const packetBuff = targetClient.serializer.createPacketBuffer({ name: meta.name, params: packetData })
       if (!bufferEqual(buffer, packetBuff)) {
         console.log('client->server: Error in packet ' + meta.state + '.' + meta.name)

@@ -1,0 +1,3 @@
+[submodule "html/hex-viewer"]
+	path = html/hex-viewer
+	url = https://github.com/Heath123/hex-viewer
