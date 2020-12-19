@@ -1,6 +1,8 @@
 pipeline {
     agent any
-    docker 'gcc:latest'
+    docker {
+        image 'gcc:latest'
+    }
     tools {
         nodejs 'Node 12'
         jdk 'Java 8'
