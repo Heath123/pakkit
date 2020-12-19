@@ -115,18 +115,18 @@ span#hiddenPackets {
 
 div.dialog {
   position: fixed;
-  top: calc(50% - 200px);
-  left: calc(50% - 250px);
+  top: 30px;
+  left: 30px;
   background: #242424;
-  height: 400px;
-  width: 500px;
+  height: calc(100% - 60px);
+  width: calc(100% - 60px);
   border-radius: 20px;
   padding: 0 16px 16px 16px;
   box-sizing: border-box;
 }
 
 .CodeMirror.CodeMirror {
-  height: 260px;
+  height: calc(100% - 120px);
 }
 
 div#Scripting .CodeMirror.CodeMirror {
