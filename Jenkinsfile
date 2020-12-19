@@ -10,7 +10,7 @@ pipeline {
     stages {
         stage('build') {
             steps {
-                sh 'lsb_release -a'
+                sh 'cat /etc/os-release'
                 /* sh 'npm install'
                 sh 'node-prune'
                 sh 'npx electron-forge package --platform win32'
