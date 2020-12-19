@@ -17,6 +17,7 @@ exports.capabilities = {
   modifyPackets: true,
   jsonData: true,
   rawData: true,
+  scriptingSupport: false,
   wikiVgPage: 'https://wiki.vg/Bedrock_Protocol'
 }
 
@@ -33,9 +34,8 @@ exports.startProxy = function (host, port, listenPort, version, authConsent, cal
     console.log(err, test)
   })
 
+  // Poll for packets as the java module doesn't seem to support callbacks
   setInterval(function () {
-    // console.log('Polled!')
-
     for (const item of proxyPass.packetQueue.toArraySync()) {
       const name = item.packetType.toStringSync().toLowerCase();
 
@@ -52,7 +52,7 @@ exports.startProxy = function (host, port, listenPort, version, authConsent, cal
     }
 
     proxyPass.packetQueue.clearSync()
-  }, 100)
+  }, 50)
 
   console.log('Proxy started (Bedrock)!')
 }

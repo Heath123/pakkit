@@ -15,6 +15,7 @@ exports.capabilities = {
   modifyPackets: true,
   jsonData: true,
   rawData: true,
+  scriptingSupport: true,
   clientboundPackets: [],
   serverboundPackets: [],
   // TODO: Only for latest, or fetch older pages

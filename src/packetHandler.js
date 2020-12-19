@@ -45,17 +45,19 @@ exports.packetHandler = function (direction, meta, data, id, raw) {
   try {
     mainWindow.send('packet', JSON.stringify({ meta: meta, data: data, direction: direction, hexIdString: id, raw: raw }))
     // TODO: Maybe write raw data?
-    if (direction === 'clientbound') {
-      if (scriptingEnabled) {
-        currentScriptModule.downstreamHandler(meta, data, server, client)
+    if (proxy.capabilities.scriptingSupport) {
+      if (direction === 'clientbound') {
+        if (scriptingEnabled) {
+          currentScriptModule.downstreamHandler(meta, data, server, client)
+        } else {
+          proxy.writeToClient(meta, data, true)
+        }
       } else {
-        // proxy.writeToClient(meta, data, true)
-      }
-    } else {
-      if (scriptingEnabled) {
-        currentScriptModule.upstreamHandler(meta, data, server, client)
-      } else {
-        // proxy.writeToServer(meta, data, true)
+        if (scriptingEnabled) {
+          currentScriptModule.upstreamHandler(meta, data, server, client)
+        } else {
+          proxy.writeToServer(meta, data, true)
+        }
       }
     }
   } catch (err) {

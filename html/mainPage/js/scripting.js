@@ -15,8 +15,14 @@ exports.setup = function (passedSharedVars) {
 // When editing your scripts, disable scripting or disconnect so
 // you don't get lots of errors.
 
+// Scripts won't automatically save (yet), so make sure to save
+// them somewhere!
+
 // Handles packets going from the client to the server
 exports.upstreamHandler = function (meta, data, server, client) {
+  /* if (meta.name === 'chat') {
+    data.message = 'modified'
+  } */
   server.sendPacket(meta, data)
 }
 

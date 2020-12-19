@@ -121,7 +121,10 @@ const sharedVars = {
 }
 
 sharedVars.proxyCapabilities = JSON.parse(sharedVars.ipcRenderer.sendSync('proxyCapabilities', ''))
-console.log(sharedVars.proxyCapabilities)
+
+if (!sharedVars.proxyCapabilities.scriptingSupport) {
+  document.getElementById('scriptingTab').style.display = 'none'
+}
 
 if (!sharedVars.proxyCapabilities.modifyPackets) {
   document.getElementById('editAndResend').style.display = 'none'
