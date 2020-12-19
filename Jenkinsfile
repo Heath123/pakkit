@@ -24,7 +24,7 @@ pipeline {
             }
             /* post {
                 success {
-                    archiveArtifacts artifacts: '**/out/*.zip', fingerprint: true
+                    archiveArtifacts artifacts: '**/   /*out*/   /*.zip', fingerprint: true
                     withCredentials([usernamePassword(credentialsId: 'GitHubPAToken', usernameVariable: 'USERNAME', passwordVariable: 'GITHUB_TOKEN')]) {
                         sh 'echo "Creating a new release in github"'
                         sh 'github-release release --user Heath123 --repo pakkit --tag v${BUILD_NUMBER} --name "Jenkins build ${BUILD_NUMBER}"'
