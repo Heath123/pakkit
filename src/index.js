@@ -1,4 +1,14 @@
-const { app, BrowserWindow, ipcMain, clipboard, Menu } = require('electron')
+const unhandled = require('electron-unhandled')
+
+unhandled({
+  logger: (err) => {
+    console.log('fdnjfsdifdsusfduhifdojsfdk')
+    console.error(err)
+  },
+  showDialog: false
+});
+
+const { app, BrowserWindow, ipcMain, clipboard,xcv Menu } = require('electron')
 app.allowRendererProcessReuse = true
 
 const javaProxy = require('./proxy/java/proxy.js')
