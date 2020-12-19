@@ -1,16 +1,17 @@
 pipeline {
     agent any
-    docker {
+    /* docker {
         image 'gcc:latest'
     }
     tools {
         nodejs 'Node 12'
         jdk 'Java 8'
-    }
+    } */
     stages {
         stage('build') {
             steps {
-                sh 'npm install'
+                sh 'lsb_release -a'
+                /* sh 'npm install'
                 sh 'node-prune'
                 sh 'npx electron-forge package --platform win32'
                 sh 'npx electron-forge package --platform linux'
@@ -19,9 +20,9 @@ pipeline {
                 sh 'mv out/pakkit-darwin-x64 out/pakkit-macos-x64'
                 sh 'zip -r out/pakkit-windows-x64.zip out/pakkit-windows-x64/'
                 sh 'zip -r out/pakkit-linux-x64.zip out/pakkit-linux-x64/'
-                sh 'zip -r -y out/pakkit-macos-x64.zip out/pakkit-macos-x64/'
+                sh 'zip -r -y out/pakkit-macos-x64.zip out/pakkit-macos-x64/' */
             }
-            post {
+            /* post {
                 success {
                     archiveArtifacts artifacts: '**/out/*.zip', fingerprint: true
                     withCredentials([usernamePassword(credentialsId: 'GitHubPAToken', usernameVariable: 'USERNAME', passwordVariable: 'GITHUB_TOKEN')]) {
@@ -33,7 +34,7 @@ pipeline {
                         sh 'github-release upload --user Heath123 --repo pakkit --tag v${BUILD_NUMBER} --name "pakkit-macos-x64.zip" --file out/pakkit-macos-x64.zip'
                     }
                 }
-            }
+            } */
         }
     }
     post {
