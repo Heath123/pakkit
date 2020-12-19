@@ -42,4 +42,9 @@ exports.setup = function (passedSharedVars) {
     const ipcMessage = JSON.parse(arg)
     sharedVars.packetDom.addPacket(ipcMessage)
   })
+
+  sharedVars.ipcRenderer.on('error', (event, arg) => {
+    const ipcMessage = JSON.parse(arg)
+    handleError(ipcMessage.msg, ipcMessage.stack)
+  })
 }

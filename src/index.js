@@ -1,14 +1,4 @@
-const unhandled = require('electron-unhandled')
-
-unhandled({
-  logger: (err) => {
-    console.log('fdnjfsdifdsusfduhifdojsfdk')
-    console.error(err)
-  },
-  showDialog: false
-});
-
-const { app, BrowserWindow, ipcMain, clipboard,xcv Menu } = require('electron')
+const { app, BrowserWindow, ipcMain, clipboard, Menu } = require('electron')
 app.allowRendererProcessReuse = true
 
 const javaProxy = require('./proxy/java/proxy.js')
@@ -18,6 +8,8 @@ const setupDataFolder = require('./setupDataFolder.js')
 
 const electronLocalShortcut = require('electron-localshortcut')
 const windowStateKeeper = require('electron-window-state')
+const unhandled = require('electron-unhandled')
+
 const fs = require('fs')
 
 let proxy // Defined later when an option is chosen
@@ -133,6 +125,15 @@ function createWindow () {
   electronLocalShortcut.register(win, 'F12', () => {
     win.openDevTools()
   })
+
+  unhandled({
+    logger: (err) => {
+      win.send('error', JSON.stringify({ msg: err.message, stack: err.stack}))
+      console.log(err.stack)
+      console.error(err)
+    },
+    showDialog: false
+  });
 
   mainWindowState.manage(win)
 }

@@ -15,7 +15,7 @@ box.onclick = function() {
 }
 */
 
-const axios = require('axios')ytsytytxhh
+const axios = require('axios')
 
 const Clusterize = require('clusterize.js')
 const filteringLogic = require('./js/filteringLogic.js')

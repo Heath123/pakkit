@@ -1,14 +1,16 @@
 const errorDiv = document.getElementById('error')
 
 // https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers/onerror
-window.onerror = function (msg, url, lineNo, columnNo, error) {
-  const string = msg.toLowerCase();
-  const substring = "script error";
-  if (string.indexOf(substring) > -1){
-    errorDiv.innerText = 'Script error: Press F12 for details'
-  }
+function handleError (stack) {
+  // Reformat message
+  const split = stack.split('at')
+  split[0] = split[0].split('\n').join(' ').trim() + '\n'
 
-  errorDiv.innerText = msg + '\n' + url + ':' + lineNo + ',' + columnNo
+  errorDiv.innerText = split.slice(0, 2).join('at')
 
   return false;
+}
+
+window.onerror = function (msg, url, lineNo, columnNo, err) {
+  handleError(msg + '\n' + '   at ' + url + ':' + lineNo + ':' + columnNo)
 }
