@@ -7,7 +7,7 @@ pipeline {
     stages {
         stage('build') {
             steps {
-                sh 'sudo pacman -S base-devel'
+                sh 'su -c "pacman -S base-devel"'
                 sh 'npm install'
                 sh 'node-prune'
                 sh 'npx electron-forge package --platform win32'
