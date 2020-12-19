@@ -21,13 +21,16 @@ pipeline {
             post {
                 success {
                     archiveArtifacts artifacts: '**/out/*.zip', fingerprint: true
-                    withCredentials([usernamePassword(credentialsId: 'GitHubPAToken', usernameVariable: 'USERNAME', passwordVariable: 'GITHUB_TOKEN')]) {
-                        sh 'echo "Creating a new release in github"'
-                        sh 'github-release release --user Heath123 --repo pakkit --tag v${BUILD_NUMBER} --name "Jenkins build ${BUILD_NUMBER}"'
-                        sh 'echo "Uploading the artifacts into github"'
-                        sh 'github-release upload --user Heath123 --repo pakkit --tag v${BUILD_NUMBER} --name "pakkit-windows-x64.zip" --file out/pakkit-windows-x64.zip'
-                        sh 'github-release upload --user Heath123 --repo pakkit --tag v${BUILD_NUMBER} --name "pakkit-linux-x64.zip" --file out/pakkit-linux-x64.zip'
-                        sh 'github-release upload --user Heath123 --repo pakkit --tag v${BUILD_NUMBER} --name "pakkit-macos-x64.zip" --file out/pakkit-macos-x64.zip'
+                    if(env.BRANCH_NAME == 'master'){
+                    stage("Release") {
+                        withCredentials([usernamePassword(credentialsId: 'GitHubPAToken', usernameVariable: 'USERNAME', passwordVariable: 'GITHUB_TOKEN')]) {
+                            sh 'echo "Creating a new release in github"'
+                            sh 'github-release release --user Heath123 --repo pakkit --tag v${BUILD_NUMBER} --name "Jenkins build ${BUILD_NUMBER}"'
+                            sh 'echo "Uploading the artifacts into github"'
+                            sh 'github-release upload --user Heath123 --repo pakkit --tag v${BUILD_NUMBER} --name "pakkit-windows-x64.zip" --file out/pakkit-windows-x64.zip'
+                            sh 'github-release upload --user Heath123 --repo pakkit --tag v${BUILD_NUMBER} --name "pakkit-linux-x64.zip" --file out/pakkit-linux-x64.zip'
+                            sh 'github-release upload --user Heath123 --repo pakkit --tag v${BUILD_NUMBER} --name "pakkit-macos-x64.zip" --file out/pakkit-macos-x64.zip'
+                        }
                     }
                 }
             }
