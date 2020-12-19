@@ -4,10 +4,20 @@ exports.setup = function (passedSharedVars) {
   sharedVars = passedSharedVars
 
   sharedVars.ipcRenderer.on('copyPacketData', (event, arg) => {
-    console.log(sharedVars.allPackets)
     const ipcMessage = JSON.parse(arg)
     let data = sharedVars.allPackets[ipcMessage.id].data
     data = sharedVars.proxyCapabilities.jsonData ? JSON.stringify(data, null, 2) : data.data
+    sharedVars.ipcRenderer.send('copyToClipboard', data)
+  })
+
+  sharedVars.ipcRenderer.on('copyHexData', (event, arg) => {
+    const ipcMessage = JSON.parse(arg)
+    let data = ''
+    for (const byte of sharedVars.allPackets[ipcMessage.id].raw) {
+      data += byte.toString(16).padStart(2, '0')
+      data += ' '
+    }
+    data = data.trim().toUpperCase()
     sharedVars.ipcRenderer.send('copyToClipboard', data)
   })
 

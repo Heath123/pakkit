@@ -38,7 +38,6 @@ function makeMenu (direction, text, id) {
       label: proxy.capabilities.jsonData ? 'Copy JSON data' : 'Copy data',
       click: () => {
         BrowserWindow.getAllWindows()[0].send('copyPacketData', JSON.stringify({
-          // Packet ID from link URL
           id: id
         }))
       }
@@ -47,7 +46,6 @@ function makeMenu (direction, text, id) {
       label: 'Edit and resend',
       click: () => {
         BrowserWindow.getAllWindows()[0].send('editAndResend', JSON.stringify({
-          // Packet ID from link URL
           id: id
         }))
       },
@@ -70,11 +68,23 @@ function makeMenu (direction, text, id) {
         label: 'Copy teleport as command',
         click: () => {
           BrowserWindow.getAllWindows()[0].send('copyTeleportCommand', JSON.stringify({
-            // Packet ID from link URL
             id: id
           }))
         }
       }
+    )
+  }
+
+  if (proxy.capabilities.rawData) {
+    menuData.splice(3, 0,
+        {
+          label: 'Copy hex data',
+          click: () => {
+            BrowserWindow.getAllWindows()[0].send('copyHexData', JSON.stringify({
+              id: id
+            }))
+          }
+        }
     )
   }
 

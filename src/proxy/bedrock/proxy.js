@@ -8,6 +8,9 @@ let storedCallback
 let mayBeFrozen = false
 let timeFrozen
 
+let proxyPass
+let proxyPlayerSession
+
 // This whole thing is messy for now.
 
 exports.capabilities = {
@@ -19,7 +22,10 @@ exports.capabilities = {
 
 exports.startProxy = function (host, port, listenPort, version, authConsent, callback, dataFolder) {
   java.classpath.push(dataFolder + '/proxypass/proxypass-pakkit.jar')
-  const proxyPass = java.import('com.nukkitx.proxypass.ProxyPass')
+
+  proxyPass = java.import('com.nukkitx.proxypass.ProxyPass')
+  proxyPlayerSession = java.import('com.nukkitx.proxypass.network.bedrock.session.ProxyPlayerSession')
+
   storedCallback = callback
 
   console.log(proxyPass)
@@ -56,11 +62,9 @@ exports.end = function () {
 }
 
 exports.writeToClient = function (meta, data) {
-  const proxyPlayerSession = java.import('com.nukkitx.proxypass.network.bedrock.session.ProxyPlayerSession')
   proxyPlayerSession.injectPacketStaticSync(JSON.stringify(data), meta.className, 'client')
 }
 
 exports.writeToServer = function (meta, data) {
-  const proxyPlayerSession = java.import('com.nukkitx.proxypass.network.bedrock.session.ProxyPlayerSession')
   proxyPlayerSession.injectPacketStaticSync(JSON.stringify(data), meta.className, 'server')
 }
