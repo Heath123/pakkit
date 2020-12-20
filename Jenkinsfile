@@ -7,7 +7,7 @@ pipeline {
     stages {
         stage('build') {
             steps {
-                sh 'npm install --only=dev'
+                sh 'npm install'
                 sh 'npx electron-forge package --platform win32'
                 sh 'cd out/pakkit-win32-x64/resources/app/; node-prune; npx electron-rebuild; cd node_modules/java; node postInstall.js'
                 sh 'npx electron-forge package --platform linux'
