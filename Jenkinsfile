@@ -7,13 +7,13 @@ pipeline {
     stages {
         stage('build') {
             steps {
-                sh 'npm install --dev'
+                sh 'npm install --only=dev'
                 sh 'npx electron-forge package --platform win32'
-                sh 'cd out/pakkit-win32-x64/resources/app/; node-prune; cd node_modules/java; node postInstall.js'
+                sh 'cd out/pakkit-win32-x64/resources/app/; node-prune; npx electron-rebuild; cd node_modules/java; node postInstall.js'
                 sh 'npx electron-forge package --platform linux'
-                sh 'cd out/pakkit-linux-x64/resources/app/; node-prune; cd node_modules/java; node postInstall.js'
+                sh 'cd out/pakkit-linux-x64/resources/app/; node-prune; npx electron-rebuild; cd node_modules/java; node postInstall.js'
                 // sh 'npx electron-forge package --platform darwin'
-                // sh 'cd out/pakkit-darwin-x64/Electron.app/Contents/Resources/app/; node-prune; cd node_modules/java; node postInstall.js'
+                // sh 'cd out/pakkit-darwin-x64/Electron.app/Contents/Resources/app/; npx electron-rebuild; node-prune; cd node_modules/java; node postInstall.js'
                 sh 'mv out/pakkit-win32-x64 pakkit-windows-x64'
                 sh 'mv out/pakkit-linux-x64 pakkit-linux-x64'
                 // sh 'mv out/pakkit-darwin-x64 pakkit-macos-x64'
