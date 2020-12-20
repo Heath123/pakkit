@@ -24,7 +24,7 @@ try {
     setupDataFolder = require('./setupDataFolder.js')
 } catch (err) {
     console.log('err', err.message)
-    if (err.message.includes('The specified module could not be found.')) {
+    if (err.message.includes('The specified module could not be found.') || err.message.includes('Cannot find module')) {
         console.log('fix!!!')
         if (!fs.existsSync(resourcesPath + 'flag_java_fixed.txt')) {
             fs.openSync(resourcesPath + 'flag_java_fixed.txt', 'w')
