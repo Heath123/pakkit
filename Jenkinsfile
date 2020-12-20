@@ -9,13 +9,17 @@ pipeline {
             steps {
                 sh 'npm install'
                 sh 'node-prune'
+                sh 'cd node_modules/java/'
+                sh 'node postInstall.js'
+                sh 'cd ../..'
                 sh 'npx electron-forge package --platform win32'
                 sh 'npx electron-forge package --platform linux'
                 sh 'npx electron-forge package --platform darwin'
                 sh 'mv out/pakkit-win32-x64 pakkit-windows-x64'
+                sh 'mv out/pakkit-linux-x64 pakkit-linux-x64'
                 sh 'mv out/pakkit-darwin-x64 pakkit-macos-x64'
-                sh 'zip -r out/pakkit-windows-x64.zip pakkit-windows-x64/'
-                sh 'zip -r out/pakkit-linux-x64.zip pakkit-linux-x64/'
+                sh 'zip -r -y out/pakkit-windows-x64.zip pakkit-windows-x64/'
+                sh 'zip -r -y out/pakkit-linux-x64.zip pakkit-linux-x64/'
                 sh 'zip -r -y out/pakkit-macos-x64.zip pakkit-macos-x64/'
             }
             post {
