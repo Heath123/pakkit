@@ -10,9 +10,90 @@
  * Also improved and tweaked styling
  */
 
-/* function compactView(json) {
-  if (typeof json === '')
-} */
+// A bunch of duplicated code, I know...
+
+function getType (val) {
+  if (val === null) {
+    return 'null'
+  }
+
+  switch (typeof val) {
+    case 'number':
+      return 'number'
+
+    case 'string':
+      return 'string'
+
+    case 'boolean':
+      return 'boolean'
+  }
+
+  switch (Object.prototype.toString.call(val)) {
+    case '[object Array]':
+      return 'array'
+
+    case '[object Object]':
+      return 'object'
+  }
+
+  throw new Error('Bad type: ' + Object.prototype.toString.call(val))
+}
+
+function toHtml (element, text, isLabel) {
+  return '<span class="' + (isLabel ? 'jsontree_label' : 'jsontree_value jsontree_value_' + getType(element)) + '">' +
+      escapeHtml(text) +
+      '</span>'
+}
+
+const maxLength = 75
+
+function compactView(json) {
+  let out = ''
+  /* let newJson = json
+  if (json.length > 6) {
+    newJson = newJson.slice(0, 6)
+  } */
+  let didBreak = false
+  let currentLength = -2
+  let elementsAdded = 0
+  for (const key in json) {
+    if (!json.hasOwnProperty(key)) {
+      continue
+    }
+    const element = json[key]
+    currentLength += 2 // for ', '
+    let labelText
+    if (!Array.isArray(json)) {
+      labelText = typeof key === 'string' ? key : JSON.stringify(key)
+      currentLength += labelText.length
+      currentLength += 2 // for ': '
+    }
+    const text = typeof element == 'object' ?
+        (Array.isArray(element) ? '[ … ]' : '{ … }') :
+        JSON.stringify(element)
+    currentLength += text.length
+    if (currentLength > maxLength) {
+      didBreak = true
+      break
+    }
+    elementsAdded += 1
+    if (!Array.isArray(json)) {
+      out += toHtml(key, labelText, true)
+      out += ': '
+    }
+    out += toHtml(element, text, false)
+    out += ', '
+  }
+  // Remove trailing comma
+  out = out.substring(0, out.length - 2)
+  if (didBreak) {
+    if (elementsAdded === 1) {
+     out += ','
+    }
+    out += ' …'
+  }
+  return out.trim()
+}
 
 const escapeHtml = require('escape-html')
 
@@ -86,7 +167,7 @@ window.jsonTree = (function () {
           break
 
         case 'object':
-          var keys = Object.keys(obj).sort()
+          var keys = Object.keys(obj) // .sort()
 
           isLast = keys.length - 1
 
@@ -449,7 +530,7 @@ window.jsonTree = (function () {
           self.type +
           '">\n                                <b>' +
           escapeHtml(sym[0]) +
-          '</b>\n                                <span class="jsontree_show-more">&hellip;</span>\n                                <ul class="jsontree_child-nodes"></ul>\n                                <b>' +
+          '</b>\n                                <span class="jsontree_show-more">' + compactView(val) + '</span>\n                                <ul class="jsontree_child-nodes"></ul>\n                                <b>' +
           escapeHtml(sym[1]) +
           '</b>' +
           '</div>' +

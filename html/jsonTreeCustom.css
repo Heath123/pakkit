@@ -14,9 +14,6 @@
 .jsontree_value_number {
   color: rgb(127, 127, 255);
 }
-.jsontree_value_number {
-  color: #F00;
-}
 .jsontree_value_string {
   color: red;
   white-space: pre;
@@ -24,3 +21,9 @@
 .jsontree_value_boolean {
   color: #ff7600;
 }
+/*.jsontree_node_complex {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  display: inline-block;
+}*/
