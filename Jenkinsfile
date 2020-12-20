@@ -21,8 +21,8 @@ pipeline {
             post {
                 success {
                     archiveArtifacts artifacts: '**/out/*.zip', fingerprint: true
-                    if (env.BRANCH_NAME == 'master') {
-                        stage("Release") {
+                    stage("Release") {
+                        if (env.BRANCH_NAME == 'master') {
                             withCredentials([usernamePassword(credentialsId: 'GitHubPAToken', usernameVariable: 'USERNAME', passwordVariable: 'GITHUB_TOKEN')]) {
                                 sh 'echo "Creating a new release in github"'
                                 sh 'github-release release --user Heath123 --repo pakkit --tag v${BUILD_NUMBER} --name "Jenkins build ${BUILD_NUMBER}"'
