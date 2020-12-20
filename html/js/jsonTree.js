@@ -7,7 +7,12 @@
  * Copyright 2017 Vera Lobacheva (http://iamvera.com)
  * Released under the MIT license (LICENSE.txt)
  * Modified for Pakkit because the original seems to be abandoned and doesn't escape HTML properly
+ * Also improved and tweaked styling
  */
+
+/* function compactView(json) {
+  if (typeof json === '')
+} */
 
 const escapeHtml = require('escape-html')
 
@@ -224,8 +229,8 @@ window.jsonTree = (function () {
     const template = function (label, val) {
       const str =
         '\n                    <span class="jsontree_label-wrapper">\n                        <span class="jsontree_label">' +
-        escapeHtml(JSON.stringify(label)) +
-        '</span> : \n                    </span>\n                    <span class="jsontree_value-wrapper">\n                        <span class="jsontree_value jsontree_value_' +
+        escapeHtml(typeof label === 'string' ? label : JSON.stringify(label)) +
+        '</span>: \n                    </span>\n                    <span class="jsontree_value-wrapper">\n                        <span class="jsontree_value jsontree_value_' +
         self.type +
         '">' +
         escapeHtml(val) +
@@ -455,9 +460,8 @@ window.jsonTree = (function () {
         str =
           '\n                        <span class="jsontree_label-wrapper">\n                            <span class="jsontree_label">' +
           '<span class="jsontree_expand-button"></span>' +
-          '"' +
-          escapeHtml(label) +
-          '"</span> : \n                        </span>' +
+            escapeHtml(typeof label === 'string' ? label : JSON.stringify(label)) +
+          '</span>: \n                        </span>' +
           str
       }
 

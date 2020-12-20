@@ -6,19 +6,19 @@
   line-height: normal;
 }
 .jsontree_label {
-  color: rgba(255, 255, 255, 0.8);
+  color: rgb(255, 127, 255);
 }
 .jsontree_expand-button {
   filter: invert(1);
 }
 .jsontree_value_number {
-  color: #0FF;
+  color: rgb(127, 127, 255);
 }
 .jsontree_value_number {
   color: #F00;
 }
 .jsontree_value_string {
-  color: #0F0;
+  color: red;
   white-space: pre;
 }
 .jsontree_value_boolean {
