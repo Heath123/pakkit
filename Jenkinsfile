@@ -9,9 +9,7 @@ pipeline {
             steps {
                 sh 'npm install'
                 sh 'node-prune'
-                sh 'cd node_modules/java/'
-                sh 'node postInstall.js'
-                sh 'cd ../..'
+                sh 'cd node_modules/java/; node postInstall.js; cd ../..'
                 sh 'npx electron-forge package --platform win32'
                 sh 'npx electron-forge package --platform linux'
                 sh 'npx electron-forge package --platform darwin'
