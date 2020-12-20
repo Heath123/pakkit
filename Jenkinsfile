@@ -10,7 +10,7 @@ pipeline {
                 sh 'npm install'
                 sh 'npx electron-forge package --platform win32'
                 sh 'cd out/pakkit-win32-x64/resources/app/; node-prune; npx electron-rebuild -v 8.5.2; cd node_modules/java/build; rm -rf Release'
-                sh 'cp -r javaCompiledReleaseWindows/Release node_modules/java/build/Release'
+                sh 'cp -r javaCompiledReleaseWindows/Release out/pakkit-win32-x64/resources/app/node_modules/java/build/Release'
                 sh 'npx electron-forge package --platform linux'
                 sh 'cd out/pakkit-linux-x64/resources/app/; node-prune; npx electron-rebuild -v 8.5.2;'
                 // sh 'npx electron-forge package --platform darwin'
