@@ -13,14 +13,14 @@ pipeline {
                 sh 'cp -r javaCompiledReleaseWindows/Release out/pakkit-win32-x64/resources/app/node_modules/java/build/Release'
                 sh 'npx electron-forge package --platform linux'
                 sh 'cd out/pakkit-linux-x64/resources/app/; node-prune; npx electron-rebuild -v 8.5.2;'
-                // sh 'npx electron-forge package --platform darwin'
-                // sh 'cd out/pakkit-darwin-x64/Electron.app/Contents/Resources/app/; npx electron-rebuild -v 8.5.2; node-prune; cd node_modules/java; node postInstall.js'
+                sh 'npx electron-forge package --platform darwin'
+                sh 'cd out/pakkit-darwin-x64/pakkit.app/Contents/Resources/app/; npx electron-rebuild -v 8.5.2;'
                 sh 'mv out/pakkit-win32-x64 pakkit-windows-x64'
                 sh 'mv out/pakkit-linux-x64 pakkit-linux-x64'
-                // sh 'mv out/pakkit-darwin-x64 pakkit-macos-x64'
+                sh 'mv out/pakkit-darwin-x64 pakkit-macos-x64'
                 sh 'zip -r -y out/pakkit-windows-x64.zip pakkit-windows-x64/'
                 sh 'zip -r -y out/pakkit-linux-x64.zip pakkit-linux-x64/'
-                // sh 'zip -r -y out/pakkit-macos-x64.zip pakkit-macos-x64/'
+                sh 'zip -r -y out/pakkit-macos-x64.zip pakkit-macos-x64/'
             }
             post {
                 success {
