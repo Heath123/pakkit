@@ -7,3 +7,5 @@ start.sh
 .vscode
 quick_start.sh
 GPUCache
+*.log
+logs/
