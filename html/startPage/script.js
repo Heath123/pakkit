@@ -26,7 +26,7 @@ platformChange()
 loadSettings(platform)
 
 function loadSettings (newPlatform) {
-  loadSetting(newPlatform + 'LastVersion', 'version', 'version', '1.15.2')
+  loadSetting(newPlatform + 'LastVersion', 'version', 'version', '1.16.4')
   loadSetting(newPlatform + 'LastConnectAddress', 'connectAddress', 'connect-address', '127.0.0.1')
   loadSetting(newPlatform + 'LastConnectPort', 'connectPort', 'connect-port', platform === 'java' ? '25565' : '19132')
   loadSetting(newPlatform + 'LastListenPort', 'listenPort', 'listen-port', platform === 'java' ? '25566' : '19133')

@@ -263,6 +263,7 @@ sharedVars.ipcRenderer.on('editAndResend', (event, arg) => { // Context menu
 })
 
 function deselectPacket () {
+  removeOrAddSelection(currentPacket, false)
   currentPacket = undefined
   currentPacketType = undefined
   sharedVars.packetDom.getTreeElement().firstElementChild.innerHTML = 'No packet selected!'
@@ -285,9 +286,35 @@ window.showAllPackets = function () { // window. stops standardjs from complaini
 
 const hexViewer = document.getElementById('hex-viewer')
 
+function removeOrAddSelection (id, add) {
+  const fakeElement = document.createElement('div')
+  fakeElement.innerHTML = sharedVars.allPacketsHTML[currentPacket][0]
+  if (add) {
+    fakeElement.firstChild.classList.add('selected')
+  } else {
+    fakeElement.firstChild.classList.remove('selected')
+  }
+  sharedVars.allPacketsHTML[currentPacket] = [fakeElement.innerHTML]
+
+  wrappedClusterizeUpdate(sharedVars.allPacketsHTML)
+  clusterize.refresh()
+}
+
 window.packetClick = function (id) { // window. stops standardjs from complaining
+  // Remove selection background from old selected packet
+  if (currentPacket) {
+    /* const previousPacket = document.getElementById('packet' + currentPacket)
+    // May not be in view
+    if (previousPacket) {
+      document.getElementById('packet' + currentPacket).classList.remove('selected')
+    } */
+    removeOrAddSelection(currentPacket, false)
+  }
+
   currentPacket = id
-  currentPacketType = document.getElementById('packet' + id).children[1].innerText
+  const element = document.getElementById('packet' + id)
+  currentPacketType = element.children[1].innerText
+  removeOrAddSelection(currentPacket, true)
   document.body.className = 'packetSelected'
   if (sharedVars.proxyCapabilities.jsonData) {
     // sidebar.innerHTML = '<div style="padding: 10px;">Loading packet data...</div>';

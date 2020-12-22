@@ -1,8 +1,6 @@
 const {app, BrowserWindow, ipcMain, clipboard, Menu} = require('electron')
 app.allowRendererProcessReuse = true
 
-console.log('test')
-
 const fs = require('fs')
 
 let proxy // Defined later when an option is chosen

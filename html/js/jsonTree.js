@@ -45,7 +45,7 @@ function toHtml (element, text, isLabel) {
       '</span>'
 }
 
-const maxLength = 75
+const maxLength = 50
 
 function compactView(json) {
   let out = ''

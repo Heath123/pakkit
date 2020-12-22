@@ -36,7 +36,8 @@ exports.startProxy = function (host, port, listenPort, version, authConsent, cal
 
   // Poll for packets as the java module doesn't seem to support callbacks
   setInterval(function () {
-    for (const item of proxyPass.packetQueue.toArraySync()) {
+    const array = proxyPass.packetQueue.toArraySync()
+    for (const item of array) {
       const name = item.packetType.toStringSync().toLowerCase();
 
       const data = JSON.parse(item.jsonData);
@@ -58,7 +59,9 @@ exports.startProxy = function (host, port, listenPort, version, authConsent, cal
 }
 
 exports.end = function () {
-  proxyPass.shutdownStaticSync();
+  proxyPass.shutdownStatic(function(err, test) {
+    console.log(err, test)
+  });
 }
 
 exports.writeToClient = function (meta, data) {

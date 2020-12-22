@@ -254,3 +254,7 @@ div.error {
   font-size: 90%;
   color: red;
 }
+
+.packet.selected {
+  background: rgba(64, 127, 255, 0.15);
+}
