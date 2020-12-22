@@ -17,6 +17,8 @@ let setupDataFolder
 
 let continueProgram = true
 
+// Hacky workaround for problems with java module in CI builds
+
 try {
     javaProxy = require('./proxy/java/proxy.js')
     bedrockProxy = require('./proxy/bedrock/proxy.js')
@@ -26,27 +28,31 @@ try {
     console.log('err', err.message)
     if (err.message.includes('The specified module could not be found.') || err.message.includes('Cannot find module')) {
         console.log('fix!!!')
-        if (!fs.existsSync(resourcesPath + 'flag_java_fixed.txt')) {
-            fs.openSync(resourcesPath + 'flag_java_fixed.txt', 'w')
-            // Run postInstall.js for java module
-            if (fs.existsSync(resourcesPath + 'node_modules/java/')) {
-                console.log('Running postInstall.js...')
-                const oldDir = process.cwd()
-                process.chdir(resourcesPath + 'node_modules/java/')
-                require(oldDir + '/' + resourcesPath + 'node_modules/java/postInstall.js')
-                process.chdir(oldDir)
+        continueProgram = false
+        // Run postInstall.js for java module
+        if (fs.existsSync(resourcesPath + 'node_modules/java/')) {
+            console.log('Running postInstall.js...')
+            const oldDir = process.cwd()
+            process.chdir(resourcesPath + 'node_modules/java/')
+            require(oldDir + '/' + resourcesPath + 'node_modules/java/postInstall.js')
+            process.chdir(oldDir)
 
-                continueProgram = false
-                setTimeout(() => {
+            if (process.platform !== 'win32') {
+                console.error('SHOULD RESTART PROGRAM')
+            }
+
+            setTimeout(() => {
+                // Handled by start script on Linux
+                if (process.platform === 'win32') {
                     app.relaunch()
                     app.exit()
-                    process.exit(0)
-                }, 3000)
-            } else {
-                console.error(resourcesPath + 'node_modules/java/ does not exist!')
-                app.exit()
+                }
                 process.exit(0)
-            }
+            }, 3000)
+        } else {
+            console.error(resourcesPath + 'node_modules/java/ does not exist!')
+            app.exit()
+            process.exit(0)
         }
     }
 }
