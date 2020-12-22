@@ -30,7 +30,7 @@ exports.startProxy = function (host, port, listenPort, version, authConsent, cal
   storedCallback = callback
 
   console.log(proxyPass)
-  proxyPass.startFromArgs('0.0.0.0', Number(listenPort), host, Number(port), 1, true, function(err, test) {
+  proxyPass.startFromArgs('0.0.0.0', Number(listenPort), host, Number(port), 1, true, true, "pakkit", "pakkit proxy powered by ProxyPass", function(err, test) {
     console.log(err, test)
   })
 
