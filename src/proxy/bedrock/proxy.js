@@ -18,6 +18,8 @@ exports.capabilities = {
   jsonData: true,
   rawData: true,
   scriptingSupport: false,
+  clientboundPackets: {},
+  serverboundPackets: {},
   wikiVgPage: 'https://wiki.vg/Bedrock_Protocol'
 }
 
@@ -26,6 +28,15 @@ exports.startProxy = function (host, port, listenPort, version, authConsent, cal
 
   proxyPass = java.import('com.nukkitx.proxypass.ProxyPass')
   proxyPlayerSession = java.import('com.nukkitx.proxypass.network.bedrock.session.ProxyPlayerSession')
+
+  const packetTypes = JSON.parse(proxyPlayerSession.getIdBiMapStaticSync())
+  for (const index in packetTypes) {
+    const idString = '0x' + Number(index).toString(16).padStart(2, '0')
+    const name = packetTypes[index].toLowerCase()
+    // There isn't much of a distinction between serverbound and clientbound in Bedrock and many packets can be sent both ways
+    exports.capabilities.clientboundPackets[idString] = name
+    exports.capabilities.serverboundPackets[idString] = name
+  }
 
   storedCallback = callback
 

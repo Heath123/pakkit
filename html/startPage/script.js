@@ -1,6 +1,7 @@
-/* global localStorage */
-
 const { ipcRenderer } = require('electron')
+const Store = require('electron-store');
+
+const store = new Store();
 
 /* const customTitlebar = require('custom-electron-titlebar');
 
@@ -8,14 +9,15 @@ new customTitlebar.Titlebar({
     backgroundColor: customTitlebar.Color.fromHex('#FFF')
 }); */
 
-if (localStorage.getItem('authConsentGiven') !== 'true') {
+if (!store.get('authConsentGiven')) {
   document.getElementById('consent-box').style.display = 'contents'
 }
 
 let isLoading = false
-
 let connectAddress
 let connectPort
+
+
 let listenPort
 let platform
 let version
@@ -33,19 +35,19 @@ function loadSettings (newPlatform) {
 }
 
 function saveSettings (thePlatform) {
-  localStorage.setItem('lastPlatform', platform)
-  localStorage.setItem(thePlatform + 'LastVersion', version)
-  localStorage.setItem(thePlatform + 'LastConnectAddress', connectAddress)
-  localStorage.setItem(thePlatform + 'LastConnectPort', connectPort)
-  localStorage.setItem(thePlatform + 'LastListenPort', listenPort)
+  store.set('lastPlatform', platform)
+  store.set(thePlatform + 'LastVersion', version)
+  store.set(thePlatform + 'LastConnectAddress', connectAddress)
+  store.set(thePlatform + 'LastConnectPort', connectPort)
+  store.set(thePlatform + 'LastListenPort', listenPort)
 }
 
 function loadSetting (name, varname, elementID, defaultValue) {
-  if (!localStorage.getItem(name)) {
-    localStorage.setItem(name, defaultValue)
+  if (!store.get(name)) {
+    store.set(name, defaultValue)
   }
 
-  window[varname] = localStorage.getItem(name)
+  window[varname] = store.get(name)
   document.getElementById(elementID).value = window[varname]
 }
 
@@ -92,11 +94,11 @@ window.startProxy = function (event) {
     listenPort = (listenPort === '') ? '25566' : listenPort
   }
   if (document.getElementById('consent').checked) {
-    localStorage.setItem('authConsentGiven', 'true')
+    store.set('authConsentGiven', true)
   }
   // TODO: Validate data (e.g. port range)
   ipcRenderer.send('startProxy', JSON.stringify({
-    consent: localStorage.getItem('authConsentGiven') === 'true',
+    consent: store.get('authConsentGiven'),
     connectAddress: connectAddress,
     connectPort: connectPort,
     listenPort: listenPort,
