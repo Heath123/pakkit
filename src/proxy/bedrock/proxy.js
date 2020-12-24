@@ -61,7 +61,11 @@ exports.startProxy = function (host, port, listenPort, version, authConsent, cal
       delete data.clientId
       delete data.senderId
 
-      storedCallback(item.direction, { name: name, className: item.className }, data, hexIdString, Object.values(item.bytes))
+      const raw = Object.values(item.bytes)
+      // Prepend packet ID for consistency with Java Edition
+      raw.unshift(item.packetId)
+
+      storedCallback(item.direction, { name: name, className: item.className }, data, hexIdString, raw)
     }
 
     proxyPass.packetQueue.clearSync()
