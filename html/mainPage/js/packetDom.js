@@ -45,10 +45,11 @@ function addPacketToDOM (packet) {
       sharedVars.packetList.parentElement.scrollTop = sharedVars.packetList.parentElement.scrollHeight;
     }
   } */
-  if (!isHidden) {
+  if (isHidden) {
+    sharedVars.hiddenPacketsAmount += 1
+  } else {
     sharedVars.packetsUpdated = true
   }
-
   updateHidden()
 }
 
@@ -68,12 +69,10 @@ function refreshPackets () {
 }
 
 function updateHidden () {
-  // TODO: make it work
-  /* hiddenPacketsAmount = (sharedVars.allPackets.length - sharedVars.allPacketsHTML.length);
-  document.getElementById("hiddenPackets").innerHTML = hiddenPacketsAmount + ' hidden packets';
-  if (hiddenPacketsAmount != 0) {
+  document.getElementById("hiddenPackets").innerHTML = sharedVars.hiddenPacketsAmount + ' hidden packets';
+  if (sharedVars.hiddenPacketsAmount != 0) {
      document.getElementById("hiddenPackets").innerHTML += ' (<a href="#" onclick="showAllPackets()">show all</a>)'
-  } */
+  }
 }
 
 exports.setup = function (passedSharedVars) {

@@ -63,10 +63,7 @@
         Tick the box to show packets
 
         <div id="mainPresets">
-            <button onclick="sharedVars.hiddenPackets = {
-            serverbound: [], clientbound: []
-          }
-          updateFilteringTab()" style="margin-left: 16px;">Show all
+            <button onclick="showAllPackets()" style="margin-left: 16px;">Show all
             </button>
 
             <!-- TODO: More dynamic and clean method of doing this -->
@@ -122,7 +119,7 @@
     <div class="split" id="packets">
         <div class="toolbar">
             <a href="#" onclick="clearPackets()">Clear</a>
-            <!-- <span id="hiddenPackets"></span> Removed for now -->
+            <span id="hiddenPackets"></span>
         </div>
         <div class="box clusterize-scroll" id="packetcontainer">
             <ul class="packetlist clusterize-content" id="packetlist">

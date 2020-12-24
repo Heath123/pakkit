@@ -16,16 +16,25 @@ let currentPacketType
 
 const filterInput = document.getElementById('filter')
 
+const hiddenPacketsCounter = document.getElementById('hiddenPackets')
+
 // Should improve performance by excluding hidden packets
 function wrappedClusterizeUpdate (htmlArray) {
+  sharedVars.hiddenPacketsAmount = 0
   const newArray = []
   for (const item of htmlArray) {
-    if (!item[0]
-      .match(/<li .* class=".*filter-hidden">/)) {
+    // If the packet is hidden
+    if (item[0].match(/<li .* class=".*filter-hidden">/)) {
+      sharedVars.hiddenPacketsAmount += 1
+    } else {
       newArray.push(item)
     }
   }
   clusterize.update(newArray)
+  hiddenPacketsCounter.innerHTML = sharedVars.hiddenPacketsAmount + ' hidden packets';
+  if (sharedVars.hiddenPacketsAmount != 0) {
+    hiddenPacketsCounter.innerHTML += ' (<a href="#" onclick="showAllPackets()">show all</a>)'
+  }
 }
 
 // Cleaned up from https://css-tricks.com/indeterminate-checkboxes/
@@ -104,7 +113,8 @@ const sharedVars = {
   packetList: document.getElementById('packetlist'),
   hiddenPackets: undefined,
   scripting: undefined,
-  lastFilter: ''
+  lastFilter: '',
+  hiddenPacketsAmount: 0
 }
 
 sharedVars.proxyCapabilities = JSON.parse(sharedVars.ipcRenderer.sendSync('proxyCapabilities', ''))
@@ -197,6 +207,7 @@ function updateFilteringTab () {
     checkbox.checked = isShown
   }
 
+  updateFiltering()
   updateFilteringStorage()
 }
 
@@ -311,7 +322,10 @@ window.clearPackets = function () { // window. stops standardjs from complaining
 }
 
 window.showAllPackets = function () { // window. stops standardjs from complaining
-  sharedVars.hiddenPackets = []
+  sharedVars.hiddenPackets = {
+    serverbound: [], clientbound: []
+  }
+  updateFilteringTab()
 }
 
 const hexViewer = document.getElementById('hex-viewer')
