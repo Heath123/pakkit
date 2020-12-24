@@ -24,7 +24,21 @@ exports.capabilities = {
   versionId: 'bedrock-proxypass-json'
 }
 
-exports.startProxy = function (host, port, listenPort, version, authConsent, callback, dataFolder) {
+let host
+let port
+let listenPort
+
+function launch() {
+  proxyPass.startFromArgs('0.0.0.0', Number(listenPort), host, Number(port), 1, true, true, "pakkit", "pakkit proxy powered by ProxyPass", function(err, test) {
+    console.log(err, test)
+  })
+}
+
+exports.startProxy = function (passedHost, passedPort, passedListenPort, version, authConsent, callback, dataFolder) {
+  host = passedHost
+  port = passedPort
+  listenPort = passedListenPort
+
   java.classpath.push(dataFolder + '/proxypass/proxypass-pakkit.jar')
 
   proxyPass = java.import('com.nukkitx.proxypass.ProxyPass')
@@ -41,31 +55,39 @@ exports.startProxy = function (host, port, listenPort, version, authConsent, cal
 
   storedCallback = callback
 
-  console.log(proxyPass)
-  proxyPass.startFromArgs('0.0.0.0', Number(listenPort), host, Number(port), 1, true, true, "pakkit", "pakkit proxy powered by ProxyPass", function(err, test) {
-    console.log(err, test)
-  })
+  launch()
 
   // Poll for packets as the java module doesn't seem to support callbacks
   setInterval(function () {
     const array = proxyPass.packetQueue.toArraySync()
     for (const item of array) {
-      const name = item.packetType.toStringSync().toLowerCase();
+      if (item.isEvent) {
+        switch(item.eventType) {
+          case 'disconnect':
+            console.log('Disconnect - relaunching proxy')
+            relaunch()
+            break;
+          default:
+            console.log('Unknown event', item.eventType)
+        }
+      } else {
+        const name = item.packetType.toStringSync().toLowerCase();
 
-      const data = JSON.parse(item.jsonData);
-      const hexIdString = '0x' + item.packetId.toString(16).padStart(2, '0')
+        const data = JSON.parse(item.jsonData);
+        const hexIdString = '0x' + item.packetId.toString(16).padStart(2, '0')
 
-      // These values are unneeded or are exposed elsewhere in the GUI
-      delete data.packetId
-      delete data.packetType
-      delete data.clientId
-      delete data.senderId
+        // These values are unneeded or are exposed elsewhere in the GUI
+        delete data.packetId
+        delete data.packetType
+        delete data.clientId
+        delete data.senderId
 
-      const raw = Object.values(item.bytes)
-      // Prepend packet ID for consistency with Java Edition
-      raw.unshift(item.packetId)
+        const raw = Object.values(item.bytes)
+        // Prepend packet ID for consistency with Java Edition
+        raw.unshift(item.packetId)
 
-      storedCallback(item.direction, { name: name, className: item.className }, data, hexIdString, raw)
+        storedCallback(item.direction, { name: name, className: item.className }, data, hexIdString, raw)
+      }
     }
 
     proxyPass.packetQueue.clearSync()
@@ -77,7 +99,15 @@ exports.startProxy = function (host, port, listenPort, version, authConsent, cal
 exports.end = function () {
   proxyPass.shutdownStatic(function(err, test) {
     console.log(err, test)
-  });
+  })
+}
+
+// used to relaunch on disconnect
+function relaunch () {
+  proxyPass.shutdownStatic(function(err, test) {
+    console.log(err, test)
+    launch()
+  })
 }
 
 exports.writeToClient = function (meta, data) {

@@ -313,9 +313,9 @@ function deselectPacket () {
 }
 
 window.clearPackets = function () { // window. stops standardjs from complaining
+  deselectPacket()
   sharedVars.allPackets = []
   sharedVars.allPacketsHTML = []
-  deselectPacket()
   sharedVars.packetsUpdated = true
   // TODO: Doesn't seem to work? When removing line above it doesn't do anything until the next packet
   wrappedClusterizeUpdate([])
