@@ -34,7 +34,7 @@ function launch() {
   })
 }
 
-exports.startProxy = function (passedHost, passedPort, passedListenPort, version, authConsent, callback, dataFolder) {
+exports.startProxy = function (passedHost, passedPort, passedListenPort, version, authConsent, callback, messageCallback, dataFolder) {
   host = passedHost
   port = passedPort
   listenPort = passedListenPort
@@ -63,6 +63,12 @@ exports.startProxy = function (passedHost, passedPort, passedListenPort, version
     for (const item of array) {
       if (item.isEvent) {
         switch(item.eventType) {
+          case 'unableToConnect':
+            messageCallback('Ubale to connect to server', 'Unable to connect to the Bedrock server at ' +
+              item.eventData.replace(/^\//, '') + // Remove slash at start
+              '. Make sure the server is online.')
+            relaunch()
+            break;
           case 'disconnect':
             console.log('Disconnect - relaunching proxy')
             relaunch()

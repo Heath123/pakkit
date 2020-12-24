@@ -280,12 +280,13 @@ function editAndResend (id) {
 
   // dialogOpen = true
   document.getElementById('dialog-overlay').className = 'dialog-overlay active'
+  document.getElementById('dialog').className='dialog'
   document.getElementById('dialog').innerHTML =
 
-    `<h2>Edit and resend packet</h2>
-  <textarea id="packetEditor"></textarea>
-  <button style="margin-top: 16px;" onclick="resendEdited(${id}, packetEditor.getValue())">Send</button>
-  <button style="margin-top: 16px;" onclick="closeDialog()">Close</button>`
+   `<h2>Edit and resend packet</h2>
+    <textarea id="packetEditor"></textarea>
+    <button style="margin-top: 16px;" onclick="resendEdited(${id}, packetEditor.getValue())">Send</button>
+    <button style="margin-top: 16px;" class="bottom-button" onclick="closeDialog()">Close</button>`
 
   document.getElementById('packetEditor').value = JSON.stringify(sharedVars.allPackets[id].data, null, 2)
 
@@ -294,6 +295,18 @@ function editAndResend (id) {
     autoCloseBrackets: true,
     theme: 'darcula'
   })
+}
+
+function errorDialog(header, info) {
+  // dialogOpen = true
+  document.getElementById('dialog-overlay').className = 'dialog-overlay active'
+  document.getElementById('dialog').className='dialog dialog-small'
+  document.getElementById('dialog').innerHTML =
+
+ `<h2>${header}</h2>
+  ${info}
+  <br>
+  <button style="margin-top: 16px;" class="bottom-button" onclick="closeDialog()">Close</button>`
 }
 
 sharedVars.ipcRenderer.on('editAndResend', (event, arg) => { // Context menu

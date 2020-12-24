@@ -47,4 +47,9 @@ exports.setup = function (passedSharedVars) {
     const ipcMessage = JSON.parse(arg)
     handleError(ipcMessage.msg, ipcMessage.stack)
   })
+
+  sharedVars.ipcRenderer.on('message', (event, arg) => {
+    const ipcMessage = JSON.parse(arg)
+    errorDialog(ipcMessage.header, ipcMessage.info)
+  })
 }

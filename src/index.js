@@ -215,7 +215,7 @@ if (continueProgram) {
             proxy = bedrockProxy
         }
         packetHandler.init(BrowserWindow.getAllWindows()[0], ipcMain, proxy)
-        proxy.startProxy(ipcMessage.connectAddress, ipcMessage.connectPort, ipcMessage.listenPort, ipcMessage.version, ipcMessage.consent, packetHandler.packetHandler, dataFolder)
+        proxy.startProxy(ipcMessage.connectAddress, ipcMessage.connectPort, ipcMessage.listenPort, ipcMessage.version, ipcMessage.consent, packetHandler.packetHandler, packetHandler.messageHandler , dataFolder)
         BrowserWindow.getAllWindows()[0].loadFile('html/mainPage/index.html')
     })
 

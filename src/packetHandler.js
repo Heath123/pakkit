@@ -64,3 +64,7 @@ exports.packetHandler = function (direction, meta, data, id, raw) {
     console.error(err)
   }
 }
+
+exports.messageHandler = function (header, info) {
+  mainWindow.send('message', JSON.stringify({ header: header, info: info }))
+}

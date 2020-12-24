@@ -125,6 +125,13 @@ div.dialog {
   box-sizing: border-box;
 }
 
+div.dialog-small {
+  top: calc(50% - 100px);
+  left: calc(50% - 250px);
+  height: 200px;
+  width: 500px;
+}
+
 .CodeMirror.CodeMirror {
   height: calc(100% - 120px);
 }
@@ -252,4 +259,9 @@ div.error {
 
 #mainPresets, #extendedPresets {
   display: contents;
+}
+
+.bottom-button {
+  position: absolute;
+  bottom: 16px;
 }
