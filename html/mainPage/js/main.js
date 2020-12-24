@@ -1,19 +1,8 @@
 /* global Split, jsonTree, escapeHtml, alert, CodeMirror */
 
-/*
-box.onclick = function() {
-  if (!box.checked) {
-    return
-  }
-  if (window.wasIn) {
-    window.wasIn = false;
-  } else {
-    box.checked = false;
-    box.indeterminate = true;
-    window.wasIn = true;
-  }
-}
-*/
+const Store = require('electron-store');
+
+const store = new Store();
 
 const axios = require('axios')
 
@@ -113,14 +102,49 @@ const sharedVars = {
   proxyCapabilities: {},
   ipcRenderer: require('electron').ipcRenderer,
   packetList: document.getElementById('packetlist'),
-  hiddenPackets: localStorage.getItem('hiddenPackets')
-    ? JSON.parse(localStorage.getItem('hiddenPackets'))
-    : Object.assign({}, defaultHiddenPackets),
+  hiddenPackets: undefined,
   scripting: undefined,
   lastFilter: ''
 }
 
 sharedVars.proxyCapabilities = JSON.parse(sharedVars.ipcRenderer.sendSync('proxyCapabilities', ''))
+
+function getVersionSpecificVar(name, defaultValue) {
+  const versionId = 'version-' + sharedVars.proxyCapabilities.versionId
+  const settingsObject = store.get(versionId)
+  if (settingsObject) {
+    if (!settingsObject[name]) {
+      settingsObject[name] = JSON.stringify(defaultValue)
+      store.set(versionId, settingsObject)
+    }
+  } else {
+    store.set(versionId, {
+      [name]: JSON.stringify(defaultValue)
+    })
+  }
+  return JSON.parse(store.get(versionId)[name])
+}
+
+function setVersionSpecificVar(name, value) {
+  const versionId = 'version-' + sharedVars.proxyCapabilities.versionId
+  const settingsObject = store.get(versionId)
+  settingsObject[name] = JSON.stringify(value)
+  store.set(versionId, settingsObject)
+}
+
+const defaultsJson = require('./js/defaults.json')
+
+function findDefault(setting) {
+  const versionId = sharedVars.proxyCapabilities.versionId
+  for (const key in defaultsJson) {
+    const regex = new RegExp(key)
+    if (versionId.match(regex)) {
+      return defaultsJson[key][setting]
+    }
+  }
+}
+
+sharedVars.hiddenPackets = getVersionSpecificVar('hiddenPackets', findDefault('hiddenPackets'))
 
 if (!sharedVars.proxyCapabilities.scriptingSupport) {
   document.getElementById('scriptingTab').style.display = 'none'
@@ -147,7 +171,7 @@ sharedVars.ipcHandler.setup(sharedVars)
 const filteringPackets = document.getElementById('filtering-packets')
 
 function updateFilteringStorage () {
-  localStorage.setItem('hiddenPackets', JSON.stringify(sharedVars.hiddenPackets))
+  setVersionSpecificVar('hiddenPackets', JSON.stringify(sharedVars.hiddenPackets))
 }
 
 function updateFilteringTab () {
@@ -263,7 +287,9 @@ sharedVars.ipcRenderer.on('editAndResend', (event, arg) => { // Context menu
 })
 
 function deselectPacket () {
-  removeOrAddSelection(currentPacket, false)
+  if (currentPacket) {
+    removeOrAddSelection(currentPacket, false)
+  }
   currentPacket = undefined
   currentPacketType = undefined
   sharedVars.packetDom.getTreeElement().firstElementChild.innerHTML = 'No packet selected!'
@@ -288,13 +314,13 @@ const hexViewer = document.getElementById('hex-viewer')
 
 function removeOrAddSelection (id, add) {
   const fakeElement = document.createElement('div')
-  fakeElement.innerHTML = sharedVars.allPacketsHTML[currentPacket][0]
+  fakeElement.innerHTML = sharedVars.allPacketsHTML[id][0]
   if (add) {
     fakeElement.firstChild.classList.add('selected')
   } else {
     fakeElement.firstChild.classList.remove('selected')
   }
-  sharedVars.allPacketsHTML[currentPacket] = [fakeElement.innerHTML]
+  sharedVars.allPacketsHTML[id] = [fakeElement.innerHTML]
 
   wrappedClusterizeUpdate(sharedVars.allPacketsHTML)
   clusterize.refresh()
@@ -303,11 +329,6 @@ function removeOrAddSelection (id, add) {
 window.packetClick = function (id) { // window. stops standardjs from complaining
   // Remove selection background from old selected packet
   if (currentPacket) {
-    /* const previousPacket = document.getElementById('packet' + currentPacket)
-    // May not be in view
-    if (previousPacket) {
-      document.getElementById('packet' + currentPacket).classList.remove('selected')
-    } */
     removeOrAddSelection(currentPacket, false)
   }
 

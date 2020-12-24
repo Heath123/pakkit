@@ -20,7 +20,8 @@ exports.capabilities = {
   scriptingSupport: false,
   clientboundPackets: {},
   serverboundPackets: {},
-  wikiVgPage: 'https://wiki.vg/Bedrock_Protocol'
+  wikiVgPage: 'https://wiki.vg/Bedrock_Protocol',
+  versionId: 'bedrock-proxypass-json'
 }
 
 exports.startProxy = function (host, port, listenPort, version, authConsent, callback, dataFolder) {

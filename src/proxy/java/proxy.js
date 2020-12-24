@@ -19,11 +19,16 @@ exports.capabilities = {
   clientboundPackets: [],
   serverboundPackets: [],
   // TODO: Only for latest, or fetch older pages
-  wikiVgPage: 'https://wiki.vg/Protocol'
+  wikiVgPage: 'https://wiki.vg/Protocol',
+  versionId: undefined
 }
 
 exports.startProxy = function (host, port, listenPort, version, authConsent, callback, dataFolder) {
   storedCallback = callback
+
+  // . cannot be in a JSON property name with electron-store
+  exports.capabilities.versionId = 'java-node-minecraft-protocol-' + version.split('.').join('-')
+
   const mcdata = require('minecraft-data')(version) // Used to get packets, may remove if I find a better way
   toClientMappings = mcdata.protocol.play.toClient.types.packet[1][0].type[1].mappings
   toServerMappings = mcdata.protocol.play.toServer.types.packet[1][0].type[1].mappings
