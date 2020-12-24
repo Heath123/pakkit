@@ -144,8 +144,8 @@ function findDefault(setting) {
   }
 }
 
-if (!findDefault('usePresets')) {
-  document.getElementById('presets').style.display = 'none'
+if (!findDefault('useExtendedPresets')) {
+  document.getElementById('extendedPresets').style.display = 'none'
 }
 
 sharedVars.hiddenPackets = getVersionSpecificVar('hiddenPackets', findDefault('hiddenPackets'))
@@ -175,7 +175,7 @@ sharedVars.ipcHandler.setup(sharedVars)
 const filteringPackets = document.getElementById('filtering-packets')
 
 function updateFilteringStorage () {
-  setVersionSpecificVar('hiddenPackets', JSON.stringify(sharedVars.hiddenPackets))
+  setVersionSpecificVar('hiddenPackets', sharedVars.hiddenPackets)
 }
 
 function updateFilteringTab () {

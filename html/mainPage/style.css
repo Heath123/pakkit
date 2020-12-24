@@ -250,6 +250,6 @@ div.error {
   background: rgba(64, 127, 255, 0.15);
 }
 
-#presets {
+#mainPresets, #extendedPresets {
   display: contents;
 }
