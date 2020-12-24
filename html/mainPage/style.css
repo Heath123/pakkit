@@ -147,15 +147,6 @@ div#Scripting .CodeMirror.CodeMirror {
   background: rgb(36, 36, 36);
 }
 
-
-
-
-
-
-
-
-
-
 /* Style the tab */
 .tab {
   overflow: hidden;
@@ -257,4 +248,8 @@ div.error {
 
 .packet.selected {
   background: rgba(64, 127, 255, 0.15);
+}
+
+#presets {
+  display: contents;
 }

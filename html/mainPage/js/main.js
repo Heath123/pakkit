@@ -144,6 +144,10 @@ function findDefault(setting) {
   }
 }
 
+if (!findDefault('usePresets')) {
+  document.getElementById('presets').style.display = 'none'
+}
+
 sharedVars.hiddenPackets = getVersionSpecificVar('hiddenPackets', findDefault('hiddenPackets'))
 
 if (!sharedVars.proxyCapabilities.scriptingSupport) {
