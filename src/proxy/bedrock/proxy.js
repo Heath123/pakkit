@@ -64,7 +64,7 @@ exports.startProxy = function (passedHost, passedPort, passedListenPort, version
       if (item.isEvent) {
         switch(item.eventType) {
           case 'unableToConnect':
-            messageCallback('Ubale to connect to server', 'Unable to connect to the Bedrock server at ' +
+            messageCallback('Unable to connect to server', 'Unable to connect to the Bedrock server at ' +
               item.eventData.replace(/^\//, '') + // Remove slash at start
               '. Make sure the server is online.')
             relaunch()

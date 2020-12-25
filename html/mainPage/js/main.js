@@ -297,7 +297,7 @@ function editAndResend (id) {
   })
 }
 
-function errorDialog(header, info) {
+function errorDialog(header, info, fatal) {
   // dialogOpen = true
   document.getElementById('dialog-overlay').className = 'dialog-overlay active'
   document.getElementById('dialog').className='dialog dialog-small'
@@ -306,7 +306,7 @@ function errorDialog(header, info) {
  `<h2>${header}</h2>
   ${info}
   <br>
-  <button style="margin-top: 16px;" class="bottom-button" onclick="closeDialog()">Close</button>`
+  <button style="margin-top: 16px;" class="bottom-button" onclick="${fatal ? 'sharedVars.ipcRenderer.send(\'relaunchApp\', \'\')' : 'closeDialog()' }">Close</button>`
 }
 
 sharedVars.ipcRenderer.on('editAndResend', (event, arg) => { // Context menu
