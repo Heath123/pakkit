@@ -36,9 +36,10 @@ exports.capabilities = {
 let host
 let port
 let listenPort
+let packetCallback
 
 function launch() {
-  proxyPass.startFromArgsPromise('0.0.0.0', Number(listenPort), host, Number(port), 1, true, true, "pakkit", "pakkit proxy powered by ProxyPass")
+  proxyPass.startFromArgsPromise('0.0.0.0', Number(listenPort), host, Number(port), 1, true, true, "pakkit", "pakkit proxy powered by ProxyPass", packetCallback)
 }
 
 exports.startProxy = function (passedHost, passedPort, passedListenPort, version, authConsent, callback, messageCallback, dataFolder) {
@@ -62,10 +63,53 @@ exports.startProxy = function (passedHost, passedPort, passedListenPort, version
 
   storedCallback = callback
 
+  packetCallback = java.newProxy('com.nukkitx.proxypass.PacketCallback', {
+    handlePacket: function (packet) {
+      if (packet.isEvent) {
+        switch(packet.eventType) {
+          case 'unableToConnect':
+            messageCallback('Ubale to connect to server', 'Unable to connect to the Bedrock server at ' +
+              packet.eventData.replace(/^\//, '') + // Remove slash at start
+              '. Make sure the server is online.')
+            relaunch()
+            break;
+          case 'disconnect':
+            console.log('Disconnect - relaunching proxy')
+            relaunch()
+            break;
+          default:
+            console.log('Unknown event', packet.eventType)
+        }
+      } else {
+        const name = packet.packetType.toString().toLowerCase();
+
+        const data = JSON.parse(packet.jsonData);
+        const hexIdString = '0x' + packet.packetId.toString(16).padStart(2, '0')
+
+        // These values are unneeded or are exposed elsewhere in the GUI
+        delete data.packetId
+        delete data.packetType
+        delete data.clientId
+        delete data.senderId
+
+        const raw = Object.values(packet.bytes)
+        // Prepend packet ID for consistency with Java Edition
+        raw.unshift(packet.packetId)
+
+        // If the packet as already handled bya  custom handler then scripting cannot modify it
+        // (well it can but that would be annoying to add)
+        const canUseScripting = !data.isHandled
+
+        storedCallback(packet.direction, { name: name, className: packet.className }, data, hexIdString, raw, canUseScripting)
+      }
+    }
+  });
+
+
   launch()
 
   // Poll for packets as the java module doesn't seem to support callbacks
-  setInterval(function () {
+  /* setInterval(function () {
     const array = proxyPass.packetQueue.toArray()
     for (const item of array) {
       if (item.isEvent) {
@@ -108,7 +152,7 @@ exports.startProxy = function (passedHost, passedPort, passedListenPort, version
     }
 
     proxyPass.packetQueue.clear()
-  }, 50)
+  }, 50) */
 
   console.log('Proxy started (Bedrock)!')
 }
