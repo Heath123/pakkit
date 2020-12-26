@@ -11,6 +11,8 @@ let toClientMappings
 let toServerMappings
 let storedCallback
 
+let scriptingEnabled = false
+
 exports.capabilities = {
   modifyPackets: true,
   jsonData: true,
@@ -83,22 +85,36 @@ exports.startProxy = function (host, port, listenPort, version, authConsent, cal
       // console.log('serverbound packet', meta, data)
       if (targetClient.state === states.PLAY && meta.state === states.PLAY) {
         const id = Object.keys(toServerMappings).find(key => toServerMappings[key] === meta.name)
-        const direction = 'serverbound' // Stops standardjs complaining (no-callback-literal)
+
+        // Stops standardjs from complaining (no-callback-literal)
+        const direction = 'serverbound'
+        const canUseScripting = true
+
         // callback(direction, meta, data, id)
         if (!endedTargetClient) {
-          // targetClient.write(meta.name, data)
-          callback(direction, meta, data, id, raw)
+          // When scripting is enabled, the script sends packets
+          if (!scriptingEnabled) {
+            targetClient.write(meta.name, data)
+          }
+          callback(direction, meta, data, id, raw, canUseScripting)
         }
       }
     }
     function handleClientboundPacket (data, meta, raw) {
       if (meta.state === states.PLAY && client.state === states.PLAY) {
         const id = Object.keys(toClientMappings).find(key => toClientMappings[key] === meta.name)
-        const direction = 'clientbound' // Stops standardjs complaining (no-callback-literal)
+
+        // Stops standardjs from complaining (no-callback-literal)
+        const direction = 'clientbound'
+        const canUseScripting = true
+
         // callback(direction, meta, data, id)
         if (!endedClient) {
-          // client.write(meta.name, data)
-          callback(direction, meta, data, id, raw)
+          // When scripting is enabled, the script sends packets
+          if (!scriptingEnabled) {
+            client.write(meta.name, data)
+          }
+          callback(direction, meta, data, id, raw, true)
           if (meta.name === 'set_compression') {
             client.compressionThreshold = data.threshold
           } // Set compression
@@ -175,4 +191,8 @@ exports.writeToServer = function (meta, data, noCallback) {
   if (!noCallback) {
     storedCallback('serverbound', meta, data, id)
   }
+}
+
+exports.setScriptingEnabled = function (isEnabled) {
+  scriptingEnabled = isEnabled
 }

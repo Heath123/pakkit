@@ -1,6 +1,13 @@
 const fs = require('fs')
 const java = require('java')
 
+java.asyncOptions = {
+  asyncSuffix: undefined,
+  syncSuffix: "",
+  promiseSuffix: "Promise",
+  promisify: require('util').promisify
+}
+
 let child
 let storedCallback
 
@@ -11,13 +18,15 @@ let timeFrozen
 let proxyPass
 let proxyPlayerSession
 
+let scriptingEnabled = false
+
 // This whole thing is messy for now.
 
 exports.capabilities = {
   modifyPackets: true,
   jsonData: true,
   rawData: true,
-  scriptingSupport: false,
+  scriptingSupport: true,
   clientboundPackets: {},
   serverboundPackets: {},
   wikiVgPage: 'https://wiki.vg/Bedrock_Protocol',
@@ -29,9 +38,7 @@ let port
 let listenPort
 
 function launch() {
-  proxyPass.startFromArgs('0.0.0.0', Number(listenPort), host, Number(port), 1, true, true, "pakkit", "pakkit proxy powered by ProxyPass", function(err, test) {
-    console.log(err, test)
-  })
+  proxyPass.startFromArgsPromise('0.0.0.0', Number(listenPort), host, Number(port), 1, true, true, "pakkit", "pakkit proxy powered by ProxyPass")
 }
 
 exports.startProxy = function (passedHost, passedPort, passedListenPort, version, authConsent, callback, messageCallback, dataFolder) {
@@ -44,7 +51,7 @@ exports.startProxy = function (passedHost, passedPort, passedListenPort, version
   proxyPass = java.import('com.nukkitx.proxypass.ProxyPass')
   proxyPlayerSession = java.import('com.nukkitx.proxypass.network.bedrock.session.ProxyPlayerSession')
 
-  const packetTypes = JSON.parse(proxyPlayerSession.getIdBiMapStaticSync())
+  const packetTypes = JSON.parse(proxyPlayerSession.getIdBiMapStatic())
   for (const index in packetTypes) {
     const idString = '0x' + Number(index).toString(16).padStart(2, '0')
     const name = packetTypes[index].toLowerCase()
@@ -59,7 +66,7 @@ exports.startProxy = function (passedHost, passedPort, passedListenPort, version
 
   // Poll for packets as the java module doesn't seem to support callbacks
   setInterval(function () {
-    const array = proxyPass.packetQueue.toArraySync()
+    const array = proxyPass.packetQueue.toArray()
     for (const item of array) {
       if (item.isEvent) {
         switch(item.eventType) {
@@ -77,7 +84,7 @@ exports.startProxy = function (passedHost, passedPort, passedListenPort, version
             console.log('Unknown event', item.eventType)
         }
       } else {
-        const name = item.packetType.toStringSync().toLowerCase();
+        const name = item.packetType.toString().toLowerCase();
 
         const data = JSON.parse(item.jsonData);
         const hexIdString = '0x' + item.packetId.toString(16).padStart(2, '0')
@@ -92,34 +99,38 @@ exports.startProxy = function (passedHost, passedPort, passedListenPort, version
         // Prepend packet ID for consistency with Java Edition
         raw.unshift(item.packetId)
 
-        storedCallback(item.direction, { name: name, className: item.className }, data, hexIdString, raw)
+        // If the packet as already handled bya  custom handler then scripting cannot modify it
+        // (well it can but that would be annoying to add)
+        const canUseScripting = !data.isHandled
+
+        storedCallback(item.direction, { name: name, className: item.className }, data, hexIdString, raw, canUseScripting)
       }
     }
 
-    proxyPass.packetQueue.clearSync()
+    proxyPass.packetQueue.clear()
   }, 50)
 
   console.log('Proxy started (Bedrock)!')
 }
 
 exports.end = function () {
-  proxyPass.shutdownStatic(function(err, test) {
-    console.log(err, test)
-  })
+  proxyPass.shutdownStaticPromise()
 }
 
 // used to relaunch on disconnect
 function relaunch () {
-  proxyPass.shutdownStatic(function(err, test) {
-    console.log(err, test)
-    launch()
-  })
+  proxyPass.shutdownStaticPromise()
 }
 
 exports.writeToClient = function (meta, data) {
-  proxyPlayerSession.injectPacketStaticSync(JSON.stringify(data), meta.className, 'client')
+  proxyPlayerSession.injectPacketStaticPromise(JSON.stringify(data), meta.className, 'client')
 }
 
 exports.writeToServer = function (meta, data) {
-  proxyPlayerSession.injectPacketStaticSync(JSON.stringify(data), meta.className, 'server')
+  proxyPlayerSession.injectPacketStaticPromise(JSON.stringify(data), meta.className, 'server')
+}
+
+exports.setScriptingEnabled = function (isEnabled) {
+  scriptingEnabled = isEnabled
+  proxyPlayerSession.setDontSendPacketsPromise(scriptingEnabled)
 }

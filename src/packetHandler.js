@@ -36,27 +36,24 @@ exports.init = function (window, passedIpcMain, passedProxy) {
   ipcMain.on('scriptStateChange', (event, arg) => {
     const ipcMessage = JSON.parse(arg)
     scriptingEnabled = ipcMessage.scriptingEnabled
+    proxy.setScriptingEnabled(scriptingEnabled)
     currentScript = ipcMessage.script
     currentScriptModule = _eval(currentScript, '/script.js')
   })
 }
 
-exports.packetHandler = function (direction, meta, data, id, raw) {
+exports.packetHandler = function (direction, meta, data, id, raw, canUseScripting) {
   try {
     mainWindow.send('packet', JSON.stringify({ meta: meta, data: data, direction: direction, hexIdString: id, raw: raw }))
     // TODO: Maybe write raw data?
-    if (proxy.capabilities.scriptingSupport) {
+    if (proxy.capabilities.scriptingSupport && canUseScripting) {
       if (direction === 'clientbound') {
         if (scriptingEnabled) {
           currentScriptModule.downstreamHandler(meta, data, server, client)
-        } else {
-          proxy.writeToClient(meta, data, true)
         }
       } else {
         if (scriptingEnabled) {
           currentScriptModule.upstreamHandler(meta, data, server, client)
-        } else {
-          proxy.writeToServer(meta, data, true)
         }
       }
     }

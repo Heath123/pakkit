@@ -30,7 +30,7 @@ exports.upstreamHandler = function (meta, data, server, client) {
 exports.downstreamHandler = function (meta, data, server, client) {
   client.sendPacket(meta, data)
 }`
-  function resetScriptEditor () {
+  window.resetScriptEditor = function () {
     // document.getElementById('scriptEditor').value = defaultScript
     window.scriptEditor.getDoc().setValue(defaultScript)
   }
