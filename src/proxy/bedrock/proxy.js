@@ -26,7 +26,7 @@ exports.capabilities = {
   modifyPackets: true,
   jsonData: true,
   rawData: true,
-  scriptingSupport: true,
+  scriptingSupport: false,
   clientboundPackets: {},
   serverboundPackets: {},
   wikiVgPage: 'https://wiki.vg/Bedrock_Protocol',
