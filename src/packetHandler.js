@@ -44,7 +44,7 @@ exports.init = function (window, passedIpcMain, passedProxy) {
 
 exports.packetHandler = function (direction, meta, data, id, raw, canUseScripting) {
   try {
-    mainWindow.send('packet', JSON.stringify({ meta: meta, data: data, direction: direction, hexIdString: id, raw: raw }))
+    mainWindow.send('packet', JSON.stringify({ meta: meta, data: data, direction: direction, hexIdString: id, raw: raw, time: Date.now() }))
     // TODO: Maybe write raw data?
     if (proxy.capabilities.scriptingSupport && canUseScripting) {
       if (direction === 'clientbound') {

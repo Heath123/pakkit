@@ -31,13 +31,21 @@ function trimData (data) { // Function to trim the size of stringified data for 
   return newData
 }
 
+function formatTime (ms) {
+  // Based on https://stackoverflow.com/a/50409993/4012708
+  return new Date(new Date(ms).getTime() - new Date().getTimezoneOffset() * 60000).toISOString().split("T")[1].replace(/[0-9]Z$/, '');
+}
+
 function addPacketToDOM (packet) {
   const isHidden = filteringLogic.packetFilteredByFilterBox(packet, sharedVars.lastFilter, sharedVars.hiddenPackets)
   sharedVars.allPacketsHTML.push([
     `<li id="packet${packet.uid}" onclick="packetClick(${packet.uid})" class="packet ${packet.direction} ${isHidden ? 'filter-hidden' : 'filter-shown'}">
-        <span class="id">${escapeHtml(packet.hexIdString)}</span>
-        <span class="name">${escapeHtml(packet.meta.name)}</span>
-        <span class="data">${escapeHtml(trimData(packet.data))}</span>
+        <div class="main-data">
+          <span class="id">${escapeHtml(packet.hexIdString)}</span>
+          <span class="name">${escapeHtml(packet.meta.name)}</span>
+          <span class="data">${escapeHtml(trimData(packet.data))}</span>
+        </div>
+        <span class="time">${escapeHtml(formatTime(packet.time))}</span>
       </li>`])
   /* if (!noUpdate) {
     clusterize.append(sharedVars.allPacketsHTML.slice(-1)[0]);

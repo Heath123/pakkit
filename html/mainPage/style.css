@@ -21,23 +21,35 @@ body {
   -moz-box-sizing: border-box;
   box-sizing: border-box;
   height: 100%;
+  /* Default before everything loads */
+  width: calc(50% - 5px);
 }
+
+/* Targets the right panel to add spacing, but only before the gutter loads */
+#packets + #sidebar {
+  margin-left: 10px;
+}
+
 .gutter.gutter-horizontal {
   cursor: ew-resize;
 }
+
 .box {
   overflow-y: auto;
   border: 1px solid #1A1A1A;
   border-radius: 10px;
   height: calc(100% - 24px); /* Take off toolbar height */
 }
+
 div.toolbar {
   height: 24px;
   overflow: hidden;
 }
+
 #packets {
   position: relative; /* Is this needed? TODO: Check */
 }
+
 .packetlist {
   list-style: none;
   padding: 0;
@@ -251,6 +263,7 @@ div.error {
   text-align: right;
   font-size: 90%;
   color: red;
+  user-select: text;
 }
 
 .packet.selected {
@@ -261,7 +274,25 @@ div.error {
   display: contents;
 }
 
+.error-dialog {
+  user-select: text;
+}
+
 .bottom-button {
   position: absolute;
   bottom: 16px;
+  user-select: none;
+}
+
+body.timeShown div.main-data {
+  display: inline-block;
+  width: calc(100% - 120px);
+  overflow-x: hidden;
+  text-overflow: ellipsis;
+  /* Makes up for inline-block causing extra space on the bottom */
+  margin-bottom: -4px;
+}
+
+body.timeNotShown div.main-data {
+  display: inline;
 }

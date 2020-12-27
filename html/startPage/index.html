@@ -87,9 +87,18 @@
       </p>
       <div id="consent-box" style="display: none;">
         <br>
+        <br>
         <p>
-          <label for="consent">Consent</label>
-          <input id="consent" type="checkbox" value="consent"> Allow pakkit to use my auth token from launcher_profiles.json for logging in to online mode servers (can be revoked by pressing F12 and typing <code>localStorage.authConsentGiven = false</code>)
+          <label for="consent">Consent:</label>
+          <span style="display: table-cell;">Allow pakkit to use my auth token from launcher_profiles.json for logging in to online mode servers</span>
+        </p>
+        <br>
+        <p>
+          <div style="display: table-cell;"></div>
+          <label class="switch" style="padding: 0;">
+            <input id="consent" type="checkbox" value="consent">
+            <span class="slider round"></span>
+          </label>
         </p>
       </div>
       <br>

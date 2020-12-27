@@ -1,7 +1,7 @@
 const { ipcRenderer } = require('electron')
-const Store = require('electron-store');
+const Store = require('electron-store')
 
-const store = new Store();
+const store = new Store()
 
 /* const customTitlebar = require('custom-electron-titlebar');
 

@@ -194,12 +194,12 @@ exports.startProxy = function (host, port, listenPort, version, authConsent, cal
         })
         targetClient.on('end', function () {
           endedTargetClient = true
-          console.log('Connection closed by server', '(' + addr + ')')
-          if (!endedClient) { client.end('Connection closed by server ' + '(' + addr + ')') }
+          console.log('Connection closed by server', '(' + host + ':' + port + ')')
+          if (!endedClient) { client.end('Connection closed by server ' + '(' + host + ':' + port + ')') }
         })
         targetClient.on('error', function (err) {
           endedTargetClient = true
-          console.log('Connection error by server', '(' + addr + ') ', err)
+          console.log('Connection error by server', '(' + host + ':' + port + ') ', err)
           console.log(err.stack)
           let header = 'Unable to connect to server'
           let message = err.message

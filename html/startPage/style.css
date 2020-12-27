@@ -1,10 +1,19 @@
+body {
+  max-width: 500px;
+}
+
 h1.title {
   font-family: "Lucida Console", Monaco, monospace;
 }
+
 form { display: table; }
+
 form p { display: table-row; }
+
 form p label { display: table-cell; padding-left: 16px; padding-right: 16px; text-align: center; }
+
 form p input { display: table-cell; }
+
 input#start {
   padding: 10px 78.5px;
 }

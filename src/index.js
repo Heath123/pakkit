@@ -2,6 +2,9 @@ const {app, BrowserWindow, ipcMain, clipboard, Menu} = require('electron')
 app.allowRendererProcessReuse = true
 
 const fs = require('fs')
+const Store = require('electron-store')
+
+const store = new Store()
 
 let proxy // Defined later when an option is chosen
 const resourcesPath = fs.existsSync('resources/app')
@@ -138,22 +141,15 @@ if (continueProgram) {
     }
 
     function createWindow() {
-        // Load the previous state with fallback to defaults
-        const mainWindowState = windowStateKeeper({
-            defaultWidth: 1000,
-            defaultHeight: 800
-        });
-
         // Let us register listeners on the window, so we can update the state
         // automatically (the listeners will be removed when the window is closed)
         // and restore the maximized or full screen state
 
         // Create the browser window.
         const win = new BrowserWindow({
-            x: mainWindowState.x,
-            y: mainWindowState.y,
-            width: mainWindowState.width,
-            height: mainWindowState.height,
+            height: store.get('authConsentGiven') ? 535 : 691,
+            width: 500,
+            resizable: false,
             // frame: false,
             webPreferences: {
                 nodeIntegration: true
@@ -178,8 +174,6 @@ if (continueProgram) {
             },
             showDialog: false
         });
-
-        mainWindowState.manage(win)
     }
 
 // This method will be called when Electron has finished
@@ -216,7 +210,22 @@ if (continueProgram) {
         }
         packetHandler.init(BrowserWindow.getAllWindows()[0], ipcMain, proxy)
         proxy.startProxy(ipcMessage.connectAddress, ipcMessage.connectPort, ipcMessage.listenPort, ipcMessage.version, ipcMessage.consent, packetHandler.packetHandler, packetHandler.messageHandler , dataFolder)
-        BrowserWindow.getAllWindows()[0].loadFile('html/mainPage/index.html')
+
+        const win = BrowserWindow.getAllWindows()[0]
+
+        win.loadFile('html/mainPage/index.html')
+
+        // Load the previous state with fallback to defaults
+        const mainWindowState = windowStateKeeper({
+            defaultWidth: 1000,
+            defaultHeight: 800
+        });
+
+        win.setResizable(true)
+        win.setPosition(mainWindowState.x, mainWindowState.y)
+        win.setSize(mainWindowState.width, mainWindowState.height)
+
+        mainWindowState.manage(win)
     })
 
     ipcMain.on('proxyCapabilities', (event, arg) => {

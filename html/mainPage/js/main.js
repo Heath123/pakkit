@@ -47,6 +47,7 @@ function toggleCheckbox (box, packetName, direction) {
     box.readOnly = true
     box.indeterminate = true
   } */
+  box.checked = !box.checked
 
   // console.log('Toggled visibility of', packetName, 'to', box.checked)
   const index = sharedVars.hiddenPackets[direction].indexOf(packetName)
@@ -221,7 +222,7 @@ function addPacketsToFiltering (packetsObject, direction, appendTo) {
     if (packetsObject.hasOwnProperty(key)) {
       console.log(!sharedVars.hiddenPackets[direction].includes(packetsObject[key]))
       filteringPackets.innerHTML +=
-     `<li id="${packetsObject[key].replace(/"/g, '&#39;') + '-' + direction}" class="packet ${direction}">
+     `<li id="${packetsObject[key].replace(/"/g, '&#39;') + '-' + direction}" class="packet ${direction}" onclick="toggleCheckbox(this.firstElementChild, 'teleport_confirm', 'serverbound')">
         <input type="checkbox" ${!sharedVars.hiddenPackets[direction].includes(packetsObject[key]) ? 'checked' : ''}
             onclick="toggleCheckbox(this, ${JSON.stringify(packetsObject[key]).replace(/"/g, '&#39;')}, '${direction}')"/>
         <span class="id">${escapeHtml(key)}</span>
@@ -300,7 +301,7 @@ function editAndResend (id) {
 function errorDialog(header, info, fatal) {
   // dialogOpen = true
   document.getElementById('dialog-overlay').className = 'dialog-overlay active'
-  document.getElementById('dialog').className='dialog dialog-small'
+  document.getElementById('dialog').className='dialog dialog-small error-dialog'
   document.getElementById('dialog').innerHTML =
 
  `<h2>${header}</h2>
@@ -321,7 +322,8 @@ function deselectPacket () {
   currentPacket = undefined
   currentPacketType = undefined
   sharedVars.packetDom.getTreeElement().firstElementChild.innerHTML = 'No packet selected!'
-  document.body.className = 'noPacketSelected'
+  document.body.classList.remove('packetSelected')
+  document.body.classList.add('noPacketSelected')
   hexViewer.style.display = 'none'
 }
 
@@ -364,10 +366,11 @@ window.packetClick = function (id) { // window. stops standardjs from complainin
   }
 
   currentPacket = id
-  const element = document.getElementById('packet' + id)
-  currentPacketType = element.children[1].innerText
+  // const element = document.getElementById('packet' + id)
+  currentPacketType = sharedVars.allPackets[id].name
   removeOrAddSelection(currentPacket, true)
-  document.body.className = 'packetSelected'
+  document.body.classList.remove('noPacketSelected')
+  document.body.classList.add('packetSelected')
   if (sharedVars.proxyCapabilities.jsonData) {
     // sidebar.innerHTML = '<div style="padding: 10px;">Loading packet data...</div>';
     sharedVars.packetDom.getTree().loadData(sharedVars.allPackets[id].data)
@@ -444,7 +447,7 @@ document.body.addEventListener('contextmenu', (event) => {
 
   sharedVars.ipcRenderer.send('contextMenu', JSON.stringify({
     direction: target.className.split(' ')[1],
-    text: target.children[0].innerText + ' ' + target.children[1].innerText,
+    text: target.children[0].children[0].innerText + ' ' + target.children[0].children[1].innerText,
     id: target.id.replace('packet', '')
   }))
 })
