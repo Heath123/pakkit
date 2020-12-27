@@ -62,6 +62,6 @@ exports.packetHandler = function (direction, meta, data, id, raw, canUseScriptin
   }
 }
 
-exports.messageHandler = function (header, info) {
-  mainWindow.send('message', JSON.stringify({ header: header, info: info }))
+exports.messageHandler = function (header, info, fatal) {
+  mainWindow.send('message', JSON.stringify({ header: header, info: info, fatal: fatal }))
 }
