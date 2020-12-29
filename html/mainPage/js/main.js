@@ -2,8 +2,6 @@
 
 const Store = require('electron-store');
 
-const store = new Store();
-
 const axios = require('axios')
 
 const Clusterize = require('clusterize.js')
@@ -115,32 +113,33 @@ const sharedVars = {
   hiddenPackets: undefined,
   scripting: undefined,
   lastFilter: '',
-  hiddenPacketsAmount: 0
+  hiddenPacketsAmount: 0,
+  store: new Store()
 }
 
 sharedVars.proxyCapabilities = JSON.parse(sharedVars.ipcRenderer.sendSync('proxyCapabilities', ''))
 
 function getVersionSpecificVar(name, defaultValue) {
   const versionId = 'version-' + sharedVars.proxyCapabilities.versionId
-  const settingsObject = store.get(versionId)
+  const settingsObject = sharedVars.store.get(versionId)
   if (settingsObject) {
     if (!settingsObject[name]) {
       settingsObject[name] = JSON.stringify(defaultValue)
-      store.set(versionId, settingsObject)
+      sharedVars.store.set(versionId, settingsObject)
     }
   } else {
-    store.set(versionId, {
+    sharedVars.store.set(versionId, {
       [name]: JSON.stringify(defaultValue)
     })
   }
-  return JSON.parse(store.get(versionId)[name])
+  return JSON.parse(sharedVars.store.get(versionId)[name])
 }
 
 function setVersionSpecificVar(name, value) {
   const versionId = 'version-' + sharedVars.proxyCapabilities.versionId
-  const settingsObject = store.get(versionId)
+  const settingsObject = sharedVars.store.get(versionId)
   settingsObject[name] = JSON.stringify(value)
-  store.set(versionId, settingsObject)
+  sharedVars.store.set(versionId, settingsObject)
 }
 
 const defaultsJson = require('./js/defaults.json')
@@ -179,6 +178,19 @@ sharedVars.packetDom = require('./js/packetDom.js')
 sharedVars.packetDom.setup(sharedVars)
 sharedVars.ipcHandler = require('./js/ipcHandler.js')
 sharedVars.ipcHandler.setup(sharedVars)
+sharedVars.settings = require('./js/settings.js')
+sharedVars.settings.bindToSettingChange('showTimes', (newValue) => {
+  if (newValue) {
+    document.body.classList.remove('timeNotShown')
+    document.body.classList.add('timeShown')
+  } else {
+    document.body.classList.remove('timeShown')
+    document.body.classList.add('timeNotShown')
+  }
+})
+sharedVars.settings.setup(sharedVars)
+
+
 
 // const sidebar = document.getElementById('sidebar-box')
 

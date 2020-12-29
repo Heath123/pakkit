@@ -56,6 +56,11 @@
     "minecraft-folder-path": "^1.1.0",
     "minecraft-protocol": "github:PrismarineJS/node-minecraft-protocol#master",
     "node-eval": "^2.0.0",
-    "source-map-support": "^0.5.19"
+    "source-map-support": "^0.5.19",
+    "ws": "^7.4.1"
+  },
+  "optionalDependencies": {
+    "bufferutil": "^4.0.2",
+    "utf-8-validate": "^5.0.3"
   }
 }
