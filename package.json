@@ -50,7 +50,6 @@
     "electron-unhandled": "^3.0.2",
     "electron-window-state": "^5.0.3",
     "escape-html": "^1.0.3",
-    "java": "^0.12.1",
     "md5-file": "^5.0.0",
     "minecraft-data": "^2.70.2",
     "minecraft-folder-path": "^1.1.0",
