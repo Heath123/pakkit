@@ -28,7 +28,7 @@ let scriptingEnabled = false
 // This whole thing is messy for now.
 
 exports.capabilities = {
-  modifyPackets: false,
+  modifyPackets: true,
   jsonData: true,
   rawData: true,
   scriptingSupport: false,
@@ -194,11 +194,23 @@ function relaunch () {
 }
 
 exports.writeToClient = function (meta, data) {
+  ws.send(JSON.stringify({
+    type: 'inject',
+    className: meta.className,
+    direction: 'client',
+    data: data
+  }))
   // proxyPlayerSession.injectPacketStaticPromise(JSON.stringify(data), meta.className, 'client')
 }
 
 exports.writeToServer = function (meta, data) {
   // proxyPlayerSession.injectPacketStaticPromise(JSON.stringify(data), meta.className, 'server')
+  ws.send(JSON.stringify({
+    type: 'inject',
+    className: meta.className,
+    direction: 'server',
+    data: data
+  }))
 }
 
 exports.setScriptingEnabled = function (isEnabled) {
