@@ -1,6 +1,7 @@
 const fs = require('fs')
 const { spawn } = require('child_process')
 const WebSocket = require('ws')
+const freePort = require("find-free-port")
 
 // const java = require('java')
 
@@ -12,14 +13,16 @@ const WebSocket = require('ws')
 } */
 
 let child
-let storedCallback
 
 // TODO: Can it still be frozen?
-let mayBeFrozen = false
-let timeFrozen
+// let mayBeFrozen = false
+// let timeFrozen
 
 let proxyPass
 let proxyPlayerSession
+
+let wsPort
+let ws
 
 let scriptingEnabled = false
 
@@ -40,186 +43,120 @@ let host
 let port
 let listenPort
 let packetCallback
+let messageCallback
+let dataFolder
 
-/* function launch() {
-  proxyPass.startFromArgsPromise('0.0.0.0', Number(listenPort), host, Number(port), 1, true, true, "pakkit", "pakkit proxy powered by ProxyPass", packetCallback)
-} */
+async function launch() {
+  wsPort = Number(await freePort(wsPort + 1))
 
-function handlePacket (packetString) {
-  let packet
-  try {
-    packet = JSON.parse(packetString)
-  } catch (err) {
-    console.error(err)
-    return
-  }
-  if (packet.isEvent) {
-    switch(packet.eventType) {
-      case 'unableToConnect':
-        messageCallback('Unable to connect to server', 'Unable to connect to the Bedrock server at ' +
-          packet.eventData.replace(/^\//, '') + // Remove slash at start
-          '. Make sure the server is online.')
-        relaunch()
-        break;
-      case 'disconnect':
-        console.log('Disconnect - relaunching proxy')
-        relaunch()
-        break;
-      default:
-        console.log('Unknown event', packet.eventType)
+  child = spawn('java', ['-jar', dataFolder + '/proxypass/' + 'proxypass-pakkit.jar', '--start-from-args', '0.0.0.0',
+    listenPort.toString(), host, port.toString(), '1', 'true', 'true', 'pakkit', 'pakkitProxyPoweredByProxyPass',
+    'true', wsPort.toString()])
+
+  child.stdout.on('data', handleOutput)
+  child.stderr.on('data', handleError)
+
+  setTimeout(startWebsocket, 3000)
+}
+
+// TODO: base on output
+function startWebsocket () {
+  ws = new WebSocket('ws://localhost:' + wsPort)
+
+  /* ws.on('open', function open() {
+    ws.send('something')
+  }); */
+
+  ws.on('message', function incoming(data) {
+    // console.log(data);
+    try {
+      data = JSON.parse(data)
+    } catch (err) {
+      console.error(err)
+      return
     }
-  } else {
-    const name = packet.packetType.toString().toLowerCase();
+    switch (data.type) {
+      case 'packet':
+        handlePacket(data.data)
+        break
+      case 'event':
+        handleEvent(data)
+        break
+      default:
+        console.log('Unknown message type', data.type)
+    }
+  })
 
-    const data = JSON.parse(packet.jsonData);
-    const hexIdString = '0x' + packet.packetId.toString(16).padStart(2, '0')
+  console.log('Proxy started (Bedrock)!')
+}
 
-    // These values are unneeded or are exposed elsewhere in the GUI
-    delete data.packetId
-    delete data.packetType
-    delete data.clientId
-    delete data.senderId
+function handlePacket (packet) {
+  const name = packet.packetType.toLowerCase()
 
-    const raw = Object.values(packet.bytes)
-    // Prepend packet ID for consistency with Java Edition
-    raw.unshift(packet.packetId)
+  const data = JSON.parse(packet.jsonData);
+  const hexIdString = '0x' + packet.packetId.toString(16).padStart(2, '0')
 
-    // If the packet as already handled bya  custom handler then scripting cannot modify it
-    // (well it can but that would be annoying to add)
-    const canUseScripting = !data.isHandled
+  // These values are unneeded or are exposed elsewhere in the GUI
+  delete data.packetId
+  delete data.packetType
+  delete data.clientId
+  delete data.senderId
 
-    storedCallback(packet.direction, { name: name, className: packet.className }, data, hexIdString, raw, canUseScripting)
+  const raw = Object.values(packet.bytes)
+  // Prepend packet ID for consistency with Java Edition
+  raw.unshift(packet.packetId)
+
+  // If the packet as already handled bya  custom handler then scripting cannot modify it
+  // (well it can but that would be annoying to add)
+  const canUseScripting = !data.isHandled
+
+  packetCallback(packet.direction, { name: name, className: packet.className }, data, hexIdString, raw, canUseScripting)
+}
+
+function handleEvent (event) {
+  switch(event.eventType) {
+    case 'unableToConnect':
+      messageCallback('Unable to connect to server', 'Unable to connect to the Bedrock server at ' +
+        event.eventData.replace(/^\//, '') + // Remove slash at start
+        '. Make sure the server is online.')
+      relaunch()
+      break;
+    case 'disconnect':
+      console.log('Disconnect - relaunching proxy')
+      relaunch()
+      break;
+    default:
+      console.log('Unknown event', event.eventType)
   }
 }
 
-exports.startProxy = function (passedHost, passedPort, passedListenPort, version, authConsent, callback, messageCallback, dataFolder) {
+function handleOutput (chunk) {
+  try {
+    console.log('ProxyPass output:', chunk.toString('utf8').trim())
+  } catch (err) {
+    console.error(err)
+  }
+}
+
+function handleError (chunk) {
+  try {
+    console.log('ProxyPass error:', chunk.toString('utf8').trim())
+  } catch (err) {
+    console.error(err)
+  }
+}
+
+exports.startProxy = function (passedHost, passedPort, passedListenPort, version, authConsent, passedPacketCallback, passedMessageCallback, passedDataFolder) {
   host = passedHost
   port = passedPort
   listenPort = passedListenPort
+  packetCallback = passedPacketCallback
+  messageCallback = passedMessageCallback
+  dataFolder = passedDataFolder
 
-  fs.writeFileSync(dataFolder + '/proxypass/config.yml', `
-  proxy:
-    host: 0.0.0.0
-    port: ${listenPort}
-  destination:
-    host: ${host}
-    port: ${port}
-  packet-testing: false
-  log-packets: true
-  log-to: console
-  ignored-packets: []
-`)
+  wsPort = 5932
 
-  const olddir = process.cwd()
-  process.chdir(dataFolder + '/proxypass/')
-
-  child = spawn('java', ['-jar', 'proxypass-pakkit.jar'])
-
-  process.chdir(olddir)
-
-  /* java.classpath.push(dataFolder + '/proxypass/proxypass-pakkit.jar')
-
-  proxyPass = java.import('com.nukkitx.proxypass.ProxyPass')
-  proxyPlayerSession = java.import('com.nukkitx.proxypass.network.bedrock.session.ProxyPlayerSession')
-
-  const packetTypes = JSON.parse(proxyPlayerSession.getIdBiMapStatic())
-  for (const index in packetTypes) {
-    const idString = '0x' + Number(index).toString(16).padStart(2, '0')
-    const name = packetTypes[index].toLowerCase()
-    // There isn't much of a distinction between serverbound and clientbound in Bedrock and many packets can be sent both ways
-    exports.capabilities.clientboundPackets[idString] = name
-    exports.capabilities.serverboundPackets[idString] = name
-  } */
-
-  storedCallback = callback
-
-  // launch()
-
-  // Poll for packets as the java module doesn't seem to support callbacks
-  /* setInterval(function () {
-    const array = proxyPass.packetQueue.toArray()
-    for (const item of array) {
-      if (item.isEvent) {
-        switch(item.eventType) {
-          case 'unableToConnect':
-            messageCallback('Unable to connect to server', 'Unable to connect to the Bedrock server at ' +
-              item.eventData.replace(/^\//, '') + // Remove slash at start
-              '. Make sure the server is online.')
-            relaunch()
-            break;
-          case 'disconnect':
-            console.log('Disconnect - relaunching proxy')
-            relaunch()
-            break;
-          default:
-            console.log('Unknown event', item.eventType)
-        }
-      } else {
-        const name = item.packetType.toString().toLowerCase();
-
-        const data = JSON.parse(item.jsonData);
-        const hexIdString = '0x' + item.packetId.toString(16).padStart(2, '0')
-
-        // These values are unneeded or are exposed elsewhere in the GUI
-        delete data.packetId
-        delete data.packetType
-        delete data.clientId
-        delete data.senderId
-
-        const raw = Object.values(item.bytes)
-        // Prepend packet ID for consistency with Java Edition
-        raw.unshift(item.packetId)
-
-        // If the packet as already handled bya  custom handler then scripting cannot modify it
-        // (well it can but that would be annoying to add)
-        const canUseScripting = !data.isHandled
-
-        storedCallback(item.direction, { name: name, className: item.className }, data, hexIdString, raw, canUseScripting)
-      }
-    }
-
-    proxyPass.packetQueue.clear()
-  }, 50) */
-
-  child.stdout.on('data', (chunk) => {
-    try {
-      console.log('ProxyPass output:', chunk.toString('utf8').trim())
-      /* mayBeFrozen = false // New messages mean it isn't froxen
-      if (chunk.search('Initializing proxy session') !== -1) { // ProxyPass gets stuck here sometimes
-        timeFrozen = Math.floor(new Date())
-        mayBeFrozen = true
-      } */
-
-      /* chunk.split('\n').forEach((item) => {
-        processPacket(item)
-      }) */
-    } catch (err) {
-      console.error(err)
-    }
-  })
-  child.stderr.on('data', (chunk) => {
-    try {
-      console.log('ProxyPass error:', chunk.toString('utf8').trim())
-    } catch (err) {
-      console.error(err)
-    }
-  })
-
-  // TODO: base on output
-  setTimeout(() => {
-    const ws = new WebSocket('ws://localhost:1835')
-
-    /* ws.on('open', function open() {
-      ws.send('something');
-    }); */
-
-    ws.on('message', function incoming(data) {
-      // console.log(data);
-      handlePacket(data)
-    })
-
-    console.log('Proxy started (Bedrock)!')
-  }, 3000)
+  launch()
 }
 
 exports.end = function () {
@@ -227,9 +164,13 @@ exports.end = function () {
 }
 
 // used to relaunch on disconnect
-/* function relaunch () {
-  proxyPass.shutdownStaticPromise()
-} */
+function relaunch () {
+  ws.close()
+  child.kill()
+  setTimeout(() => {
+    launch()
+  }, 500)
+}
 
 exports.writeToClient = function (meta, data) {
   // proxyPlayerSession.injectPacketStaticPromise(JSON.stringify(data), meta.className, 'client')
