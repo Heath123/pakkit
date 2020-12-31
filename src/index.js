@@ -208,10 +208,14 @@ if (continueProgram) {
         } else {
             proxy = bedrockProxy
         }
-        packetHandler.init(BrowserWindow.getAllWindows()[0], ipcMain, proxy)
-        proxy.startProxy(ipcMessage.connectAddress, ipcMessage.connectPort, ipcMessage.listenPort, ipcMessage.version, ipcMessage.consent, packetHandler.packetHandler, packetHandler.messageHandler , dataFolder)
 
         const win = BrowserWindow.getAllWindows()[0]
+
+        packetHandler.init(BrowserWindow.getAllWindows()[0], ipcMain, proxy)
+        proxy.startProxy(ipcMessage.connectAddress, ipcMessage.connectPort, ipcMessage.listenPort, ipcMessage.version,
+          ipcMessage.consent, packetHandler.packetHandler, packetHandler.messageHandler , dataFolder, () => {
+              win.send('updateFiltering', '')
+          })
 
         win.loadFile('html/mainPage/index.html')
 

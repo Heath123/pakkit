@@ -52,4 +52,10 @@ exports.setup = function (passedSharedVars) {
     const ipcMessage = JSON.parse(arg)
     errorDialog(ipcMessage.header, ipcMessage.info, ipcMessage.fatal)
   })
+
+  sharedVars.ipcRenderer.on('updateFiltering', (event, arg) => {
+    console.log('update!!!')
+    sharedVars.proxyCapabilities = JSON.parse(sharedVars.ipcRenderer.sendSync('proxyCapabilities', ''))
+    window.updateFilteringPackets()
+  })
 }

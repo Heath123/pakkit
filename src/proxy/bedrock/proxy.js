@@ -44,6 +44,7 @@ let listenPort
 let packetCallback
 let messageCallback
 let dataFolder
+let updateFilteringCallback
 
 // https://stackoverflow.com/questions/28050171/nodejs-random-free-tcp-ports
 function freePort () {
@@ -146,6 +147,18 @@ function handleEvent (event) {
       console.log('Disconnect - relaunching proxy')
       relaunch()
       break;
+    case 'filteringPackets':
+      console.log('rec')
+      const packetTypes = JSON.parse(event.eventData)
+      for (const index in packetTypes) {
+        const idString = '0x' + Number(index).toString(16).padStart(2, '0')
+        const name = packetTypes[index].toLowerCase()
+        // There isn't much of a distinction between serverbound and clientbound in Bedrock and many packets can be sent both ways
+        exports.capabilities.clientboundPackets[idString] = name
+        exports.capabilities.serverboundPackets[idString] = name
+      }
+      updateFilteringCallback()
+      break;
     default:
       console.log('Unknown event', event.eventType)
   }
@@ -171,13 +184,15 @@ function handleError (chunk) {
   }
 }
 
-exports.startProxy = function (passedHost, passedPort, passedListenPort, version, authConsent, passedPacketCallback, passedMessageCallback, passedDataFolder) {
+exports.startProxy = function (passedHost, passedPort, passedListenPort, version, authConsent, passedPacketCallback,
+  passedMessageCallback, passedDataFolder, passedUpdateFilteringCallback) {
   host = passedHost
   port = passedPort
   listenPort = passedListenPort
   packetCallback = passedPacketCallback
   messageCallback = passedMessageCallback
   dataFolder = passedDataFolder
+  updateFilteringCallback = passedUpdateFilteringCallback
 
   launch()
 }
@@ -213,7 +228,8 @@ exports.writeToServer = function (meta, data) {
   }))
 }
 
-exports.setScriptingEnabled = function (isEnabled) {
+// TODO
+/* imports.setScriptingEnabled = function (isEnabled) {
   scriptingEnabled = isEnabled
   proxyPlayerSession.setDontSendPacketsPromise(scriptingEnabled)
-}
+} */

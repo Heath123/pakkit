@@ -227,27 +227,30 @@ function updateFilteringTab () {
 const allServerboundPackets = []
 const allClientboundPackets = []
 
-// Filtering - coming soon
-function addPacketsToFiltering (packetsObject, direction, appendTo) {
-  console.log('packets', packetsObject)
-  for (const key in packetsObject) {
-    if (packetsObject.hasOwnProperty(key)) {
-      console.log(!sharedVars.hiddenPackets[direction].includes(packetsObject[key]))
-      filteringPackets.innerHTML +=
-     `<li id="${packetsObject[key].replace(/"/g, '&#39;') + '-' + direction}" class="packet ${direction}" onclick="toggleCheckbox(this.firstElementChild, 'teleport_confirm', 'serverbound')">
+window.updateFilteringPackets = () => {
+  function addPacketsToFiltering (packetsObject, direction, appendTo) {
+    console.log('packets', packetsObject)
+    for (const key in packetsObject) {
+      if (packetsObject.hasOwnProperty(key)) {
+        console.log(!sharedVars.hiddenPackets[direction].includes(packetsObject[key]))
+        filteringPackets.innerHTML +=
+          `<li id="${packetsObject[key].replace(/"/g, '&#39;') + '-' + direction}" class="packet ${direction}" onclick="toggleCheckbox(this.firstElementChild, 'teleport_confirm', 'serverbound')">
         <input type="checkbox" ${!sharedVars.hiddenPackets[direction].includes(packetsObject[key]) ? 'checked' : ''}
             onclick="toggleCheckbox(this, ${JSON.stringify(packetsObject[key]).replace(/"/g, '&#39;')}, '${direction}')"/>
         <span class="id">${escapeHtml(key)}</span>
         <span class="name">${escapeHtml(packetsObject[key])}</span>
       </li>`
-      console.log(key + ' -> ' + packetsObject[key])
-      appendTo.push(packetsObject[key])
+        console.log(key + ' -> ' + packetsObject[key])
+        appendTo.push(packetsObject[key])
+      }
     }
   }
+
+  addPacketsToFiltering(sharedVars.proxyCapabilities.serverboundPackets, 'serverbound', allServerboundPackets)
+  addPacketsToFiltering(sharedVars.proxyCapabilities.clientboundPackets, 'clientbound', allClientboundPackets)
 }
 
-addPacketsToFiltering(sharedVars.proxyCapabilities.serverboundPackets, 'serverbound', allServerboundPackets)
-addPacketsToFiltering(sharedVars.proxyCapabilities.clientboundPackets, 'clientbound', allClientboundPackets)
+window.updateFilteringPackets()
 
 // Update every 0.05 seconds
 // TODO: Find a better way without updating on every packet (which causes lag)
