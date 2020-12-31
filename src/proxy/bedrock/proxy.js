@@ -1,7 +1,6 @@
-const fs = require('fs')
 const { spawn } = require('child_process')
 const WebSocket = require('ws')
-const freePort = require("find-free-port")
+const net = require('net')
 
 // const java = require('java')
 
@@ -46,8 +45,25 @@ let packetCallback
 let messageCallback
 let dataFolder
 
+// https://stackoverflow.com/questions/28050171/nodejs-random-free-tcp-ports
+function freePort () {
+  return new Promise((resolve, reject) => {
+    const srv = net.createServer(function(sock) {
+      sock.end()
+    })
+    srv.listen(0, function() {
+      const port = srv.address().port
+      srv.close()
+      resolve(port)
+    })
+    srv.on('error', (err) => {
+      reject(err)
+    })
+  })
+}
+
 async function launch() {
-  wsPort = Number(await freePort(wsPort + 1))
+  wsPort = Number(await freePort())
 
   child = spawn('java', ['-jar', dataFolder + '/proxypass/' + 'proxypass-pakkit.jar', '--start-from-args', '0.0.0.0',
     listenPort.toString(), host, port.toString(), '1', 'true', 'true', 'pakkit', 'pakkitProxyPoweredByProxyPass',
@@ -55,11 +71,16 @@ async function launch() {
 
   child.stdout.on('data', handleOutput)
   child.stderr.on('data', handleError)
+  child.on('close', (code, signal) => {
+    setTimeout(() => {
+      launch()
+    }, 50)
+  })
 
-  setTimeout(startWebsocket, 3000)
+
+  // setTimeout(startWebsocket, 3000)
 }
 
-// TODO: base on output
 function startWebsocket () {
   ws = new WebSocket('ws://localhost:' + wsPort)
 
@@ -132,7 +153,11 @@ function handleEvent (event) {
 
 function handleOutput (chunk) {
   try {
-    console.log('ProxyPass output:', chunk.toString('utf8').trim())
+    const text = chunk.toString('utf8').trim()
+    console.log('ProxyPass output:', text)
+    if (text.startsWith('ProxyPass - Websocket started on port: ') && !(ws && ws.readyState === WebSocket.OPEN)) {
+      setTimeout(startWebsocket, 100)
+    }
   } catch (err) {
     console.error(err)
   }
@@ -154,8 +179,6 @@ exports.startProxy = function (passedHost, passedPort, passedListenPort, version
   messageCallback = passedMessageCallback
   dataFolder = passedDataFolder
 
-  wsPort = 5932
-
   launch()
 }
 
@@ -166,10 +189,8 @@ exports.end = function () {
 // used to relaunch on disconnect
 function relaunch () {
   ws.close()
+  // Will auto-restart
   child.kill()
-  setTimeout(() => {
-    launch()
-  }, 500)
 }
 
 exports.writeToClient = function (meta, data) {
