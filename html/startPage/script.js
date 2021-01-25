@@ -31,7 +31,7 @@ function loadSettings (newPlatform) {
   loadSetting(newPlatform + 'LastVersion', 'version', 'version', '1.16.4')
   loadSetting(newPlatform + 'LastConnectAddress', 'connectAddress', 'connect-address', '127.0.0.1')
   loadSetting(newPlatform + 'LastConnectPort', 'connectPort', 'connect-port', platform === 'java' ? '25565' : '19132')
-  loadSetting(newPlatform + 'LastListenPort', 'listenPort', 'listen-port', platform === 'java' ? '25566' : '19133')
+  loadSetting(newPlatform + 'LastListenPort', 'listenPort', 'listen-port', platform === 'java' ? '25566' : '19142')
 }
 
 function saveSettings (thePlatform) {
@@ -88,7 +88,7 @@ window.startProxy = function (event) {
   connectAddress = (connectAddress === '') ? '127.0.0.1' : connectAddress
   if (platform === 'bedrock') {
     connectPort = (connectPort === '') ? '19132' : connectPort
-    listenPort = (listenPort === '') ? '19133' : listenPort
+    listenPort = (listenPort === '') ? '19142' : listenPort
   } else {
     connectPort = (connectPort === '') ? '25565' : connectPort
     listenPort = (listenPort === '') ? '25566' : listenPort
