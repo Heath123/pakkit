@@ -152,6 +152,7 @@ div#Scripting .CodeMirror.CodeMirror {
   height: calc(100% - 185px);
 }
 
+/* TODO: needed? */
 .packetLink {
   text-decoration: none;
 }
