@@ -1,0 +1,34 @@
+name: Build
+
+on:
+  workflow_dispatch:
+#   push:
+#     branches: [ master ]
+#   pull_request:
+#     branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v1
+      with:
+        node-version: 12.x
+    - uses: actions/setup-java@v1
+      with:
+        java-version: 1.8
+    - run: npm install
+    - run: npx electron-forge package --platform win32
+    - run: cd out/pakkit-win32-x64/resources/app/; node-prune; npx electron-rebuild -v 8.5.2
+    - run: npx electron-forge package --platform linux
+    - run: cd out/pakkit-linux-x64/resources/app/; node-prune; npx electron-rebuild -v 8.5.2;
+    - run: chmod +x out/pakkit-linux-x64/pakkit
+    - run: npx electron-forge package --platform darwin
+    - run: cd out/pakkit-darwin-x64/pakkit.app/Contents/Resources/app/; node-prune; npx electron-rebuild -v 8.5.2
+    - run: mv out/pakkit-win32-x64 pakkit-windows-x64
+    - run: mv out/pakkit-linux-x64 pakkit-linux-x64
+    - run: mv out/pakkit-darwin-x64 pakkit-macos-x64
+    - run: zip -r -y out/pakkit-windows-x64.zip pakkit-windows-x64/
+    - run: zip -r -y out/pakkit-linux-x64.zip pakkit-linux-x64/
+    - run: zip -r -y out/pakkit-macos-x64.zip pakkit-macos-x64/
