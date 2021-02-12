@@ -1,11 +1,6 @@
 name: Build
 
-on:
-  workflow_dispatch:
-#   push:
-#     branches: [ master ]
-#   pull_request:
-#     branches: [ master ]
+on: push
 
 jobs:
   build:
@@ -21,14 +16,7 @@ jobs:
       with:
         java-version: 1.8
 
-#     - run: brew install wine-stable
-
     - run: sudo apt install wine64
-#     - run: sudo dpkg --add-architecture i386
-#     - run: wget -qO- https://dl.winehq.org/wine-builds/winehq.key | sudo apt-key add -
-#     - run: sudo apt-add-repository "deb https://dl.winehq.org/wine-builds/ubuntu $(lsb_release -cs) main"
-#     - run: sudo apt update
-#     - run: sudo apt install --install-recommends winehq-stable
 
     - run: curl -sf https://gobinaries.com/tj/node-prune | sh
 
@@ -52,20 +40,23 @@ jobs:
     - run: zip -r -y out/pakkit-linux-x64.zip pakkit-linux-x64/
     - run: zip -r -y out/pakkit-macos-x64.zip pakkit-macos-x64/
 
-#     - uses: actions/upload-artifact@v2
-#       with:
-#         name: windows-x64
-#         path: pakkit-windows-x64/
+    - uses: actions/upload-artifact@v2
+      if: ${{ github.ref != 'refs/heads/master' }}
+      with:
+        name: pakkit-windows-x64
+        path: out/pakkit-windows-x64.zip
 
-#     - uses: actions/upload-artifact@v2
-#       with:
-#         name: linux-x64
-#         path: pakkit-linux-x64/
+    - uses: actions/upload-artifact@v2
+      if: ${{ github.ref != 'refs/heads/master' }}
+      with:
+        name: pakkit-linux-x64
+        path: out/pakkit-linux-x64.zip
 
-#     - uses: actions/upload-artifact@v2
-#       with:
-#         name: macos-x64
-#         path: pakkit-macos-x64/
+    - uses: actions/upload-artifact@v2
+      if: ${{ github.ref != 'refs/heads/master' }}
+      with:
+        name: pakkit-macos-x64
+        path: out/pakkit-macos-x64.zip
 
     - id: create_release
       uses: actions/create-release@v1
@@ -83,7 +74,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./out/pakkit-windows-x64.zip
+        asset_path: out/pakkit-windows-x64.zip
         asset_name: pakkit-windows-x64.zip
         asset_content_type: application/zip
 
@@ -93,7 +84,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./out/pakkit-linux-x64.zip
+        asset_path: out/pakkit-linux-x64.zip
         asset_name: pakkit-linux-x64.zip
         asset_content_type: application/zip
 
@@ -103,26 +94,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./out/pakkit-macos-x64.zip
+        asset_path: out/pakkit-macos-x64.zip
         asset_name: pakkit-macos-x64.zip
         asset_content_type: application/zip
 
-#   build-windows:
-#     runs-on: windows-latest
-#     steps:
-#     - uses: actions/checkout@v2
-#     - uses: actions/setup-node@v1
-#       with:
-#         node-version: 12.x
-#     - uses: actions/setup-java@v1
-#       with:
-#         java-version: 1.8
-#     - uses: actions/setup-go@v1
-#       with:
-#         go-version: 1.13.x
-#     - run: go get github.com/tj/node-prune
-#     - run: npm install
-#     - run: npx electron-forge package --platform win32
-#     - run: cd out/pakkit-win32-x64/resources/app/; node-prune; npx electron-rebuild -v 8.5.2
-#     - run: mv out/pakkit-win32-x64 pakkit-windows-x64
-#     - run: zip -r -y out/pakkit-windows-x64.zip pakkit-windows-x64/
