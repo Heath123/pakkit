@@ -8,29 +8,39 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - uses: actions/setup-node@v1
+    - name: Set up Node
+      uses: actions/setup-node@v1
       with:
         node-version: 12.x
 
-    - uses: actions/setup-java@v1
+    - name: Set up Java
+      uses: actions/setup-java@v1
       with:
         java-version: 1.8
 
-    - run: sudo apt install wine64
+    - name: Install Wine
+      run: sudo apt install wine64
 
-    - run: curl -sf https://gobinaries.com/tj/node-prune | sh
+    - name: Install node-prune
+      run: curl -sf https://gobinaries.com/tj/node-prune | sh
 
     - run: npm install
 
-    - run: npx electron-forge package --platform win32
-    - run: cd out/pakkit-win32-x64/resources/app/; node-prune; npx electron-rebuild -v 8.5.2
+    - name: Build for Windows
+      run: |
+        npx electron-forge package --platform win32
+        cd out/pakkit-win32-x64/resources/app/; node-prune; npx electron-rebuild -v 8.5.2
 
-    - run: npx electron-forge package --platform linux
-    - run: cd out/pakkit-linux-x64/resources/app/; node-prune; npx electron-rebuild -v 8.5.2;
-    - run: chmod +x out/pakkit-linux-x64/pakkit
+    - name: Build for Linux
+      run: |
+        npx electron-forge package --platform linux
+        cd out/pakkit-linux-x64/resources/app/; node-prune; npx electron-rebuild -v 8.5.2;
+        chmod +x out/pakkit-linux-x64/pakkit
 
-    - run: npx electron-forge package --platform darwin
-    - run: cd out/pakkit-darwin-x64/pakkit.app/Contents/Resources/app/; node-prune; npx electron-rebuild -v 8.5.2
+    - name: Build for macOS
+      run: |
+        npx electron-forge package --platform darwin
+        cd out/pakkit-darwin-x64/pakkit.app/Contents/Resources/app/; node-prune; npx electron-rebuild -v 8.5.2
 
     - name: Create archives for new release
       if: ${{ github.ref == 'refs/heads/master' }}
@@ -42,7 +52,8 @@ jobs:
         zip -r -y out/pakkit-linux-x64.zip pakkit-linux-x64/
         zip -r -y out/pakkit-macos-x64.zip pakkit-macos-x64/
 
-    - id: create_release
+    - name: Create release
+      id: create_release
       uses: actions/create-release@v1
       if: ${{ github.ref == 'refs/heads/master' }}
       env:
@@ -52,7 +63,8 @@ jobs:
         release_name: GitHub build ${{ github.run_number }}
         body: github-${{ github.run_number }}
 
-    - uses: actions/upload-release-asset@v1
+    - name: Upload Windows build
+      uses: actions/upload-release-asset@v1
       if: ${{ github.ref == 'refs/heads/master' }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -62,7 +74,8 @@ jobs:
         asset_name: pakkit-windows-x64.zip
         asset_content_type: application/zip
 
-    - uses: actions/upload-release-asset@v1
+    - name: Upload Linux build
+      uses: actions/upload-release-asset@v1
       if: ${{ github.ref == 'refs/heads/master' }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -72,7 +85,8 @@ jobs:
         asset_name: pakkit-linux-x64.zip
         asset_content_type: application/zip
 
-    - uses: actions/upload-release-asset@v1
+    - name: Upload macOS build
+      uses: actions/upload-release-asset@v1
       if: ${{ github.ref == 'refs/heads/master' }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -92,19 +106,22 @@ jobs:
         mv out/pakkit-linux-x64 out/linux/pakkit-linux-x64
         mv out/pakkit-darwin-x64 out/macos/pakkit-macos-x64
 
-    - uses: actions/upload-artifact@v2
+    - name: Upload Windows artifact
+      uses: actions/upload-artifact@v2
       if: ${{ github.ref != 'refs/heads/master' }}
       with:
         name: pakkit-windows-x64
         path: out/windows/
 
-    - uses: actions/upload-artifact@v2
+    - name: Upload Linux artifact
+      uses: actions/upload-artifact@v2
       if: ${{ github.ref != 'refs/heads/master' }}
       with:
         name: pakkit-linux-x64
         path: out/linux/
 
-    - uses: actions/upload-artifact@v2
+    - name: Upload macOS artifact
+      uses: actions/upload-artifact@v2
       if: ${{ github.ref != 'refs/heads/master' }}
       with:
         name: pakkit-macos-x64
