@@ -42,34 +42,6 @@ jobs:
         zip -r -y out/pakkit-linux-x64.zip pakkit-linux-x64/
         zip -r -y out/pakkit-macos-x64.zip pakkit-macos-x64/
 
-    - name: Prepare to upload artifacts
-      if: ${{ github.ref != 'refs/heads/master' }}
-      run: |
-        mkdir out/windows
-        mkdir out/linux
-        mkdir out/macos
-        mv out/pakkit-win32-x64 out/windows/pakkit-windows-x64
-        mv out/pakkit-linux-x64 out/linux/pakkit-linux-x64
-        mv out/pakkit-darwin-x64 out/macos/pakkit-macos-x64
-
-    - uses: actions/upload-artifact@v2
-      if: ${{ github.ref != 'refs/heads/master' }}
-      with:
-        name: pakkit-windows-x64
-        path: out/windows/
-
-    - uses: actions/upload-artifact@v2
-      if: ${{ github.ref != 'refs/heads/master' }}
-      with:
-        name: pakkit-linux-x64
-        path: out/linux/
-
-    - uses: actions/upload-artifact@v2
-      if: ${{ github.ref != 'refs/heads/master' }}
-      with:
-        name: pakkit-macos-x64
-        path: out/macos/
-
     - id: create_release
       uses: actions/create-release@v1
       if: ${{ github.ref == 'refs/heads/master' }}
@@ -109,3 +81,31 @@ jobs:
         asset_path: out/pakkit-macos-x64.zip
         asset_name: pakkit-macos-x64.zip
         asset_content_type: application/zip
+
+    - name: Prepare to upload artifacts
+      if: ${{ github.ref != 'refs/heads/master' }}
+      run: |
+        mkdir out/windows
+        mkdir out/linux
+        mkdir out/macos
+        mv out/pakkit-win32-x64 out/windows/pakkit-windows-x64
+        mv out/pakkit-linux-x64 out/linux/pakkit-linux-x64
+        mv out/pakkit-darwin-x64 out/macos/pakkit-macos-x64
+
+    - uses: actions/upload-artifact@v2
+      if: ${{ github.ref != 'refs/heads/master' }}
+      with:
+        name: pakkit-windows-x64
+        path: out/windows/
+
+    - uses: actions/upload-artifact@v2
+      if: ${{ github.ref != 'refs/heads/master' }}
+      with:
+        name: pakkit-linux-x64
+        path: out/linux/
+
+    - uses: actions/upload-artifact@v2
+      if: ${{ github.ref != 'refs/heads/master' }}
+      with:
+        name: pakkit-macos-x64
+        path: out/macos/
