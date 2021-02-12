@@ -40,23 +40,23 @@ jobs:
     - run: zip -r -y out/pakkit-linux-x64.zip pakkit-linux-x64/
     - run: zip -r -y out/pakkit-macos-x64.zip pakkit-macos-x64/
 
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v1
       if: ${{ github.ref != 'refs/heads/master' }}
       with:
         name: pakkit-windows-x64
-        path: out/pakkit-windows-x64.zip
+        path: pakkit-windows-x64/
 
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v1
       if: ${{ github.ref != 'refs/heads/master' }}
       with:
         name: pakkit-linux-x64
-        path: out/pakkit-linux-x64.zip
+        path: pakkit-linux-x64/
 
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v1
       if: ${{ github.ref != 'refs/heads/master' }}
       with:
         name: pakkit-macos-x64
-        path: out/pakkit-macos-x64.zip
+        path: pakkit-macos-x64/
 
     - id: create_release
       uses: actions/create-release@v1
