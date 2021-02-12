@@ -68,7 +68,7 @@ jobs:
       with:
         tag_name: github-${{ github.run_number }}
         release_name: GitHub build ${{ github.run_number }}
-        # body: github-${{ github.run_number }}
+        body: github-${{ github.run_number }}
 
 #     - uses: actions/upload-release-asset@v1
 #       if: ${{ github.ref == 'refs/heads/master' }}
