@@ -32,31 +32,43 @@ jobs:
     - run: npx electron-forge package --platform darwin
     - run: cd out/pakkit-darwin-x64/pakkit.app/Contents/Resources/app/; node-prune; npx electron-rebuild -v 8.5.2
 
-    - run: mv out/pakkit-win32-x64 pakkit-windows-x64
-    - run: mv out/pakkit-linux-x64 pakkit-linux-x64
-    - run: mv out/pakkit-darwin-x64 pakkit-macos-x64
+    - name: Create archives for new release
+      if: ${{ github.ref == 'refs/heads/master' }}
+      run: |
+        mv out/pakkit-win32-x64 pakkit-windows-x64
+        mv out/pakkit-linux-x64 pakkit-linux-x64
+        mv out/pakkit-darwin-x64 pakkit-macos-x64
+        zip -r -y out/pakkit-windows-x64.zip pakkit-windows-x64/
+        zip -r -y out/pakkit-linux-x64.zip pakkit-linux-x64/
+        zip -r -y out/pakkit-macos-x64.zip pakkit-macos-x64/
 
-    - run: zip -r -y out/pakkit-windows-x64.zip pakkit-windows-x64/
-    - run: zip -r -y out/pakkit-linux-x64.zip pakkit-linux-x64/
-    - run: zip -r -y out/pakkit-macos-x64.zip pakkit-macos-x64/
+    - name: Prepare to upload artifacts
+      if: ${{ github.ref != 'refs/heads/master' }}
+      run: |
+        mkdir out/windows
+        mkdir out/linux
+        mkdir out/macos
+        mv out/pakkit-win32-x64 out/windows/pakkit-windows-x64
+        mv out/pakkit-linux-x64 out/linux/pakkit-linux-x64
+        mv out/pakkit-darwin-x64 out/macos/pakkit-macos-x64
 
-    - uses: actions/upload-artifact@v1.0.0
+    - uses: actions/upload-artifact@v2
       if: ${{ github.ref != 'refs/heads/master' }}
       with:
         name: pakkit-windows-x64
-        path: pakkit-windows-x64/
+        path: out/windows/
 
-    - uses: actions/upload-artifact@v1.0.0
+    - uses: actions/upload-artifact@v2
       if: ${{ github.ref != 'refs/heads/master' }}
       with:
         name: pakkit-linux-x64
-        path: pakkit-linux-x64/
+        path: out/linux/
 
-    - uses: actions/upload-artifact@v1.0.0
+    - uses: actions/upload-artifact@v2
       if: ${{ github.ref != 'refs/heads/master' }}
       with:
         name: pakkit-macos-x64
-        path: pakkit-macos-x64/
+        path: out/macos/
 
     - id: create_release
       uses: actions/create-release@v1
