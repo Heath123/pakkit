@@ -50,15 +50,15 @@ jobs:
 #         name: windows-x64
 #         path: pakkit-windows-x64/
 
-    - uses: actions/upload-artifact@v2
-      with:
-        name: linux-x64
-        path: pakkit-linux-x64/
+#     - uses: actions/upload-artifact@v2
+#       with:
+#         name: linux-x64
+#         path: pakkit-linux-x64/
 
-    - uses: actions/upload-artifact@v2
-      with:
-        name: macos-x64
-        path: pakkit-macos-x64/
+#     - uses: actions/upload-artifact@v2
+#       with:
+#         name: macos-x64
+#         path: pakkit-macos-x64/
 
     - id: create_release
       uses: actions/create-release@v1
