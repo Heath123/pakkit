@@ -35,7 +35,8 @@ jobs:
       run: |
         npx electron-forge package --platform linux
         cd out/pakkit-linux-x64/resources/app/; node-prune; npx electron-rebuild -v 8.5.2;
-        chmod +x out/pakkit-linux-x64/pakkit
+
+    - run: chmod +x out/pakkit-linux-x64/pakkit
 
     - name: Build for macOS
       run: |
