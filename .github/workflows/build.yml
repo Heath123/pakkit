@@ -33,6 +33,18 @@ jobs:
     - run: zip -r -y out/pakkit-windows-x64.zip pakkit-windows-x64/
     - run: zip -r -y out/pakkit-linux-x64.zip pakkit-linux-x64/
     - run: zip -r -y out/pakkit-macos-x64.zip pakkit-macos-x64/
+    - uses: actions/upload-artifact@v2
+      with:
+        name: windows-x64
+        path: pakkit-windows-x64/
+    - uses: actions/upload-artifact@v2
+      with:
+        name: linux-x64
+        path: pakkit-linux-x64/
+    - uses: actions/upload-artifact@v2
+      with:
+        name: macos-x64
+        path: pakkit-macos-x64/
 
 #   build-windows:
 #     runs-on: windows-latest
