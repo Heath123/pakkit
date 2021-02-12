@@ -34,22 +34,22 @@ jobs:
     - run: zip -r -y out/pakkit-linux-x64.zip pakkit-linux-x64/
     - run: zip -r -y out/pakkit-macos-x64.zip pakkit-macos-x64/
 
-  build-windows:
-    runs-on: windows-latest
-    steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-node@v1
-      with:
-        node-version: 12.x
-    - uses: actions/setup-java@v1
-      with:
-        java-version: 1.8
-    - uses: actions/setup-go@v1
-      with:
-        go-version: 1.13.x
-    - run: go get github.com/tj/node-prune
-    - run: npm install
-    - run: npx electron-forge package --platform win32
-    - run: cd out/pakkit-win32-x64/resources/app/; node-prune; npx electron-rebuild -v 8.5.2
-    - run: mv out/pakkit-win32-x64 pakkit-windows-x64
-    - run: zip -r -y out/pakkit-windows-x64.zip pakkit-windows-x64/
+#   build-windows:
+#     runs-on: windows-latest
+#     steps:
+#     - uses: actions/checkout@v2
+#     - uses: actions/setup-node@v1
+#       with:
+#         node-version: 12.x
+#     - uses: actions/setup-java@v1
+#       with:
+#         java-version: 1.8
+#     - uses: actions/setup-go@v1
+#       with:
+#         go-version: 1.13.x
+#     - run: go get github.com/tj/node-prune
+#     - run: npm install
+#     - run: npx electron-forge package --platform win32
+#     - run: cd out/pakkit-win32-x64/resources/app/; node-prune; npx electron-rebuild -v 8.5.2
+#     - run: mv out/pakkit-win32-x64 pakkit-windows-x64
+#     - run: zip -r -y out/pakkit-windows-x64.zip pakkit-windows-x64/
