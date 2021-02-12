@@ -1,9 +1,9 @@
-name: Build
+name: Build pakkit
 
 on: push
 
 jobs:
-  build:
+  build-job:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -97,4 +97,3 @@ jobs:
         asset_path: out/pakkit-macos-x64.zip
         asset_name: pakkit-macos-x64.zip
         asset_content_type: application/zip
-
