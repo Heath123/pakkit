@@ -325,6 +325,43 @@ function errorDialog(header, info, fatal) {
   <button style="margin-top: 16px;" class="bottom-button" onclick="${fatal ? 'sharedVars.ipcRenderer.send(\'relaunchApp\', \'\')' : 'closeDialog()' }">Close</button>`
 }
 
+function loginDialog(callback) {
+  // dialogOpen = true
+  window.loginFormHandler = function (event) {
+    if (event === 'cancel') {
+      callback({cancelled: true})
+      closeDialog()
+      return
+    }
+    event.preventDefault()
+    callback({
+      cancelled: false,
+      email: document.getElementById('login-email').value,
+      password: document.getElementById('login-password').value
+    })
+    closeDialog()
+  }
+
+  document.getElementById('dialog-overlay').className = 'dialog-overlay active'
+  document.getElementById('dialog').className='dialog dialog-medium'
+  document.getElementById('dialog').innerHTML =
+ `<form onsubmit="loginFormHandler(event); return false;"> <!-- TODO: prevent page reload? and handle login -->
+    <h2>This server is in online mode</h2>
+    Please log in to your Minecraft account.
+    <br><br>
+    pakkit does not store passwords, though it may store authentication tokens.
+    <br><br>
+    <input placeholder="Email" type="text" style="width: calc(100% - 24px);" id="login-email">
+    <br><br>
+    <input placeholder="Password" type="password" style="width: calc(100% - 24px);" id="login-password">
+    <br>
+    <input style="margin-top: 16px; margin-right: 8px;" type="submit" value="Log in">
+    
+    <!-- Need to specify that this is a button so it doesn't submit the form: https://stackoverflow.com/questions/932653/how-to-prevent-buttons-from-submitting-forms -->
+    <button style="margin-top: 16px;" onclick="loginFormHandler('cancel')" type="button">Cancel</button>
+  </form>`
+}
+
 sharedVars.ipcRenderer.on('editAndResend', (event, arg) => { // Context menu
   const ipcMessage = JSON.parse(arg)
   editAndResend(ipcMessage.id)

@@ -144,6 +144,13 @@ div.dialog-small {
   width: 500px;
 }
 
+div.dialog-medium {
+  top: calc(50% - 160px);
+  left: calc(50% - 250px);
+  height: 320px;
+  width: 500px;
+}
+
 .CodeMirror.CodeMirror {
   height: calc(100% - 120px);
 }

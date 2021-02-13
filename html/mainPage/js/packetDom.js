@@ -47,7 +47,7 @@ function addPacketToDOM (packet) {
         </div>
         <span class="time">${escapeHtml(formatTime(packet.time))}</span>
       </li>`])
-  /* if (!noUpdate) {
+  /* if (!noUpdate) {/html/mainPage/index.html/html/mainPage/index.html
     clusterize.append(sharedVars.allPacketsHTML.slice(-1)[0]);
     if (wasScrolledToBottom) {
       sharedVars.packetList.parentElement.scrollTop = sharedVars.packetList.parentElement.scrollHeight;
