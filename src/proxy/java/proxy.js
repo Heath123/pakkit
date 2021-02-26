@@ -40,7 +40,8 @@ exports.capabilities = {
   versionId: undefined
 }
 
-exports.startProxy = function (host, port, listenPort, version, authConsent, callback, messageCallback, dataFolder) {
+exports.startProxy = function (host, port, listenPort, version, authConsent, callback, messageCallback, dataFolder,
+  updateFilteringCallback) {
   storedCallback = callback
 
   // . cannot be in a JSON property name with electron-store

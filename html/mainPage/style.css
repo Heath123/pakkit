@@ -152,6 +152,7 @@ div#Scripting .CodeMirror.CodeMirror {
   height: calc(100% - 185px);
 }
 
+/* TODO: needed? */
 .packetLink {
   text-decoration: none;
 }
@@ -295,4 +296,12 @@ body.timeShown div.main-data {
 
 body.timeNotShown div.main-data {
   display: inline;
+}
+
+body.timeNotShown span.time {
+  display: none;
+}
+
+.settingDescription {
+  color: rgba(255, 255, 255, 0.5);
 }

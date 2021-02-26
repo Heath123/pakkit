@@ -2,8 +2,6 @@
 
 const Store = require('electron-store');
 
-const store = new Store();
-
 const axios = require('axios')
 
 const Clusterize = require('clusterize.js')
@@ -115,32 +113,33 @@ const sharedVars = {
   hiddenPackets: undefined,
   scripting: undefined,
   lastFilter: '',
-  hiddenPacketsAmount: 0
+  hiddenPacketsAmount: 0,
+  store: new Store()
 }
 
 sharedVars.proxyCapabilities = JSON.parse(sharedVars.ipcRenderer.sendSync('proxyCapabilities', ''))
 
 function getVersionSpecificVar(name, defaultValue) {
   const versionId = 'version-' + sharedVars.proxyCapabilities.versionId
-  const settingsObject = store.get(versionId)
+  const settingsObject = sharedVars.store.get(versionId)
   if (settingsObject) {
     if (!settingsObject[name]) {
       settingsObject[name] = JSON.stringify(defaultValue)
-      store.set(versionId, settingsObject)
+      sharedVars.store.set(versionId, settingsObject)
     }
   } else {
-    store.set(versionId, {
+    sharedVars.store.set(versionId, {
       [name]: JSON.stringify(defaultValue)
     })
   }
-  return JSON.parse(store.get(versionId)[name])
+  return JSON.parse(sharedVars.store.get(versionId)[name])
 }
 
 function setVersionSpecificVar(name, value) {
   const versionId = 'version-' + sharedVars.proxyCapabilities.versionId
-  const settingsObject = store.get(versionId)
+  const settingsObject = sharedVars.store.get(versionId)
   settingsObject[name] = JSON.stringify(value)
-  store.set(versionId, settingsObject)
+  sharedVars.store.set(versionId, settingsObject)
 }
 
 const defaultsJson = require('./js/defaults.json')
@@ -179,6 +178,19 @@ sharedVars.packetDom = require('./js/packetDom.js')
 sharedVars.packetDom.setup(sharedVars)
 sharedVars.ipcHandler = require('./js/ipcHandler.js')
 sharedVars.ipcHandler.setup(sharedVars)
+sharedVars.settings = require('./js/settings.js')
+sharedVars.settings.bindToSettingChange('showTimes', (newValue) => {
+  if (newValue) {
+    document.body.classList.remove('timeNotShown')
+    document.body.classList.add('timeShown')
+  } else {
+    document.body.classList.remove('timeShown')
+    document.body.classList.add('timeNotShown')
+  }
+})
+sharedVars.settings.setup(sharedVars)
+
+
 
 // const sidebar = document.getElementById('sidebar-box')
 
@@ -215,27 +227,30 @@ function updateFilteringTab () {
 const allServerboundPackets = []
 const allClientboundPackets = []
 
-// Filtering - coming soon
-function addPacketsToFiltering (packetsObject, direction, appendTo) {
-  console.log('packets', packetsObject)
-  for (const key in packetsObject) {
-    if (packetsObject.hasOwnProperty(key)) {
-      console.log(!sharedVars.hiddenPackets[direction].includes(packetsObject[key]))
-      filteringPackets.innerHTML +=
-     `<li id="${packetsObject[key].replace(/"/g, '&#39;') + '-' + direction}" class="packet ${direction}" onclick="toggleCheckbox(this.firstElementChild, 'teleport_confirm', 'serverbound')">
+window.updateFilteringPackets = () => {
+  function addPacketsToFiltering (packetsObject, direction, appendTo) {
+    console.log('packets', packetsObject)
+    for (const key in packetsObject) {
+      if (packetsObject.hasOwnProperty(key)) {
+        console.log(!sharedVars.hiddenPackets[direction].includes(packetsObject[key]))
+        filteringPackets.innerHTML +=
+          `<li id="${packetsObject[key].replace(/"/g, '&#39;') + '-' + direction}" class="packet ${direction}" onclick="toggleCheckbox(this.firstElementChild, 'teleport_confirm', 'serverbound')">
         <input type="checkbox" ${!sharedVars.hiddenPackets[direction].includes(packetsObject[key]) ? 'checked' : ''}
             onclick="toggleCheckbox(this, ${JSON.stringify(packetsObject[key]).replace(/"/g, '&#39;')}, '${direction}')"/>
         <span class="id">${escapeHtml(key)}</span>
         <span class="name">${escapeHtml(packetsObject[key])}</span>
       </li>`
-      console.log(key + ' -> ' + packetsObject[key])
-      appendTo.push(packetsObject[key])
+        console.log(key + ' -> ' + packetsObject[key])
+        appendTo.push(packetsObject[key])
+      }
     }
   }
+
+  addPacketsToFiltering(sharedVars.proxyCapabilities.serverboundPackets, 'serverbound', allServerboundPackets)
+  addPacketsToFiltering(sharedVars.proxyCapabilities.clientboundPackets, 'clientbound', allClientboundPackets)
 }
 
-addPacketsToFiltering(sharedVars.proxyCapabilities.serverboundPackets, 'serverbound', allServerboundPackets)
-addPacketsToFiltering(sharedVars.proxyCapabilities.clientboundPackets, 'clientbound', allClientboundPackets)
+window.updateFilteringPackets()
 
 // Update every 0.05 seconds
 // TODO: Find a better way without updating on every packet (which causes lag)

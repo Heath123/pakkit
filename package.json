@@ -42,7 +42,7 @@
     "electron-rebuild": "^2.3.4"
   },
   "dependencies": {
-    "axios": "^0.21.0",
+    "axios": "^0.21.1",
     "clusterize.js": "^0.18.1",
     "electron-localshortcut": "^3.2.1",
     "electron-squirrel-startup": "^1.0.0",
@@ -50,12 +50,16 @@
     "electron-unhandled": "^3.0.2",
     "electron-window-state": "^5.0.3",
     "escape-html": "^1.0.3",
-    "java": "^0.12.1",
     "md5-file": "^5.0.0",
     "minecraft-data": "^2.70.2",
     "minecraft-folder-path": "^1.1.0",
-    "minecraft-protocol": "github:PrismarineJS/node-minecraft-protocol#master",
+    "minecraft-protocol": "^1.22.0",
     "node-eval": "^2.0.0",
-    "source-map-support": "^0.5.19"
+    "source-map-support": "^0.5.19",
+    "ws": "^7.4.1"
+  },
+  "optionalDependencies": {
+    "bufferutil": "^4.0.2",
+    "utf-8-validate": "^5.0.3"
   }
 }

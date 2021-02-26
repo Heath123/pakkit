@@ -1,0 +1,8 @@
+{
+  "showTimes": {
+    "name": "Show packet times",
+    "description": "Shows information about the timing of packets on the right side of the packet list",
+    "type": "boolean",
+    "default": false
+  }
+}

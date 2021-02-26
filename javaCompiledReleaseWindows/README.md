@@ -1,1 +1,0 @@
-Copied into resources\app\node_modules\java\build on Windows build - hacky but fixes a bug
