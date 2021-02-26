@@ -34,7 +34,7 @@ exports.capabilities = {
   scriptingSupport: false,
   clientboundPackets: {},
   serverboundPackets: {},
-  wikiVgPage: 'https://wiki.vg/Bedrock_Protocol',
+  wikiVgPage: undefined, // 'https://wiki.vg/Bedrock_Protocol',
   versionId: 'bedrock-proxypass-json'
 }
 
