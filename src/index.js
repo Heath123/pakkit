@@ -18,7 +18,7 @@ if (options.autostart) {
     }
 }
 
-const {app, BrowserWindow, ipcMain, clipboard, Menu} = require('electron')
+const {app, BrowserWindow, ipcMain, clipboard, Menu, dialog } = require('electron')
 app.allowRendererProcessReuse = true
 
 const fs = require('fs')
@@ -242,6 +242,48 @@ ipcMain.on('contextMenu', (event, arg) => {
 ipcMain.on('relaunchApp', (event, arg) => {
     app.relaunch()
     app.exit()
+})
+
+ipcMain.on('saveLog', async (event, arg) => {
+    const win = BrowserWindow.getAllWindows()[0]
+
+    const result = await dialog.showSaveDialog(win, {
+        filters: [
+            { name: 'pakkit log files', extensions: ['pakkit-json'] },
+            // { name: 'All Files', extensions: ['*'] }
+        ]
+    })
+
+    if (!result.canceled) {
+        const realPath = result.filePath.endsWith('.pakkit-json') ? result.filePath : result.filePath + '.pakkit-json'
+        console.log('Saving log to', realPath)
+        fs.writeFile(realPath, arg, function (err) {
+            if (err) throw err;
+            console.log('Saved!');
+        })
+    }
+})
+
+ipcMain.on('loadLog', async (event, arg) => {
+    const win = BrowserWindow.getAllWindows()[0]
+
+    const result = await dialog.showOpenDialog(win, {
+        filters: [
+            { name: 'pakkit log files', extensions: ['pakkit-json'] },
+            { name: 'All Files', extensions: ['*'] }
+        ],
+        properties: ['openFile']
+    })
+
+    if (!result.canceled) {
+        // It's an array, but we have multi-select off so it should only have one item
+        console.log('Loading log from', result.filePaths[0])
+        fs.readFile(result.filePaths[0], 'utf-8', function(err, data) {
+            if (err) throw err;
+            console.log('File has been read')
+            win.send('loadLogData', data)
+        })
+    }
 })
 
 // In this file you can include the rest of your app's specific main process
