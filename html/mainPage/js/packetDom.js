@@ -36,7 +36,7 @@ function formatTime (ms) {
   return new Date(new Date(ms).getTime() - new Date().getTimezoneOffset() * 60000).toISOString().split("T")[1].replace(/[0-9]Z$/, '');
 }
 
-function addPacketToDOM (packet) {
+exports.addPacketToDOM = function (packet) {
   const isHidden = filteringLogic.packetFilteredByFilterBox(packet, sharedVars.lastFilter, sharedVars.hiddenPackets)
   sharedVars.allPacketsHTML.push([
     `<li id="packet${packet.uid}" onclick="packetClick(${packet.uid})" class="packet ${packet.direction} ${isHidden ? 'filter-hidden' : 'filter-shown'}">
@@ -78,7 +78,7 @@ function refreshPackets () {
 
 function updateHidden () {
   document.getElementById("hiddenPackets").innerHTML = sharedVars.hiddenPacketsAmount + ' hidden packets';
-  if (sharedVars.hiddenPacketsAmount != 0) {
+  if (sharedVars.hiddenPacketsAmount !== 0) {
      document.getElementById("hiddenPackets").innerHTML += ' (<a href="#" onclick="showAllPackets()">show all</a>)'
   }
 }
@@ -95,7 +95,7 @@ exports.setup = function (passedSharedVars) {
 exports.addPacket = function (data) {
   sharedVars.allPackets.push(data)
   data.uid = sharedVars.allPackets.length - 1
-  addPacketToDOM(data)
+  exports.addPacketToDOM(data)
 }
 
 // TODO: use shared var

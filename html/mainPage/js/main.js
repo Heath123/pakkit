@@ -576,3 +576,11 @@ function scrollWikiToCurrentPacket () {
     }
   }
 }
+
+function saveLog() {
+  sharedVars.ipcRenderer.send('saveLog', JSON.stringify(sharedVars.allPackets))
+}
+
+function loadLog() {
+  sharedVars.ipcRenderer.send('loadLog', '')
+}

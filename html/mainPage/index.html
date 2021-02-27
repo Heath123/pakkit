@@ -37,6 +37,7 @@
     <div class="tab">
         <button class="back-button" onclick="sharedVars.ipcRenderer.send('relaunchApp', '')">&lt;</button>
         <button class="tab-button tablinks-topmenu active" onclick="openMenu(event, 'Main', '-topmenu')">Main</button>
+        <button class="tab-button tablinks-topmenu" onclick="openMenu(event, 'File', '-topmenu')">File</button>
         <!--  <button class="tab-button tablinks-topmenu" onclick="openMenu(event, 'Packet', '-topmenu')">Packet</button> -->
         <button class="tab-button tablinks-topmenu" onclick="openMenu(event, 'Filtering', '-topmenu')">Filtering</button>
         <button class="tab-button tablinks-topmenu" id="scriptingTab" onclick="openMenu(event, 'Scripting', '-topmenu')">Scripting</button>
@@ -50,9 +51,14 @@
         <div class="whenPacketSelected">
             <div style="padding: 8px 0;">Quick actions</div>
             <button onclick="hideAll(currentPacket)" style="width: 200px;">Hide all packets of this type</button>
-            <button id="editAndResend" onclick="editAndResend(currentPacket)" style="width: 200px;">Edit and resend
-            </button>
+            <button id="editAndResend" onclick="editAndResend(currentPacket)" style="width: 200px;">Edit and resend</button>
         </div>
+    </div>
+
+    <div class="tabcontent tabcontent-topmenu" id="File">
+        <div style="padding: 8px 0;">Packet log</div>
+        <button onclick="saveLog()">Save</button>
+        <button onclick="loadLog()">Load</button>
     </div>
 
     <!-- <div class="tabcontent tabcontent-topmenu" id="Packet">
