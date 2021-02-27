@@ -1,6 +1,23 @@
 const fs = require('fs')
 const md5File = require('md5-file')
 
+function copyIfNotMatches (src, dest) {
+  if (!fs.existsSync(dest)) {
+    fs.copyFileSync(src, dest)
+  } else {
+    const packagedHash = md5File.sync(src)
+    console.log('The MD5 hash of the packaged', src.split('/')[src.split('/').length], 'is', packagedHash)
+    const savedHash = md5File.sync(dest)
+    console.log('The MD5 hash of the saved', src.split('/')[src.split('/').length], 'is', savedHash)
+    if (packagedHash === savedHash) {
+      console.log('Match! Not copying.')
+    } else {
+      console.log('No match! Overwriting.')
+      fs.copyFileSync(src, dest)
+    }
+  }
+}
+
 exports.setup = function (osDataFolder, resourcesPath) {
   const dataFolder = osDataFolder + '/pakkit'
   if (!fs.existsSync(dataFolder)) {
@@ -11,20 +28,7 @@ exports.setup = function (osDataFolder, resourcesPath) {
     fs.mkdirSync(dataFolder + '/proxypass')
   }
 
-  if (!fs.existsSync(dataFolder + '/proxypass/proxypass-pakkit.jar')) {
-    fs.copyFileSync(resourcesPath + 'data/proxypass-pakkit.jar', dataFolder + '/proxypass/proxypass-pakkit.jar')
-  } else {
-    const packagedHash = md5File.sync(resourcesPath + 'data/proxypass-pakkit.jar')
-    console.log('The MD5 hash of the packaged ProxyPass is', packagedHash)
-    const savedHash = md5File.sync(dataFolder + '/proxypass/proxypass-pakkit.jar')
-    console.log('The MD5 hash of the saved ProxyPass is', savedHash)
-    if (packagedHash === savedHash) {
-      console.log('Match! Not copying.')
-    } else {
-      console.log('No match! Overwriting.')
-      fs.copyFileSync(resourcesPath + 'data/proxypass-pakkit.jar', dataFolder + '/proxypass/proxypass-pakkit.jar')
-    }
-  }
+  copyIfNotMatches(resourcesPath + 'data/proxypass-pakkit.jar', dataFolder + '/proxypass/proxypass-pakkit.jar')
 
   return dataFolder
 }
