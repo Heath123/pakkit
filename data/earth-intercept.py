@@ -66,7 +66,7 @@ class GenoaReplacement:
 					ctx.log.info("")
 					ctx.log.info("Starting pakkit...")
 
-					handle = Popen(PAKKIT_LOCATION + " --autostart --platform earth --connect " + str(origip) + " --connect-port " + str(origport) + " --listen-port ${PAKKIT_PORT}", stdin = PIPE, stderr = PIPE, stdout = PIPE, shell = True)
+					handle = Popen(PAKKIT_LOCATION + " --autostart --platform earth --connect " + str(origip) + " --connect-port " + str(origport) + " --listen-port " + str(ownport), stdin = PIPE, stderr = PIPE, stdout = PIPE, shell = True)
 
 					changeip = True
 
