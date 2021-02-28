@@ -34,6 +34,7 @@ const resourcesPath = fs.existsSync('resources/app')
 
 const javaProxy = require('./proxy/java/proxy.js')
 const bedrockProxy = require('./proxy/bedrock/proxy.js')
+const mitmProxy = require('./proxy/mitm/proxy.js')
 const packetHandler = require('./packetHandler.js')
 const setupDataFolder = require('./setupDataFolder.js')
 
@@ -129,7 +130,7 @@ function createWindow() {
         resizable: false,
         // frame: false,
         webPreferences: {
-            nodeIntegration: true
+            nodeIntegration: true,
         },
         icon: resourcesPath + 'icons/icon.png'
     })
@@ -197,21 +198,29 @@ ipcMain.on('startProxy', (event, arg) => {
 })
 
 function startProxy (args) {
+    console.log(args.platform)
     if (args.platform === 'java') {
         proxy = javaProxy
-    } else {
+    } else if (args.platform === 'bedrock') {
         proxy = bedrockProxy
+    } else if (args.platform === 'earth-mitm') {
+        proxy = mitmProxy
     }
 
     const win = BrowserWindow.getAllWindows()[0]
 
     packetHandler.init(BrowserWindow.getAllWindows()[0], ipcMain, proxy)
+    console.log(proxy)
     proxy.startProxy(args.connectAddress, args.connectPort, args.listenPort, args.version,
       args.consent, packetHandler.packetHandler, packetHandler.messageHandler , dataFolder, () => {
           win.send('updateFiltering', '')
       })
 
-    win.loadFile('html/mainPage/index.html')
+    if (args.platform === 'earth-mitm') {
+        win.loadFile('html/earthMitmPage/index.html')
+    } else {
+        win.loadFile('html/mainPage/index.html')
+    }
 
     // Load the previous state with fallback to defaults
     const mainWindowState = windowStateKeeper({

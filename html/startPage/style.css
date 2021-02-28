@@ -17,3 +17,7 @@ form p input { display: table-cell; }
 input#start {
   padding: 10px 78.5px;
 }
+
+#address-options {
+  display: contents;
+}

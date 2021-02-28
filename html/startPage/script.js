@@ -65,12 +65,17 @@ function platformChange () {
     updateVars()
     saveSettings(lastPlatform)
   }
-  if (platform === 'bedrock') {
+  if (platform === 'bedrock' || platform === 'earth-mitm') {
     document.getElementById('version-bedrock').style.display = 'block'
     document.getElementById('version').style.display = 'none'
   } else {
     document.getElementById('version').style.display = 'block'
     document.getElementById('version-bedrock').style.display = 'none'
+  }
+  if (platform === 'earth-mitm') {
+    document.getElementById('address-options').style.display = 'none'
+  } else {
+    document.getElementById('address-options').style.display = 'contents'
   }
   loadSettings(platform)
   lastPlatform = platform

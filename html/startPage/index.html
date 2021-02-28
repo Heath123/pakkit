@@ -19,6 +19,7 @@
         <select id="platform" style="width: 191px;" onchange="platformChange()">
           <option value="java">Java Edition</option>
           <option value="bedrock">Minecraft Earth (beta)</option>
+          <option value="earth-mitm">Minecraft Earth - launch mitmproxy (beta)</option>
         </select>
       </p>
       <br>
@@ -71,20 +72,22 @@
         </select>
       </p>
       <br><br>
-      <p>
-        <label for="connect-address">Connect address:</label>
-        <input type="text" name="connect-address" id="connect-address" value="127.0.0.1" placeholder="127.0.0.1">
-      </p>
-      <br>
-      <p>
-        <label for="connect-port">Connect port:</label>
-        <input type="text" name="connect-port" id="connect-port" value="25565" placeholder="25565">
-      </p>
-      <br><br>
-      <p>
-        <label for="listen-port">Listen port:</label>
-        <input type="text" name="listen-port" id="listen-port" value="25566" placeholder="25566">
-      </p>
+      <div id="address-options">
+        <p>
+          <label for="connect-address">Connect address:</label>
+          <input type="text" name="connect-address" id="connect-address" value="127.0.0.1" placeholder="127.0.0.1">
+        </p>
+        <br>
+        <p>
+          <label for="connect-port">Connect port:</label>
+          <input type="text" name="connect-port" id="connect-port" value="25565" placeholder="25565">
+        </p>
+        <br><br>
+        <p>
+          <label for="listen-port">Listen port:</label>
+          <input type="text" name="listen-port" id="listen-port" value="25566" placeholder="25566">
+        </p>
+      </div>
       <div id="consent-box" style="display: none;">
         <br>
         <br>

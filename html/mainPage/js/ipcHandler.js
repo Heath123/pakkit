@@ -30,7 +30,7 @@ exports.setup = function (passedSharedVars) {
       ((data.flags & 0x02) ? ' ~' : ' ') + ((data.y === 0 && (data.flags & 0x03)) ? '' : data.y) +
       ((data.flags & 0x04) ? ' ~' : ' ') + ((data.z === 0 && (data.flags & 0x04)) ? '' : data.z)
 
-    if (!(data.flags & 0x10) || !(data.flags & 0x08) || data.pitch != 0 || data.yaw !== 0) {
+    if (!(data.flags & 0x10) || !(data.flags & 0x08) || data.pitch !== 0 || data.yaw !== 0) {
       clipData += ((data.flags & 0x10) ? ' ~' : ' ') + data.pitch +
         ((data.flags & 0x08) ? ' ~' : ' ') + data.yaw
     }
