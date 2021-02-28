@@ -229,12 +229,96 @@ ipcMain.on('injectCssSoon', (event, args) => {
     }
     
     .resource-icon-plain {
-      background-image: url( data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABHNCSVQICAgIfAhkiAAAArpJREFUWIXllr1OG0EUhb/9cZQosrReLDDYEoIKAStZ2IaCCuQ0eYy8Q94iffIKeQD6NBSYgpg2khsUicIsSoEJXjw3RTKr9e7a67WdJjnSyJ6fnXvumXvvDPzvMGJ9y3XdVr1erwB2tCmlLNM0C0opC7AAW0QswDZN0wLs0Whk6f+GYZjRMRGxer3e15ubm4/TCBVKpdJbmRNKKRmNRvL8/CxBEMhwOJSnpyd5fHyUwWAgwLu4QXtxEX9DKYWITGxKKYCXuQicn58DcHd3B0Cr1aLX64V9YMxIo9EI53VfRFhbW0NEAAq5CBwfHyfG1tfXE4ajbXV1NdX7PwTMhRTQ0Bs2m80xj/8YCecPDg7iCuQjkKaAhja4sbGR6m1aA9RcCmxvb3N5eRmONxoNOp1OSATAdV36/X6ogOu6bG5uZioQrwOFUqn0xvf9s2leZ3k6aX5lZeU98GFmBc7OzhARfN9HKUW9Xufq6mqMjOM4+L6PiOB5HtfX16Eq+/v7iAi7u7t6LO7wdALNZjPhVbvdnur1ycnJtCxIYCIBEeHi4iJUQI9FN/M8j263C4DjONzf34fzjuNQrVa19PqbBItUAtE0ykKtVstcEwQBpmnCrEegCXS73aXEwNbWli7FsxMIgmBpMaAJp2EiAWBpMfDiVZGCmahBkwloA3t7e6kfRdFutzPXoIaoZA2aTEB7cXt7Cyx+F9i2Haqai0ClUgEIf+MYDofUarXMTMhdB+IKLHoXRNflIrCzsxMG3tHR0VhkHx4eJiqdNhjPgIgC+QpRNAsWqQPlclnHQD4Cf+EuyFcJO53OUupAuVye7wj0o3LaXX96epr5Foik4M+ZCKRtkmVkxiv4RxYBEZEHz/M+iUiVlDfcnDANw/gO9LMIqGKx+G0wGHwWkdeknNmcMAzDeAC+LGm/fwi/ACsSOC1GMuYcAAAAAElFTkSuQmCC)!important;
+      background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABHNCSVQICAgIfAhkiAAAArpJREFUWIXllr1OG0EUhb/9cZQosrReLDDYEoIKAStZ2IaCCuQ0eYy8Q94iffIKeQD6NBSYgpg2khsUicIsSoEJXjw3RTKr9e7a67WdJjnSyJ6fnXvumXvvDPzvMGJ9y3XdVr1erwB2tCmlLNM0C0opC7AAW0QswDZN0wLs0Whk6f+GYZjRMRGxer3e15ubm4/TCBVKpdJbmRNKKRmNRvL8/CxBEMhwOJSnpyd5fHyUwWAgwLu4QXtxEX9DKYWITGxKKYCXuQicn58DcHd3B0Cr1aLX64V9YMxIo9EI53VfRFhbW0NEAAq5CBwfHyfG1tfXE4ajbXV1NdX7PwTMhRTQ0Bs2m80xj/8YCecPDg7iCuQjkKaAhja4sbGR6m1aA9RcCmxvb3N5eRmONxoNOp1OSATAdV36/X6ogOu6bG5uZioQrwOFUqn0xvf9s2leZ3k6aX5lZeU98GFmBc7OzhARfN9HKUW9Xufq6mqMjOM4+L6PiOB5HtfX16Eq+/v7iAi7u7t6LO7wdALNZjPhVbvdnur1ycnJtCxIYCIBEeHi4iJUQI9FN/M8j263C4DjONzf34fzjuNQrVa19PqbBItUAtE0ykKtVstcEwQBpmnCrEegCXS73aXEwNbWli7FsxMIgmBpMaAJp2EiAWBpMfDiVZGCmahBkwloA3t7e6kfRdFutzPXoIaoZA2aTEB7cXt7Cyx+F9i2Haqai0ClUgEIf+MYDofUarXMTMhdB+IKLHoXRNflIrCzsxMG3tHR0VhkHx4eJiqdNhjPgIgC+QpRNAsWqQPlclnHQD4Cf+EuyFcJO53OUupAuVye7wj0o3LaXX96epr5Foik4M+ZCKRtkmVkxiv4RxYBEZEHz/M+iUiVlDfcnDANw/gO9LMIqGKx+G0wGHwWkdeknNmcMAzDeAC+LGm/fwi/ACsSOC1GMuYcAAAAAElFTkSuQmCC)!important;
     }
     
     .flow-detail nav {
-      background: #121212;
-      border-bottom: solid 1px #121212;
+      background: #121212!important;
+      border-bottom: solid 1px #121212!important;
+    }
+    
+    .splitter {
+      background-color: #121212!important;
+    }
+    
+    pre {
+      color: inherit!important;
+      background-color: #2B2B2B!important;
+      border: black!important;
+    }
+    
+    .inline-input.editable {
+      border-color: transparent!important;
+    }
+    
+    table {
+        border-collapse: unset!important;
+    }
+    
+    .alert-info {
+      background-color: #191919!important;
+      border-color: #101010!important;
+      color: inherit!important;
+    }
+    
+    hr {
+      border-top: 1px solid transparent!important;
+    }
+    
+    /* https://codemirror.net/theme/darcula.css */
+    
+    /**
+        Name: IntelliJ IDEA default theme
+        From IntelliJ IDEA by JetBrains
+     */
+    
+    .cm-s-default  { font-family: Consolas, Menlo, Monaco, 'Lucida Console', 'Liberation Mono', 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', 'Courier New', monospace, serif!important;}
+    .cm-s-default.CodeMirror { background: #2B2B2B!important; color: #A9B7C6!important; }
+    
+    .cm-s-default span.cm-meta { color: #BBB529!important; }
+    .cm-s-default span.cm-number { color: #6897BB!important; }
+    .cm-s-default span.cm-keyword { color: #CC7832!important; line-height: 1em!important; font-weight: bold!important; }
+    .cm-s-default span.cm-def { color: #A9B7C6!important; font-style: italic!important; }
+    .cm-s-default span.cm-variable { color: #A9B7C6!important; }
+    .cm-s-default span.cm-variable-2 { color: #A9B7C6!important; }
+    .cm-s-default span.cm-variable-3 { color: #9876AA!important; }
+    .cm-s-default span.cm-type { color: #AABBCC!important; font-weight: bold!important; }
+    .cm-s-default span.cm-property { color: #FFC66D!important; }
+    .cm-s-default span.cm-operator { color: #A9B7C6!important; }
+    .cm-s-default span.cm-string { color: #6A8759!important; }
+    .cm-s-default span.cm-string-2 { color: #6A8759!important; }
+    .cm-s-default span.cm-comment { color: #61A151!important; font-style: italic!important; }
+    .cm-s-default span.cm-link { color: #CC7832!important; }
+    .cm-s-default span.cm-atom { color: #CC7832!important; }
+    .cm-s-default span.cm-error { color: #BC3F3C!important; }
+    .cm-s-default span.cm-tag { color: #629755!important; font-weight: bold!important; font-style: italic!important; text-decoration: underline!important; }
+    .cm-s-default span.cm-attribute { color: #6897bb!important; }
+    .cm-s-default span.cm-qualifier { color: #6A8759!important; }
+    .cm-s-default span.cm-bracket { color: #A9B7C6!important; }
+    .cm-s-default span.cm-builtin { color: #FF9E59!important; }
+    .cm-s-default span.cm-special { color: #FF9E59!important; }
+    .cm-s-default span.cm-matchhighlight { color: #FFFFFF!important; background-color: rgba(50, 89, 48, .7)!important; font-weight: normal!important;}
+    .cm-s-default span.cm-searching { color: #FFFFFF!important; background-color: rgba(61, 115, 59, .7)!important; font-weight: normal!important;}
+    
+    .cm-s-default .CodeMirror-cursor { border-left: 1px solid #A9B7C6!important; }
+    .cm-s-default .CodeMirror-activeline-background { background: #323232!important; }
+    .cm-s-default .CodeMirror-gutters { background: #313335!important; border-right: 1px solid #313335!important; }
+    .cm-s-default .CodeMirror-guttermarker { color: #FFEE80!important; }
+    .cm-s-default .CodeMirror-guttermarker-subtle { color: #D0D0D0!important; }
+    .cm-s-default .CodeMirrir-linenumber { color: #606366!important; }
+    .cm-s-default .CodeMirror-matchingbracket { background-color: #3B514D!important; color: #FFEF28 !important; font-weight: bold!important; }
+    
+    .cm-s-default div.CodeMirror-selected { background: #214283!important; }
+    
+    .CodeMirror-hints.default {
+      font-family: Menlo, Monaco, Consolas, 'Courier New', monospace!important;
+      color: #9C9E9E!important;
+      background-color: #3B3E3F !important;
+    }
+    
+    .CodeMirror-hints.default .CodeMirror-hint-active {
+      background-color: #494D4E !important;
+      color: #9C9E9E !important;
     }
     
     /* pakkit shared styles */
