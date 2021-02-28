@@ -1,3 +1,7 @@
+const path = require('path')
+
+process.chdir(path.join(__dirname, '..'))
+
 const { program } = require('commander');
 
 program
@@ -27,6 +31,8 @@ const Store = require('electron-store')
 const store = new Store()
 
 let proxy // Defined later when an option is chosen
+
+// TODO: Can it still be the first after the cwd?
 const resourcesPath = fs.existsSync('resources/app')
     ? 'resources/app/' // Packaged with electron-forge
     : './' // npm start
@@ -198,7 +204,7 @@ ipcMain.on('startProxy', (event, arg) => {
 })
 
 function startProxy (args) {
-    console.log(args.platform)
+    args.platform = (args.platform === 'earth') ? 'bedrock' : args.platform
     if (args.platform === 'java') {
         proxy = javaProxy
     } else if (args.platform === 'bedrock') {
