@@ -35,7 +35,11 @@ exports.setup = function (osDataFolder, resourcesPath) {
 
   // Replace
   let pyScript = fs.readFileSync(dataFolder + '/earth-intercept.py', 'utf-8')
-  pyScript = pyScript.replace('${PAKKIT_LOCATION}', JSON.stringify(process.argv[0] + ' ' + path.resolve(process.argv[1])))
+  pyScript = pyScript.replace('${PAKKIT_LOCATION}', JSON.stringify(process.argv[0] +
+    // If process.argv[1] is empty we're probably on electron-forge and we need --
+    // TODO: make this not break if you pass arguments
+    (process.argv[1] ? ' ' + path.resolve(process.argv[1]) :  ' --')
+  ))
   // TODO: find free port
   pyScript = pyScript.split('${PAKKIT_PORT}').join('19122')
   // TODO: get actual local IP
