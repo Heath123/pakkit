@@ -3,6 +3,7 @@ import gzip
 import re
 import ruamel.yaml as yaml
 import io
+import random
 from subprocess import *
 
 from mitmproxy import ctx
@@ -31,7 +32,8 @@ class GenoaReplacement:
 					if True: # with io.open(CONFIG_LOCATION, "r") as stream:
 						# configdata = yaml.safe_load(stream)
 						ownip = ${LOCAL_IP} # configdata['proxy']['host']
-						ownport = ${PAKKIT_PORT} # = configdata['proxy']['port']
+						# TODO: Check if the port is free
+						ownport = random.randint(1050, 6000)
 
 					origip = data["result"]["ipV4Address"]
 					origport = data["result"]["port"]
@@ -64,7 +66,7 @@ class GenoaReplacement:
 					ctx.log.info("")
 					ctx.log.info("Starting pakkit...")
 
-					handle = Popen(PAKKIT_LOCATION + " --autostart --platform earth --connect " + str(origip) + " --connect-port " + str(origport) + " --listen-port ${PAKKIT_PORT}", stdin = PIPE, stderr = PIPE, stdout = PIPE, shell = True)
+					handle = Popen(PAKKIT_LOCATION + " --autostart --platform earth --connect " + str(origip) + " --connect-port " + str(origport) + " --listen-port " + str(ownport), stdin = PIPE, stderr = PIPE, stdout = PIPE, shell = True)
 
 					changeip = True
 
