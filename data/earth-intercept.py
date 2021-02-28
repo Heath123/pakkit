@@ -3,6 +3,7 @@ import gzip
 import re
 import ruamel.yaml as yaml
 import io
+import random
 from subprocess import *
 
 from mitmproxy import ctx
@@ -31,7 +32,8 @@ class GenoaReplacement:
 					if True: # with io.open(CONFIG_LOCATION, "r") as stream:
 						# configdata = yaml.safe_load(stream)
 						ownip = ${LOCAL_IP} # configdata['proxy']['host']
-						ownport = ${PAKKIT_PORT} # = configdata['proxy']['port']
+						# TODO: Check if the port is free
+						ownport = random.randint(1050, 6000)
 
 					origip = data["result"]["ipV4Address"]
 					origport = data["result"]["port"]
