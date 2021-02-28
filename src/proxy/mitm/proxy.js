@@ -272,3 +272,7 @@ exports.startProxy = function (passedHost, passedPort, passedListenPort, version
   child.stdout.on('data', handleOutput)
   child.stderr.on('data', handleError)
 }
+
+exports.end = function () {
+  child.kill()
+}

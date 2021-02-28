@@ -198,7 +198,8 @@ exports.startProxy = function (passedHost, passedPort, passedListenPort, version
 }
 
 exports.end = function () {
-  proxyPass.shutdownStaticPromise()
+  // proxyPass.shutdownStaticPromise()
+  child.kill()
 }
 
 // used to relaunch on disconnect
