@@ -1,5 +1,6 @@
 const { spawn } = require('child_process')
 const { BrowserWindow, ipcMain } = require('electron')
+const { getReasonableIP } = require('../../reasonableIP.js')
 
 // TODO: maybe pass this and ipcMain in?
 let mainWindow
@@ -50,7 +51,8 @@ function handleOutput (chunk) {
 function proxyReadyHandler () {
   mainWindow.send('proxyStarted', JSON.stringify({
     webAddress,
-    proxyPort
+    proxyPort,
+    localIP: getReasonableIP()
   }))
 }
 

@@ -1,6 +1,7 @@
 const fs = require('fs')
 const path = require('path')
 const md5File = require('md5-file')
+const { getReasonableIP } = require('./reasonableIP.js')
 
 function copyIfNotMatches (src, dest) {
   if (!fs.existsSync(dest)) {
@@ -38,7 +39,7 @@ exports.setup = function (osDataFolder, resourcesPath) {
   // TODO: find free port
   pyScript = pyScript.split('${PAKKIT_PORT}').join('19122')
   // TODO: get actual local IP
-  pyScript = pyScript.replace('${LOCAL_IP}', JSON.stringify('192.168.0.19'))
+  pyScript = pyScript.replace('${LOCAL_IP}', JSON.stringify(getReasonableIP()))
   fs.writeFileSync(dataFolder + '/earth-intercept.py', pyScript)
 
   return dataFolder
