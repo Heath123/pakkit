@@ -12,6 +12,17 @@ let proxyPort
 let proxyReady
 let hasConnected
 
+exports.capabilities = {
+  modifyPackets: false,
+  jsonData: false,
+  rawData: false,
+  scriptingSupport: false,
+  clientboundPackets: {},
+  serverboundPackets: {},
+  wikiVgPage: undefined,
+  versionId: 'earth-mitm-not-normal-proxy'
+}
+
 function handleOutput (chunk) {
   const output = chunk.toString('utf8').trim()
   try {
