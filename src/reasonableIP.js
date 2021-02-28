@@ -18,11 +18,16 @@ exports.getReasonableIP = function() {
     }
   }
 
-  // TODO: test on Windows
+  console.log(results)
 
-  // Old naming scheme for Ethernet
+  // Old naming scheme for Ethernet (and also Windows where it's just Ethernet)
   for (const interfaceName in results) {
-    if (interfaceName.startsWith('eth')) return results[interfaceName]
+    if (interfaceName.toLowerCase().startsWith('eth')) return results[interfaceName]
+  }
+
+  for (const interfaceName in results) {
+    if (interfaceName.toLowerCase().startsWith('wifi') ||
+        interfaceName.toLowerCase().startsWith('wireless')) return results[interfaceName]
   }
 
   // New naming scheme for Ethernet
@@ -37,7 +42,7 @@ exports.getReasonableIP = function() {
 
   // New naming scheme for WiFi (starts with w, not sure what comes after)
   for (const interfaceName in results) {
-    if (interfaceName.startsWith('w')) return results[interfaceName]
+    if (interfaceName.toLowerCase().startsWith('w')) return results[interfaceName]
   }
 
   // Give up and return first IP
