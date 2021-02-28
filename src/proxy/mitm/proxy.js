@@ -33,7 +33,7 @@ function handleOutput (chunk) {
 
   if (proxyReady && !hasConnected) {
     // TODO: better check
-    if (output.includes('connected')) {
+    if (output.includes('clientconnect')) {
       hasConnected = true
       mainWindow.send('hasConnected', '')
     }
