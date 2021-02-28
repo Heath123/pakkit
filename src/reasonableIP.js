@@ -18,8 +18,6 @@ exports.getReasonableIP = function() {
     }
   }
 
-  console.log(results)
-
   // Old naming scheme for Ethernet (and also Windows where it's just Ethernet)
   for (const interfaceName in results) {
     if (interfaceName.toLowerCase().startsWith('eth')) return results[interfaceName]
