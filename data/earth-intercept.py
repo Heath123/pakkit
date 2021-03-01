@@ -14,6 +14,9 @@ from mitmproxy import http
 PAKKIT_LOCATION = ${PAKKIT_LOCATION}
 changeip = False
 
+ownip = ${LOCAL_IP}
+ownport = random.randint(1050, 6000)
+
 class GenoaReplacement:
 
 
@@ -29,11 +32,11 @@ class GenoaReplacement:
 
 					data = json.loads(flow.response.content)
 
-					if True: # with io.open(CONFIG_LOCATION, "r") as stream:
+					# if True: # with io.open(CONFIG_LOCATION, "r") as stream:
 						# configdata = yaml.safe_load(stream)
-						ownip = ${LOCAL_IP} # configdata['proxy']['host']
+						# ownip = ${LOCAL_IP} # configdata['proxy']['host']
 						# TODO: Check if the port is free
-						ownport = random.randint(1050, 6000)
+						# ownport = random.randint(1050, 6000)
 
 					origip = data["result"]["ipV4Address"]
 					origport = data["result"]["port"]
