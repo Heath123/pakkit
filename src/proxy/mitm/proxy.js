@@ -372,7 +372,7 @@ exports.startProxy = function (passedHost, passedPort, passedListenPort, version
   dataFolder = passedDataFolder
   mainWindow = BrowserWindow.getAllWindows()[0]
 
-  child = spawn('mitmweb', ['-s', dataFolder + '/earth-intercept.py', '--no-web-open-browser', '--listen-port', '8000'])
+  child = spawn('mitmweb', ['-s', dataFolder + '/mitmScript/earth-intercept.py', '--no-web-open-browser', '--listen-port', '8000'])
   child.stdout.on('data', handleOutput)
   child.stderr.on('data', handleError)
 }

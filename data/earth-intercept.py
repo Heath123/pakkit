@@ -41,6 +41,9 @@ class GenoaReplacement:
 					origip = data["result"]["ipV4Address"]
 					origport = data["result"]["port"]
 
+					ctx.log.info(json.dumps(origip))
+					ctx.log.info(json.dumps(ownip))
+
 					ctx.log.info("Replacing IP now!")
 					flow.response.content = flow.response.content.replace(bytes(origip.encode("utf-8")), bytes(ownip.encode("utf-8")))
 					ctx.log.info("Replacing Port now!")
@@ -69,7 +72,9 @@ class GenoaReplacement:
 					ctx.log.info("")
 					ctx.log.info("Starting pakkit...")
 
-					handle = Popen(PAKKIT_LOCATION + " --autostart --platform earth --connect " + str(origip) + " --connect-port " + str(origport) + " --listen-port " + str(ownport), stdin = PIPE, stderr = PIPE, stdout = PIPE, shell = True)
+					ctx.log.info("TEST_PRE")
+					handle = Popen(PAKKIT_LOCATION + " --no-copy-files --autostart --platform earth --connect " + str(origip) + " --connect-port " + str(origport) + " --listen-port " + str(ownport), stdin = PIPE, stderr = PIPE, stdout = PIPE, shell = True)
+					ctx.log.info("TEST_POST")
 
 					changeip = True
 

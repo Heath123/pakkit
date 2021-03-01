@@ -20,7 +20,7 @@ function copyIfNotMatches (src, dest) {
   }
 }
 
-exports.setup = function (osDataFolder, resourcesPath) {
+exports.setup = function (osDataFolder, resourcesPath, copyFiles) {
   const dataFolder = osDataFolder + '/pakkit'
   if (!fs.existsSync(dataFolder)) {
     fs.mkdirSync(dataFolder)
@@ -30,19 +30,25 @@ exports.setup = function (osDataFolder, resourcesPath) {
     fs.mkdirSync(dataFolder + '/proxypass')
   }
 
-  copyIfNotMatches(resourcesPath + 'data/proxypass-pakkit.jar', dataFolder + '/proxypass/proxypass-pakkit.jar')
-  copyIfNotMatches(resourcesPath + 'data/earth-intercept.py', dataFolder + '/earth-intercept.py')
+  if (!fs.existsSync(dataFolder + '/mitmScript')) {
+    fs.mkdirSync(dataFolder + '/mitmScript')
+  }
 
-  // Replace
-  let pyScript = fs.readFileSync(dataFolder + '/earth-intercept.py', 'utf-8')
-  pyScript = pyScript.replace('${PAKKIT_LOCATION}', JSON.stringify(process.argv[0] +
-    // If process.argv[1] is empty we're probably on electron-forge and we need --
-    // TODO: make this not break if you pass arguments
-    (process.argv[1] ? ' ' + path.resolve(process.argv[1]) :  ' --')
-  ))
-  // TODO: get actual local IP
-  pyScript = pyScript.replace('${LOCAL_IP}', JSON.stringify(getReasonableIP()))
-  fs.writeFileSync(dataFolder + '/earth-intercept.py', pyScript)
+  if (copyFiles) {
+    copyIfNotMatches(resourcesPath + 'data/proxypass-pakkit.jar', dataFolder + '/proxypass/proxypass-pakkit.jar')
+    copyIfNotMatches(resourcesPath + 'data/earth-intercept.py', dataFolder + '/mitmScript/earth-intercept.py')
+
+    // Replace
+    let pyScript = fs.readFileSync(dataFolder + '/mitmScript/earth-intercept.py', 'utf-8')
+    pyScript = pyScript.replace('${PAKKIT_LOCATION}', JSON.stringify(process.argv[0] +
+      // If process.argv[1] is empty we're probably on electron-forge and we need --
+      // TODO: make this not break if you pass arguments
+      (process.argv[1] ? ' ' + path.resolve(process.argv[1]) : ' --')
+    ))
+    // TODO: get actual local IP
+    pyScript = pyScript.replace('${LOCAL_IP}', JSON.stringify(getReasonableIP()))
+    fs.writeFileSync(dataFolder + '/mitmScript/earth-intercept.py', pyScript)
+  }
 
   return dataFolder
 }

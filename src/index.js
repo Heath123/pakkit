@@ -5,12 +5,13 @@ process.chdir(path.join(__dirname, '..'))
 const { program } = require('commander');
 
 program
-  .option('-a, --autostart', 'Automatically starts the program without the start window (all below options must be set)')
+  .option('-a, --autostart', 'Automatically starts the program without the start window (the next 5 options must be set except the version on Bedrock)')
   .option('-e, --platform <platform>', 'Platform (accepted values: java, earth)')
   .option('-v, --version <version>', 'The version to use (not needed for Bedrock)')
   .option('-c, --connect <address>', 'The address of the server to connect to')
   .option('-p, --connect-port  <port>', 'The port of the server to connect to')
   .option('-P, --listen-port  <port>', 'The port to listen on')
+  .option('-n, --no-copy-files', 'Don\'t try to copy needed files to pakkit\'s directory')
 
 program.parse(process.argv)
 const options = program.opts()
@@ -50,7 +51,10 @@ const unhandled = require('electron-unhandled')
 
 const osDataFolder = app.getPath('appData')
 
-const dataFolder = setupDataFolder.setup(osDataFolder, resourcesPath)
+if (options.copyFiles === undefined) {
+    options.copyFiles = true
+}
+const dataFolder = setupDataFolder.setup(osDataFolder, resourcesPath, !!options.copyFiles)
 
 function makeMenu(direction, text, id) {
     if (direction !== 'clientbound' && direction !== 'serverbound') {

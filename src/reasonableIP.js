@@ -20,29 +20,29 @@ exports.getReasonableIP = function() {
 
   // Old naming scheme for Ethernet (and also Windows where it's just Ethernet)
   for (const interfaceName in results) {
-    if (interfaceName.toLowerCase().startsWith('eth')) return results[interfaceName]
+    if (interfaceName.toLowerCase().startsWith('eth')) return results[interfaceName][0]
   }
 
   for (const interfaceName in results) {
     if (interfaceName.toLowerCase().startsWith('wifi') ||
-        interfaceName.toLowerCase().startsWith('wireless')) return results[interfaceName]
+        interfaceName.toLowerCase().startsWith('wireless')) return results[interfaceName][0]
   }
 
   // New naming scheme for Ethernet
   for (const interfaceName in results) {
-    if (interfaceName.startsWith('en')) return results[interfaceName]
+    if (interfaceName.startsWith('en')) return results[interfaceName][0]
   }
 
   // Old naming scheme for WiFi
   for (const interfaceName in results) {
-    if (interfaceName.startsWith('wlan')) return results[interfaceName]
+    if (interfaceName.startsWith('wlan')) return results[interfaceName][0]
   }
 
   // New naming scheme for WiFi (starts with w, not sure what comes after)
   for (const interfaceName in results) {
-    if (interfaceName.toLowerCase().startsWith('w')) return results[interfaceName]
+    if (interfaceName.toLowerCase().startsWith('w')) return results[interfaceName][0]
   }
 
   // Give up and return first IP
-  return Object.values(results)[0]
+  return Object.values(results)[0][0]
 }
