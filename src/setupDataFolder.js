@@ -38,17 +38,32 @@ exports.setup = function (osDataFolder, resourcesPath, copyFiles) {
     copyIfNotMatches(resourcesPath + 'data/proxypass-pakkit.jar', dataFolder + '/proxypass/proxypass-pakkit.jar')
     copyIfNotMatches(resourcesPath + 'data/earth-intercept.py', dataFolder + '/mitmScript/earth-intercept.py')
 
-    // Replace
-    let pyScript = fs.readFileSync(dataFolder + '/mitmScript/earth-intercept.py', 'utf-8')
-    pyScript = pyScript.replace('${PAKKIT_LOCATION}', JSON.stringify(process.argv[0] +
-      // If process.argv[1] is empty we're probably on electron-forge and we need --
-      // TODO: make this not break if you pass arguments
-      (process.argv[1] ? ' ' + path.resolve(process.argv[1]) : ' --')
-    ))
-    // TODO: get actual local IP
-    pyScript = pyScript.replace('${LOCAL_IP}', JSON.stringify(getReasonableIP()))
-    fs.writeFileSync(dataFolder + '/mitmScript/earth-intercept.py', pyScript)
+    exports.setScriptOptions(resourcesPath, dataFolder, false)
   }
 
   return dataFolder
+}
+
+exports.setScriptOptions = function (resourcesPath, dataFolder, useCustomIP, customIP, customPort) {
+  copyIfNotMatches(resourcesPath + 'data/earth-intercept.py', dataFolder + '/mitmScript/earth-intercept.py')
+
+  // Replace
+  let pyScript = fs.readFileSync(dataFolder + '/mitmScript/earth-intercept.py', 'utf-8')
+  pyScript = pyScript.replace('${PAKKIT_LOCATION}', JSON.stringify(process.argv[0] +
+    // If process.argv[1] is empty we're probably on electron-forge and we need --
+    // TODO: make this not break if you pass arguments
+    (process.argv[1] ? ' ' + path.resolve(process.argv[1]) : ' --')
+  ))
+  // TODO: get actual local IP
+  pyScript = pyScript.replace('${LOCAL_IP}', JSON.stringify(getReasonableIP()))
+  if (useCustomIP) {
+    pyScript = pyScript.replace('${USE_CUSTOM_IP}', 'True')
+    pyScript = pyScript.replace('${CUSTOM_IP}', JSON.stringify(customIP))
+    pyScript = pyScript.replace('${CUSTOM_PORT}', customPort)
+  } else {
+    pyScript = pyScript.replace('${USE_CUSTOM_IP}', 'False')
+    pyScript = pyScript.replace('${CUSTOM_IP}', 'None')
+    pyScript = pyScript.replace('${CUSTOM_PORT}', 'None')
+  }
+  fs.writeFileSync(dataFolder + '/mitmScript/earth-intercept.py', pyScript)
 }

@@ -1,6 +1,7 @@
 const { spawn } = require('child_process')
 const { BrowserWindow, ipcMain } = require('electron')
 const { getReasonableIP } = require('../../reasonableIP.js')
+const { setScriptOptions } = require('../../setupDataFolder.js')
 
 // TODO: maybe pass this and ipcMain in?
 let mainWindow
@@ -368,9 +369,13 @@ ipcMain.on('injectCssSoon', (event, args) => {
 })
 
 exports.startProxy = function (passedHost, passedPort, passedListenPort, version, authConsent, passedPacketCallback,
-  passedMessageCallback, passedDataFolder, passedUpdateFilteringCallback) {
+  passedMessageCallback, passedDataFolder, passedUpdateFilteringCallback, useCustomBuildplateServer, passedResourcesPath) {
   dataFolder = passedDataFolder
   mainWindow = BrowserWindow.getAllWindows()[0]
+
+  if (useCustomBuildplateServer) {
+    setScriptOptions(passedResourcesPath, dataFolder, true, passedHost, Number(passedPort))
+  }
 
   child = spawn('mitmweb', ['-s', dataFolder + '/mitmScript/earth-intercept.py', '--no-web-open-browser', '--listen-port', '8000'])
   child.stdout.on('data', handleOutput)

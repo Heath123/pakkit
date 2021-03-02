@@ -72,6 +72,10 @@ class GenoaReplacement:
 					ctx.log.info("")
 					ctx.log.info("Starting pakkit...")
 
+					if ${USE_CUSTOM_IP}:
+						origip = ${CUSTOM_IP}
+						origport = ${CUSTOM_PORT}
+
 					ctx.log.info("TEST_PRE")
 					handle = Popen(PAKKIT_LOCATION + " --no-copy-files --autostart --platform earth --connect " + str(origip) + " --connect-port " + str(origport) + " --listen-port " + str(ownport), stdin = PIPE, stderr = PIPE, stdout = PIPE, shell = True)
 					ctx.log.info("TEST_POST")

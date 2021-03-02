@@ -71,8 +71,20 @@
           <option value="1.15.2">Latest</option>
         </select>
       </p>
+      <div id="earth" style="display: none;">
+        <br><br>
+        <p>
+          <label for="customIP">Custom buildplate server IP:</label>
+          <!-- <span style="display: table-cell;"></span> -->
+          <!-- <div style="display: table-cell;"></div> -->
+          <label class="switch" style="padding: 0;">
+            <input id="customIP" type="checkbox" value="customIP" onchange="updateEarth()">
+            <span class="slider round"></span>
+          </label>
+        </p>
+      </div>
       <br><br>
-      <div id="address-options">
+      <div id="address-options-main">
         <p>
           <label for="connect-address">Connect address:</label>
           <input type="text" name="connect-address" id="connect-address" value="127.0.0.1" placeholder="127.0.0.1">
@@ -83,6 +95,8 @@
           <input type="text" name="connect-port" id="connect-port" value="25565" placeholder="25565">
         </p>
         <br><br>
+      </div>
+      <div id="address-options-listen">
         <p>
           <label for="listen-port">Listen port:</label>
           <input type="text" name="listen-port" id="listen-port" value="25566" placeholder="25566">

@@ -135,7 +135,7 @@ function createWindow() {
 
     // Create the browser window.
     const win = new BrowserWindow({
-        height: store.get('authConsentGiven') ? 535 : 691,
+        height: store.get('authConsentGiven') ? 545 : 701,
         width: 500,
         resizable: false,
         // frame: false,
@@ -224,7 +224,7 @@ function startProxy (args) {
     proxy.startProxy(args.connectAddress, args.connectPort, args.listenPort, args.version,
       args.consent, packetHandler.packetHandler, packetHandler.messageHandler , dataFolder, () => {
           win.send('updateFiltering', '')
-      })
+      }, args.useCustomBuildplateServer, resourcesPath)
 
     if (args.platform === 'earth-mitm') {
         win.loadFile('html/earthMitmPage/index.html')
