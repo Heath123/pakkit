@@ -7,6 +7,8 @@ pipeline {
     stages {
         stage('build') {
             steps {
+                sh 'git submodule init'
+                sh 'git submodule update'
                 sh 'npm install'
                 sh 'npx electron-forge package --platform win32'
                 sh 'cd out/pakkit-win32-x64/resources/app/; node-prune; npx electron-rebuild -v 8.5.2'
