@@ -7,8 +7,8 @@ const Store = require('electron-store')
 const store = new Store()
 
 let proxy // Defined later when an option is chosen
-const resourcesPath = fs.existsSync('resources/app')
-    ? 'resources/app/' // Packaged with electron-forge
+const resourcesPath = fs.existsSync(process.resourcesPath.concat('/app/'))
+    ? process.resourcesPath.concat('/app/') // Packaged with electron-forge
     : './' // npm start
 
 
