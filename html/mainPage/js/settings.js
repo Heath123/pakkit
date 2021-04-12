@@ -10,21 +10,21 @@ exports.bindToSettingChange = function (settingId, f) {
   changeFunctions[settingId] = f
 }
 
-function getSetting (id) {
+exports.getSetting = function (id) {
   if (!sharedVars.store.get('settings.' + id)) {
     sharedVars.store.set('settings.' + id, settingsJson[id].default)
   }
   return sharedVars.store.get('settings.' + id)
 }
 
-function setSetting (settingId, value) {
+exports.setSetting = function (settingId, value) {
   sharedVars.store.set('settings.' + settingId, value)
   if (changeFunctions[settingId]) {
     changeFunctions[settingId](value)
   }
 }
 
-window.setSetting = setSetting
+window.setSetting = exports.setSetting
 
 function createToggle (settingId) {
   const toggleElement = document.createElement('label')
@@ -33,9 +33,9 @@ function createToggle (settingId) {
   const input = document.createElement('input')
   input.id = settingId
   input.type = 'checkbox'
-  input.checked = getSetting(settingId)
+  input.checked = exports.getSetting(settingId)
   input.addEventListener('change', () => {
-    setSetting(settingId, input.checked)
+    exports.setSetting(settingId, input.checked)
   });
   toggleElement.appendChild(input)
 
@@ -91,7 +91,7 @@ exports.setup = function (passedSharedVars) {
 
     // Call change function
     if (changeFunctions[settingId]) {
-      changeFunctions[settingId](getSetting(settingId))
+      changeFunctions[settingId](exports.getSetting(settingId))
     }
   }
 }

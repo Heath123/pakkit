@@ -72,10 +72,24 @@ function updateFilterBox () {
 }
 
 function updateFiltering () {
+  const inverseFiltering = sharedVars.settings.getSetting('inverseFiltering')
+  const regexFilter = sharedVars.settings.getSetting('regexFilter')
+  let regex
+  if (regexFilter) {
+    try {
+      regex = new RegExp(sharedVars.lastFilter)
+    } catch (err) {
+      // TODO: handle
+      regex = new RegExp("")
+    }
+  }
   sharedVars.allPacketsHTML.forEach(function (item, index, array) {
-    if (!filteringLogic.packetFilteredByFilterBox(sharedVars.allPackets[index],
-      sharedVars.lastFilter,
-      sharedVars.hiddenPackets)) {
+    if (sharedVars.lastFilter === '' ||
+          !filteringLogic.packetFilteredByFilterBox(sharedVars.allPackets[index],
+          regexFilter ? regex : sharedVars.lastFilter,
+          sharedVars.hiddenPackets,
+          inverseFiltering,
+          regexFilter)) {
       // If it's hidden, show it
       array[index] = [item[0].replace('filter-hidden', 'filter-shown')]
     } else {
@@ -187,6 +201,18 @@ sharedVars.settings.bindToSettingChange('showTimes', (newValue) => {
     document.body.classList.remove('timeShown')
     document.body.classList.add('timeNotShown')
   }
+})
+sharedVars.settings.bindToSettingChange('inverseFiltering', (newValue) => {
+  try {
+    deselectPacket()
+    updateFiltering()
+  } catch (e) {}
+})
+sharedVars.settings.bindToSettingChange('regexFilter', (newValue) => {
+  try {
+    deselectPacket()
+    updateFiltering()
+  } catch (e) {}
 })
 sharedVars.settings.setup(sharedVars)
 
