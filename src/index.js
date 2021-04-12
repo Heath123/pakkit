@@ -2,7 +2,7 @@ const { program } = require('commander');
 
 program
   .option('-a, --autostart', 'Automatically starts the program without the start window (all below options must be set)')
-  .option('-e, --platform <platform>', 'Platform (accepted values: java, earth)')
+  .option('-e, --platform <platform>', 'Platform (accepted values: java, bedrock)')
   .option('-v, --version <version>', 'The version to use (not needed for Bedrock)')
   .option('-c, --connect <address>', 'The address of the server to connect to')
   .option('-p, --connect-port  <port>', 'The port of the server to connect to')
