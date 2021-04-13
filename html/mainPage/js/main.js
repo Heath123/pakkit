@@ -80,16 +80,17 @@ function updateFiltering () {
       regex = new RegExp(sharedVars.lastFilter)
     } catch (err) {
       // TODO: handle
+      console.error(err)
       regex = new RegExp("")
     }
   }
   sharedVars.allPacketsHTML.forEach(function (item, index, array) {
-    if (sharedVars.lastFilter === '' ||
-          !filteringLogic.packetFilteredByFilterBox(sharedVars.allPackets[index],
+    if (!filteringLogic.packetFilteredByFilterBox(sharedVars.allPackets[index],
           regexFilter ? regex : sharedVars.lastFilter,
           sharedVars.hiddenPackets,
           inverseFiltering,
-          regexFilter)) {
+          regexFilter,
+          sharedVars)) {
       // If it's hidden, show it
       array[index] = [item[0].replace('filter-hidden', 'filter-shown')]
     } else {

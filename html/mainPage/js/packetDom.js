@@ -39,7 +39,8 @@ function formatTime (ms) {
 exports.addPacketToDOM = function (packet) {
   const isHidden = filteringLogic.packetFilteredByFilterBox(packet, sharedVars.lastFilter, sharedVars.hiddenPackets,
     // TODO: cache these?
-    sharedVars.settings.getSetting('inverseFiltering'), sharedVars.settings.getSetting('regexFilter'))
+    sharedVars.settings.getSetting('inverseFiltering'), sharedVars.settings.getSetting('regexFilter'),
+    sharedVars)
   sharedVars.allPacketsHTML.push([
     `<li id="packet${packet.uid}" onclick="packetClick(${packet.uid})" class="packet ${packet.direction} ${isHidden ? 'filter-hidden' : 'filter-shown'}">
         <div class="main-data">

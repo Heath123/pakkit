@@ -1,9 +1,10 @@
-exports.packetFilteredByFilterBox = function (packet, filter, hiddenPackets, inverseFiltering, regexFilter) {
+exports.packetFilteredByFilterBox = function (packet, filter, hiddenPackets, inverseFiltering, regexFilter,
+  sharedVars) {
   if (hiddenPackets[packet.direction].includes(packet.meta.name)) {
     return true
   }
 
-  if (filter === '') {
+  if (sharedVars.lastFilter === '') {
     return false
   }
 
@@ -14,6 +15,7 @@ exports.packetFilteredByFilterBox = function (packet, filter, hiddenPackets, inv
       filter = new RegExp(sharedVars.lastFilter)
     } catch (err) {
       // TODO: handle
+      console.error(err)
       filter = new RegExp("")
     }
   }
