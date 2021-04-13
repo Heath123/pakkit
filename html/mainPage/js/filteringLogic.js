@@ -9,6 +9,15 @@ exports.packetFilteredByFilterBox = function (packet, filter, hiddenPackets, inv
 
   const comparisonString = packet.hexIdString + ' ' + packet.meta.name + ' ' + JSON.stringify(packet.data)
 
+  if (regexFilter && typeof filter === 'string') {
+    try {
+      filter = new RegExp(sharedVars.lastFilter)
+    } catch (err) {
+      // TODO: handle
+      filter = new RegExp("")
+    }
+  }
+
   let result
   if (regexFilter) {
     result = filter.test(comparisonString)
