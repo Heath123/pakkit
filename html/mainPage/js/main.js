@@ -474,8 +474,10 @@ window.openMenu = function (evt, MenuName, id) { // window. stops standardjs fro
 document.body.addEventListener('contextmenu', (event) => {
   let target = event.srcElement
 
-  if (target.tagName !== 'LI') {
+  let attempts = 0
+  while (target.tagName !== 'LI' && attempts < 5) {
     target = target.parentElement
+    attempts++
   }
 
   if (!target || target.tagName !== 'LI') {
