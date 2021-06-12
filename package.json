@@ -38,7 +38,7 @@
     "@electron-forge/maker-rpm": "^6.0.0-beta.54",
     "@electron-forge/maker-squirrel": "^6.0.0-beta.54",
     "@electron-forge/maker-zip": "^6.0.0-beta.54",
-    "electron": "^8.5.2",
+    "electron": "^9.4.0",
     "electron-rebuild": "^2.3.4"
   },
   "dependencies": {
