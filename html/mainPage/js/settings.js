@@ -5,19 +5,25 @@ const settingsElement = document.getElementById('Settings')
 let sharedVars
 
 const changeFunctions = {}
+// Prevents constant file reads/writes
+const cache = {}
 
 exports.bindToSettingChange = function (settingId, f) {
   changeFunctions[settingId] = f
 }
 
 exports.getSetting = function (id) {
-  if (!sharedVars.store.get('settings.' + id)) {
-    sharedVars.store.set('settings.' + id, settingsJson[id].default)
+  if (cache[id] === undefined) {
+    if (sharedVars.store.get('settings.' + id) === undefined) {
+      sharedVars.store.set('settings.' + id, settingsJson[id].default)
+    }
+    cache[id] = sharedVars.store.get('settings.' + id)
   }
-  return sharedVars.store.get('settings.' + id)
+  return cache[id]
 }
 
 exports.setSetting = function (settingId, value) {
+  cache[settingId] = value
   sharedVars.store.set('settings.' + settingId, value)
   if (changeFunctions[settingId]) {
     changeFunctions[settingId](value)
@@ -53,6 +59,8 @@ exports.setup = function (passedSharedVars) {
   settingsElement.appendChild(document.createElement('br'))
 
   for (const settingId in settingsJson) {
+    if (!settingsJson.hasOwnProperty(settingId)) continue
+
     const setting = settingsJson[settingId]
 
     const element = document.createElement('div')
