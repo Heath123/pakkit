@@ -1,4 +1,24 @@
-const {app, BrowserWindow, ipcMain, clipboard, Menu} = require('electron')
+const { program } = require('commander');
+
+program
+  .option('-a, --autostart', 'Automatically starts the program without the start window (all below options must be set)')
+  .option('-e, --platform <platform>', 'Platform (accepted values: java, bedrock)')
+  .option('-v, --version <version>', 'The version to use (not needed for Bedrock)')
+  .option('-c, --connect <address>', 'The address of the server to connect to')
+  .option('-p, --connect-port  <port>', 'The port of the server to connect to')
+  .option('-P, --listen-port  <port>', 'The port to listen on')
+
+program.parse(process.argv)
+const options = program.opts()
+
+if (options.autostart) {
+    if (!options.platform || !(options.version || options.platform !== 'java') || !options.connect || !options.connectPort || !options.listenPort) {
+        console.log('Not all required options were passed.')
+        program.help()
+    }
+}
+
+const {app, BrowserWindow, ipcMain, clipboard, Menu, dialog } = require('electron')
 app.allowRendererProcessReuse = true
 
 const fs = require('fs')
@@ -7,8 +27,8 @@ const Store = require('electron-store')
 const store = new Store()
 
 let proxy // Defined later when an option is chosen
-const resourcesPath = fs.existsSync('resources/app')
-    ? 'resources/app/' // Packaged with electron-forge
+const resourcesPath = fs.existsSync(process.resourcesPath.concat('/app/'))
+    ? process.resourcesPath.concat('/app/') // Packaged with electron-forge
     : './' // npm start
 
 
@@ -104,7 +124,7 @@ function createWindow() {
 
     // Create the browser window.
     const win = new BrowserWindow({
-        height: store.get('authConsentGiven') ? 535 : 691,
+        height: store.get('authConsentGiven') ? 550 : 691,
         width: 500,
         resizable: false,
         // frame: false,
@@ -114,9 +134,6 @@ function createWindow() {
         icon: resourcesPath + 'icons/icon.png'
     })
 
-    win.setMenu(null)
-    // and load the index.html of the app.
-    win.loadFile('html/startPage/index.html')
     // Open the DevTools.
     // win.webContents.openDevTools()
     electronLocalShortcut.register(win, 'F12', () => {
@@ -131,6 +148,22 @@ function createWindow() {
         },
         showDialog: false
     });
+
+    win.setMenu(null)
+    // and load the index.html of the app.
+    if (options.autostart) {
+        startProxy({
+            // TODO
+            consent: false,
+            connectAddress: options.connect,
+            connectPort: options.connectPort,
+            listenPort: options.listenPort,
+            platform: options.platform,
+            version: options.version
+        })
+    } else {
+        win.loadFile('html/startPage/index.html')
+    }
 }
 
 // This method will be called when Electron has finished
@@ -160,7 +193,11 @@ app.on('activate', () => {
 
 ipcMain.on('startProxy', (event, arg) => {
     const ipcMessage = JSON.parse(arg)
-    if (ipcMessage.platform === 'java') {
+    startProxy(ipcMessage)
+})
+
+function startProxy (args) {
+    if (args.platform === 'java') {
         proxy = javaProxy
     } else {
         proxy = bedrockProxy
@@ -169,8 +206,8 @@ ipcMain.on('startProxy', (event, arg) => {
     const win = BrowserWindow.getAllWindows()[0]
 
     packetHandler.init(BrowserWindow.getAllWindows()[0], ipcMain, proxy)
-    proxy.startProxy(ipcMessage.connectAddress, ipcMessage.connectPort, ipcMessage.listenPort, ipcMessage.version,
-      ipcMessage.consent, packetHandler.packetHandler, packetHandler.messageHandler , dataFolder, () => {
+    proxy.startProxy(args.connectAddress, args.connectPort, args.listenPort, args.version,
+      args.consent, packetHandler.packetHandler, packetHandler.messageHandler , dataFolder, () => {
           win.send('updateFiltering', '')
       })
 
@@ -187,7 +224,7 @@ ipcMain.on('startProxy', (event, arg) => {
     win.setSize(mainWindowState.width, mainWindowState.height)
 
     mainWindowState.manage(win)
-})
+}
 
 ipcMain.on('proxyCapabilities', (event, arg) => {
     event.returnValue = JSON.stringify(proxy.capabilities)
@@ -205,6 +242,48 @@ ipcMain.on('contextMenu', (event, arg) => {
 ipcMain.on('relaunchApp', (event, arg) => {
     app.relaunch()
     app.exit()
+})
+
+ipcMain.on('saveLog', async (event, arg) => {
+    const win = BrowserWindow.getAllWindows()[0]
+
+    const result = await dialog.showSaveDialog(win, {
+        filters: [
+            { name: 'pakkit log files', extensions: ['pakkit-json'] },
+            // { name: 'All Files', extensions: ['*'] }
+        ]
+    })
+
+    if (!result.canceled) {
+        const realPath = result.filePath.endsWith('.pakkit-json') ? result.filePath : result.filePath + '.pakkit-json'
+        console.log('Saving log to', realPath)
+        fs.writeFile(realPath, arg, function (err) {
+            if (err) throw err;
+            console.log('Saved!');
+        })
+    }
+})
+
+ipcMain.on('loadLog', async (event, arg) => {
+    const win = BrowserWindow.getAllWindows()[0]
+
+    const result = await dialog.showOpenDialog(win, {
+        filters: [
+            { name: 'pakkit log files', extensions: ['pakkit-json'] },
+            { name: 'All Files', extensions: ['*'] }
+        ],
+        properties: ['openFile']
+    })
+
+    if (!result.canceled) {
+        // It's an array, but we have multi-select off so it should only have one item
+        console.log('Loading log from', result.filePaths[0])
+        fs.readFile(result.filePaths[0], 'utf-8', function(err, data) {
+            if (err) throw err;
+            console.log('File has been read')
+            win.send('loadLogData', data)
+        })
+    }
 })
 
 // In this file you can include the rest of your app's specific main process

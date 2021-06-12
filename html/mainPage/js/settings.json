@@ -4,5 +4,17 @@
     "description": "Shows information about the timing of packets on the right side of the packet list",
     "type": "boolean",
     "default": false
+  },
+  "inverseFiltering": {
+    "name": "Inverse filtering",
+    "description": "Hide, rather than show, packets matching the filter text box",
+    "type": "boolean",
+    "default": false
+  },
+  "regexFilter": {
+    "name": "Filter by regex",
+    "description": "Treat the filter box as a regular expression",
+    "type": "boolean",
+    "default": false
   }
 }

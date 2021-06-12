@@ -72,10 +72,25 @@ function updateFilterBox () {
 }
 
 function updateFiltering () {
+  const inverseFiltering = sharedVars.settings.getSetting('inverseFiltering')
+  const regexFilter = sharedVars.settings.getSetting('regexFilter')
+  let regex
+  if (regexFilter) {
+    try {
+      regex = new RegExp(sharedVars.lastFilter)
+    } catch (err) {
+      // TODO: handle
+      console.error(err)
+      regex = new RegExp("")
+    }
+  }
   sharedVars.allPacketsHTML.forEach(function (item, index, array) {
     if (!filteringLogic.packetFilteredByFilterBox(sharedVars.allPackets[index],
-      sharedVars.lastFilter,
-      sharedVars.hiddenPackets)) {
+          regexFilter ? regex : sharedVars.lastFilter,
+          sharedVars.hiddenPackets,
+          inverseFiltering,
+          regexFilter,
+          sharedVars)) {
       // If it's hidden, show it
       array[index] = [item[0].replace('filter-hidden', 'filter-shown')]
     } else {
@@ -187,6 +202,18 @@ sharedVars.settings.bindToSettingChange('showTimes', (newValue) => {
     document.body.classList.remove('timeShown')
     document.body.classList.add('timeNotShown')
   }
+})
+sharedVars.settings.bindToSettingChange('inverseFiltering', (newValue) => {
+  try {
+    deselectPacket()
+    updateFiltering()
+  } catch (e) {}
+})
+sharedVars.settings.bindToSettingChange('regexFilter', (newValue) => {
+  try {
+    deselectPacket()
+    updateFiltering()
+  } catch (e) {}
 })
 sharedVars.settings.setup(sharedVars)
 
@@ -484,8 +511,10 @@ window.openMenu = function (evt, MenuName, id) { // window. stops standardjs fro
 document.body.addEventListener('contextmenu', (event) => {
   let target = event.srcElement
 
-  if (target.tagName !== 'LI') {
+  let attempts = 0
+  while (target.tagName !== 'LI' && attempts < 5) {
     target = target.parentElement
+    attempts++
   }
 
   if (!target || target.tagName !== 'LI') {
@@ -612,4 +641,12 @@ function scrollWikiToCurrentPacket () {
       console.error(err);
     }
   }
+}
+
+function saveLog() {
+  sharedVars.ipcRenderer.send('saveLog', JSON.stringify(sharedVars.allPackets))
+}
+
+function loadLog() {
+  sharedVars.ipcRenderer.send('loadLog', '')
 }

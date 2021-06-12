@@ -5,26 +5,32 @@ const settingsElement = document.getElementById('Settings')
 let sharedVars
 
 const changeFunctions = {}
+// Prevents constant file reads/writes
+const cache = {}
 
 exports.bindToSettingChange = function (settingId, f) {
   changeFunctions[settingId] = f
 }
 
-function getSetting (id) {
-  if (!sharedVars.store.get('settings.' + id)) {
-    sharedVars.store.set('settings.' + id, settingsJson[id].default)
+exports.getSetting = function (id) {
+  if (cache[id] === undefined) {
+    if (sharedVars.store.get('settings.' + id) === undefined) {
+      sharedVars.store.set('settings.' + id, settingsJson[id].default)
+    }
+    cache[id] = sharedVars.store.get('settings.' + id)
   }
-  return sharedVars.store.get('settings.' + id)
+  return cache[id]
 }
 
-function setSetting (settingId, value) {
+exports.setSetting = function (settingId, value) {
+  cache[settingId] = value
   sharedVars.store.set('settings.' + settingId, value)
   if (changeFunctions[settingId]) {
     changeFunctions[settingId](value)
   }
 }
 
-window.setSetting = setSetting
+window.setSetting = exports.setSetting
 
 function createToggle (settingId) {
   const toggleElement = document.createElement('label')
@@ -33,9 +39,9 @@ function createToggle (settingId) {
   const input = document.createElement('input')
   input.id = settingId
   input.type = 'checkbox'
-  input.checked = getSetting(settingId)
+  input.checked = exports.getSetting(settingId)
   input.addEventListener('change', () => {
-    setSetting(settingId, input.checked)
+    exports.setSetting(settingId, input.checked)
   });
   toggleElement.appendChild(input)
 
@@ -53,6 +59,8 @@ exports.setup = function (passedSharedVars) {
   settingsElement.appendChild(document.createElement('br'))
 
   for (const settingId in settingsJson) {
+    if (!settingsJson.hasOwnProperty(settingId)) continue
+
     const setting = settingsJson[settingId]
 
     const element = document.createElement('div')
@@ -91,7 +99,7 @@ exports.setup = function (passedSharedVars) {
 
     // Call change function
     if (changeFunctions[settingId]) {
-      changeFunctions[settingId](getSetting(settingId))
+      changeFunctions[settingId](exports.getSetting(settingId))
     }
   }
 }
