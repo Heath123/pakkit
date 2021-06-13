@@ -40,8 +40,20 @@ exports.capabilities = {
   versionId: undefined
 }
 
+let manualAuthEnabled = false
+let manualAuthEmail = undefined
+let manualAuthPassword = undefined
+
+exports.setManualAuth = function (enabled, email, password) {
+  manualAuthEnabled = enabled
+  if (enabled) {
+    manualAuthEmail = email
+    manualAuthPassword = password
+  }
+}
+
 exports.startProxy = function (host, port, listenPort, version, authConsent, callback, messageCallback, dataFolder,
-  updateFilteringCallback) {
+  updateFilteringCallback, manualAuthCallback) {
   storedCallback = callback
 
   // . cannot be in a JSON property name with electron-store
@@ -108,17 +120,24 @@ exports.startProxy = function (host, port, listenPort, version, authConsent, cal
         if (authConsent) {
           console.log('Will attempt to use launcher_profiles.json for online mode login data')
         } else {
-          console.warn('Consent not given to use launcher_profiles.json - online mode will not work')
+          console.warn('Consent not given to use launcher_profiles.json - automatic online mode will not work')
         }
-        const targetClient = mc.createClient({
+        const clientOptions = {
           host: host,
           port: port,
-          username: client.username,
+          username: manualAuthEnabled ? manualAuthEmail : client.username,
+          password: manualAuthEnabled ? manualAuthPassword : undefined,
           keepAlive: false,
           version: version,
-          profilesFolder: authConsent ? minecraftFolder : undefined
-        })
+          profilesFolder: (authConsent && !manualAuthEnabled) ? minecraftFolder : dataFolder
+        }
+        let targetClient = mc.createClient(clientOptions)
         realServer = targetClient
+        targetClient.on('noAuth', () => {
+          // Request manual authentication
+          console.log('Automatic auth failed - manual auth needed')
+          manualAuthCallback()
+        })
         function handleServerboundPacket (data, meta, raw) {
           // console.log('serverbound packet', meta, data)
           if (targetClient.state === states.PLAY && meta.state === states.PLAY) {

@@ -10,7 +10,8 @@
     "make": "electron-forge make",
     "publish": "electron-forge publish",
     "lint": "echo \"No linting configured\"",
-    "build-web": "cp html out/html; rm -r out/html/startPage;"
+    "build-web": "cp html out/html; rm -r out/html/startPage;",
+    "postinstall": "patch-package"
   },
   "author": {
     "name": "Heath Mitchell",
@@ -56,6 +57,7 @@
     "minecraft-folder-path": "^1.1.0",
     "minecraft-protocol": "^1.24.1",
     "node-eval": "^2.0.0",
+    "patch-package": "^6.4.7",
     "source-map-support": "^0.5.19",
     "ws": "^7.4.6"
   },

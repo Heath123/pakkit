@@ -374,7 +374,7 @@ function loginDialog(callback) {
   document.getElementById('dialog').innerHTML =
  `<form onsubmit="loginFormHandler(event); return false;"> <!-- TODO: prevent page reload? and handle login -->
     <h2>This server is in online mode</h2>
-    Please log in to your Minecraft account.
+    Please log in to your Minecraft account then reconnect.
     <br><br>
     pakkit does not store passwords, though it may store authentication tokens.
     <br><br>
@@ -389,7 +389,15 @@ function loginDialog(callback) {
   </form>`
 }
 
-sharedVars.ipcRenderer.on('editAndResend', (event, arg) => { // Context menu
+sharedVars.ipcRenderer.on('requestManualAuth', (event, arg) => {
+  loginDialog((data) => {
+    if (!data.cancelled) {
+      sharedVars.ipcRenderer.send('setManualAuth', JSON.stringify(data))
+    }
+  })
+})
+
+sharedVars.ipcRenderer.on('editAndResend', (event, arg) => {
   const ipcMessage = JSON.parse(arg)
   editAndResend(ipcMessage.id)
 })

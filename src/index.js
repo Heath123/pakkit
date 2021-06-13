@@ -124,7 +124,7 @@ function createWindow() {
 
     // Create the browser window.
     const win = new BrowserWindow({
-        height: store.get('authConsentGiven') ? 550 : 691,
+        height: store.get('authConsentGiven') ? 550 : 700,
         width: 500,
         resizable: false,
         // frame: false,
@@ -196,6 +196,16 @@ ipcMain.on('startProxy', (event, arg) => {
     startProxy(ipcMessage)
 })
 
+function requestManualAuth () {
+    const win = BrowserWindow.getAllWindows()[0]
+    win.send('requestManualAuth', '')
+}
+
+ipcMain.on('setManualAuth', (event, arg) => {
+    const ipcMessage = JSON.parse(arg)
+    proxy.setManualAuth(true, ipcMessage.email, ipcMessage.password)
+})
+
 function startProxy (args) {
     if (args.platform === 'java') {
         proxy = javaProxy
@@ -209,7 +219,7 @@ function startProxy (args) {
     proxy.startProxy(args.connectAddress, args.connectPort, args.listenPort, args.version,
       args.consent, packetHandler.packetHandler, packetHandler.messageHandler , dataFolder, () => {
           win.send('updateFiltering', '')
-      })
+      }, requestManualAuth)
 
     win.loadFile('html/mainPage/index.html')
 

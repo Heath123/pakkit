@@ -185,7 +185,7 @@ function handleError (chunk) {
 }
 
 exports.startProxy = function (passedHost, passedPort, passedListenPort, version, authConsent, passedPacketCallback,
-  passedMessageCallback, passedDataFolder, passedUpdateFilteringCallback) {
+  passedMessageCallback, passedDataFolder, passedUpdateFilteringCallback, manualAuthCallback) {
   host = passedHost
   port = passedPort
   listenPort = passedListenPort
