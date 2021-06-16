@@ -448,7 +448,7 @@ function removeOrAddSelection (id, add) {
 
 window.packetClick = function (id) { // window. stops standardjs from complaining
   // Remove selection background from old selected packet
-  if (currentPacket) {
+  if (currentPacket !== undefined) {
     removeOrAddSelection(currentPacket, false)
   }
 
