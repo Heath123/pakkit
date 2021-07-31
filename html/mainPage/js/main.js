@@ -517,6 +517,8 @@ window.openMenu = function (evt, MenuName, id) { // window. stops standardjs fro
 }
 
 document.body.addEventListener('contextmenu', (event) => {
+  if (event.srcElement == null) return
+
   let target = event.srcElement
 
   let attempts = 0
