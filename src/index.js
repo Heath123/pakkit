@@ -45,7 +45,7 @@ const osDataFolder = app.getPath('appData')
 
 const dataFolder = setupDataFolder.setup(osDataFolder, resourcesPath)
 
-function makeMenu(direction, text, id) {
+function makeMenu(direction, text, id, invalid, noData) {
     if (direction !== 'clientbound' && direction !== 'serverbound') {
         // This probably isn't a packet
         return
@@ -53,20 +53,12 @@ function makeMenu(direction, text, id) {
 
     const menuData = [
         {
-            icon: resourcesPath + `icons/${direction}.png`,
+            icon: resourcesPath + `icons/${direction + (invalid ? '-invalid' : '')}.png`,
             label: text,
             enabled: false
         },
         {
             type: 'separator'
-        },
-        {
-            label: proxy.capabilities.jsonData ? 'Copy JSON data' : 'Copy data',
-            click: () => {
-                BrowserWindow.getAllWindows()[0].send('copyPacketData', JSON.stringify({
-                    id: id
-                }))
-            }
         },
         {
             label: 'Edit and resend',
@@ -88,7 +80,20 @@ function makeMenu(direction, text, id) {
         }
     ]
 
-    if (text.split(' ')[1] === 'position' && direction === 'clientbound') {
+    if (!noData) {
+        menuData.splice(2, 0,
+            {
+                label: proxy.capabilities.jsonData ? 'Copy JSON data' : 'Copy data',
+                click: () => {
+                    BrowserWindow.getAllWindows()[0].send('copyPacketData', JSON.stringify({
+                        id: id
+                    }))
+                }
+            }
+        )
+    }
+
+    if (!noData && text.split(' ')[1] === 'position' && direction === 'clientbound') {
         menuData.splice(3, 0,
             {
                 label: 'Copy teleport as command',
@@ -246,7 +251,7 @@ ipcMain.on('copyToClipboard', (event, arg) => {
 
 ipcMain.on('contextMenu', (event, arg) => {
     const ipcMessage = JSON.parse(arg)
-    makeMenu(ipcMessage.direction, ipcMessage.text, ipcMessage.id).popup(BrowserWindow.getAllWindows()[0])
+    makeMenu(ipcMessage.direction, ipcMessage.text, ipcMessage.id, ipcMessage.invalid, ipcMessage.noData).popup(BrowserWindow.getAllWindows()[0])
 })
 
 ipcMain.on('relaunchApp', (event, arg) => {

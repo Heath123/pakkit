@@ -138,10 +138,23 @@ exports.startProxy = function (host, port, listenPort, version, authConsent, cal
           console.log('Automatic auth failed - manual auth needed')
           manualAuthCallback()
         })
-        function handleServerboundPacket (data, meta, raw) {
+
+        function getId (meta, mappings) {
+          let id
+          if (typeof meta.name === 'number') {
+            // Unknown packet ID
+            id = '0x' + meta.name.toString(16).padStart(2, '0')
+            meta.name = 'unknown'
+          } else {
+            id = Object.keys(mappings).find(key => mappings[key] === meta.name)
+          }
+          return id
+        }
+
+        function handleServerboundPacket (data, meta, raw, packetValid) {
           // console.log('serverbound packet', meta, data)
           if (targetClient.state === states.PLAY && meta.state === states.PLAY) {
-            const id = Object.keys(toServerMappings).find(key => toServerMappings[key] === meta.name)
+            const id = getId(meta, toServerMappings)
 
             // Stops standardjs from complaining (no-callback-literal)
             const direction = 'serverbound'
@@ -154,13 +167,13 @@ exports.startProxy = function (host, port, listenPort, version, authConsent, cal
                 // targetClient.write(meta.name, data)
                 targetClient.writeRaw(raw)
               }
-              callback(direction, meta, data, id, [...raw], canUseScripting)
+              callback(direction, meta, data, id, [...raw], canUseScripting, packetValid)
             }
           }
         }
-        function handleClientboundPacket (data, meta, raw) {
+        function handleClientboundPacket (data, meta, raw, packetValid) {
           if (meta.state === states.PLAY && client.state === states.PLAY) {
-            const id = Object.keys(toClientMappings).find(key => toClientMappings[key] === meta.name)
+            const id = getId(meta, toClientMappings)
 
             // Stops standardjs from complaining (no-callback-literal)
             const direction = 'clientbound'
@@ -173,7 +186,7 @@ exports.startProxy = function (host, port, listenPort, version, authConsent, cal
                 // client.write(meta.name, data)
                 client.writeRaw(raw)
               }
-              callback(direction, meta, data, id, [...raw], true)
+              callback(direction, meta, data, id, [...raw], canUseScripting, packetValid)
               if (meta.name === 'set_compression') {
                 client.compressionThreshold = data.threshold
               } // Set compression
@@ -184,15 +197,22 @@ exports.startProxy = function (host, port, listenPort, version, authConsent, cal
         targetClient.on('raw', function (buffer, meta) {
           if (client.state !== states.PLAY || meta.state !== states.PLAY) { return }
           const packetData = targetClient.deserializer.parsePacketBuffer(buffer).data.params
-          handleClientboundPacket(packetData, meta, buffer)
-          const packetBuff = client.serializer.createPacketBuffer({ name: meta.name, params: packetData })
-          if (!bufferEqual(buffer, packetBuff)) {
-            console.log('client<-server: Error in packet ' + meta.state + '.' + meta.name)
-            console.log('received buffer', buffer.toString('hex'))
-            console.log('produced buffer', packetBuff.toString('hex'))
-            console.log('received length', buffer.length)
-            console.log('produced length', packetBuff.length)
+          let packetValid = false
+          try {
+            const packetBuff = client.serializer.createPacketBuffer({ name: meta.name, params: packetData })
+            if (!bufferEqual(buffer, packetBuff)) {
+              console.log('client<-server: Error in packet ' + meta.state + '.' + meta.name)
+              console.log('received buffer', buffer.toString('hex'))
+              console.log('produced buffer', packetBuff.toString('hex'))
+              console.log('received length', buffer.length)
+              console.log('produced length', packetBuff.length)
+            } else {
+              packetValid = true
+            }
+          } catch (e) {
+            // TODO: handle?
           }
+          handleClientboundPacket(packetData, meta, buffer, packetValid)
           /* if (client.state === states.PLAY && brokenPackets.indexOf(packetId.value) !=== -1)
            {
            console.log(`client<-server: raw packet);
@@ -202,17 +222,30 @@ exports.startProxy = function (host, port, listenPort, version, authConsent, cal
            } */
         })
         client.on('raw', function (buffer, meta) {
+          console.log('raw', meta.name, buffer.toString('hex'))
           if (meta.state !== states.PLAY || targetClient.state !== states.PLAY) { return }
           const packetData = client.deserializer.parsePacketBuffer(buffer).data.params
-          handleServerboundPacket(packetData, meta, buffer)
-          const packetBuff = targetClient.serializer.createPacketBuffer({ name: meta.name, params: packetData })
-          if (!bufferEqual(buffer, packetBuff)) {
-            console.log('client->server: Error in packet ' + meta.state + '.' + meta.name)
-            console.log('received buffer', buffer.toString('hex'))
-            console.log('produced buffer', packetBuff.toString('hex'))
-            console.log('received length', buffer.length)
-            console.log('produced length', packetBuff.length)
+          let packetValid = false
+          try {
+            const packetBuff = targetClient.serializer.createPacketBuffer({ name: meta.name, params: packetData })
+            console.log(buffer, packetBuff)
+            if (!bufferEqual(buffer, packetBuff)) {
+              console.log('client->server: Error in packet ' + meta.state + '.' + meta.name)
+              console.log('received buffer', buffer.toString('hex'))
+              console.log('produced buffer', packetBuff.toString('hex'))
+              console.log('received length', buffer.length)
+              console.log('produced length', packetBuff.length)
+            } else {
+              packetValid = true
+            }
+          } catch (e) {
+            // TODO: handle?
           }
+          if (typeof meta.name === 'number') {
+            // Unknown packet ID so packet is invalid
+            packetValid = false
+          }
+          handleServerboundPacket(packetData, meta, buffer, packetValid)
         })
         targetClient.on('end', function () {
           endedTargetClient = true

@@ -5,6 +5,11 @@ let sharedVars
 const filteringLogic = require('./filteringLogic.js')
 
 function trimData (data) { // Function to trim the size of stringified data for previews
+  if (data === undefined) {
+    // Undefined data, probably an invalid packet
+    return 'Could not parse packet'
+  }
+
   let newData
   if (sharedVars.proxyCapabilities.jsonData) {
     newData = Object.assign({}, data)
@@ -42,7 +47,7 @@ exports.addPacketToDOM = function (packet) {
     sharedVars.settings.getSetting('inverseFiltering'), sharedVars.settings.getSetting('regexFilter'),
     sharedVars)
   sharedVars.allPacketsHTML.push([
-    `<li id="packet${packet.uid}" onclick="packetClick(${packet.uid})" class="packet ${packet.direction} ${isHidden ? 'filter-hidden' : 'filter-shown'}">
+    `<li id="packet${packet.uid}" onclick="packetClick(${packet.uid})" class="packet ${packet.direction} ${isHidden ? 'filter-hidden' : 'filter-shown'} ${packet.packetValid ? '' : 'invalid'}">
         <div class="main-data">
           <span class="id">${escapeHtml(packet.hexIdString)}</span>
           <span class="name">${escapeHtml(packet.meta.name)}</span>

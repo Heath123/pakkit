@@ -84,6 +84,10 @@ div.toolbar {
   padding-right: 4px;
 }
 
+.packet.invalid::before {
+  color: #ffff00;
+}
+
 .name {
   color: rgba(255, 255, 255, 0.8);
 }

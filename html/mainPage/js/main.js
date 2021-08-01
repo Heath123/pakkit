@@ -460,7 +460,12 @@ window.packetClick = function (id) { // window. stops standardjs from complainin
   document.body.classList.add('packetSelected')
   if (sharedVars.proxyCapabilities.jsonData) {
     // sidebar.innerHTML = '<div style="padding: 10px;">Loading packet data...</div>';
-    sharedVars.packetDom.getTree().loadData(sharedVars.allPackets[id].data)
+    if (sharedVars.allPackets[id].data === undefined) {
+      sharedVars.packetDom.getTreeElement().firstElementChild.innerHTML = 'Could not parse packet'
+      // TODO: Error message
+    } else {
+      sharedVars.packetDom.getTree().loadData(sharedVars.allPackets[id].data)
+    }
   } else {
     sharedVars.packetDom.getTreeElement().innerText = sharedVars.allPackets[id].data.data
     sharedVars.packetDom.getTreeElement().style = `
@@ -517,12 +522,12 @@ window.openMenu = function (evt, MenuName, id) { // window. stops standardjs fro
 }
 
 document.body.addEventListener('contextmenu', (event) => {
-  if (event.srcElement == null) return
+  if (event.srcElement === null) return
 
   let target = event.srcElement
 
   let attempts = 0
-  while (target.tagName !== 'LI' && attempts < 5) {
+  while (target !== null && target.tagName !== 'LI' && attempts < 5) {
     target = target.parentElement
     attempts++
   }
@@ -536,10 +541,13 @@ document.body.addEventListener('contextmenu', (event) => {
     return
   }
 
+  const id = target.id.replace('packet', '')
   sharedVars.ipcRenderer.send('contextMenu', JSON.stringify({
     direction: target.className.split(' ')[1],
     text: target.children[0].children[0].innerText + ' ' + target.children[0].children[1].innerText,
-    id: target.id.replace('packet', '')
+    id: id,
+    invalid: target.classList.contains('invalid'),
+    noData: sharedVars.allPackets[Number(id)].data === undefined
   }))
 })
 

@@ -132,7 +132,8 @@ function handlePacket (packet) {
   // (well it can but that would be annoying to add)
   const canUseScripting = !data.isHandled
 
-  packetCallback(packet.direction, { name: name, className: packet.className }, data, hexIdString, raw, canUseScripting)
+  // TODO: check validity
+  packetCallback(packet.direction, { name: name, className: packet.className }, data, hexIdString, raw, canUseScripting, true)
 }
 
 function handleEvent (event) {
