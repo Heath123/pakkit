@@ -1,0 +1,6 @@
+directories:
+  output: dist
+  buildResources: build
+electronDist: ./electron-global
+files: []
+electronVersion: 9.4.0
