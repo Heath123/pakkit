@@ -194,17 +194,17 @@ exports.startProxy = function (host, port, listenPort, version, authConsent, cal
           }
         }
         const bufferEqual = require('buffer-equal')
-        targetClient.on('raw', function (buffer, meta) {
+        targetClient.on('packet', function (data, meta, buffer, fullBuffer) {
           if (client.state !== states.PLAY || meta.state !== states.PLAY) { return }
-          const packetData = targetClient.deserializer.parsePacketBuffer(buffer).data.params
+          
           let packetValid = false
           try {
-            const packetBuff = client.serializer.createPacketBuffer({ name: meta.name, params: packetData })
-            if (!bufferEqual(buffer, packetBuff)) {
+            const packetBuff = client.serializer.createPacketBuffer({ name: meta.name, params: data })
+            if (!bufferEqual(fullBuffer, packetBuff)) {
               console.log('client<-server: Error in packet ' + meta.state + '.' + meta.name)
-              console.log('received buffer', buffer.toString('hex'))
+              console.log('received buffer', fullBuffer.toString('hex'))
               console.log('produced buffer', packetBuff.toString('hex'))
-              console.log('received length', buffer.length)
+              console.log('received length', fullBuffer.length)
               console.log('produced length', packetBuff.length)
             } else {
               packetValid = true
@@ -212,7 +212,7 @@ exports.startProxy = function (host, port, listenPort, version, authConsent, cal
           } catch (e) {
             // TODO: handle?
           }
-          handleClientboundPacket(packetData, meta, buffer, packetValid)
+          handleClientboundPacket(data, meta, fullBuffer, packetValid)
           /* if (client.state === states.PLAY && brokenPackets.indexOf(packetId.value) !=== -1)
            {
            console.log(`client<-server: raw packet);
@@ -221,19 +221,17 @@ exports.startProxy = function (host, port, listenPort, version, authConsent, cal
            client.writeRaw(buffer);
            } */
         })
-        client.on('raw', function (buffer, meta) {
-          console.log('raw', meta.name, buffer.toString('hex'))
+        client.on('packet', function (data, meta, buffer, fullBuffer) {
           if (meta.state !== states.PLAY || targetClient.state !== states.PLAY) { return }
-          const packetData = client.deserializer.parsePacketBuffer(buffer).data.params
+          const packetData = client.deserializer.parsePacketBuffer(fullBuffer).data.params
           let packetValid = false
           try {
             const packetBuff = targetClient.serializer.createPacketBuffer({ name: meta.name, params: packetData })
-            console.log(buffer, packetBuff)
-            if (!bufferEqual(buffer, packetBuff)) {
+            if (!bufferEqual(fullBuffer, packetBuff)) {
               console.log('client->server: Error in packet ' + meta.state + '.' + meta.name)
-              console.log('received buffer', buffer.toString('hex'))
+              console.log('received buffer', fullBuffer.toString('hex'))
               console.log('produced buffer', packetBuff.toString('hex'))
-              console.log('received length', buffer.length)
+              console.log('received length', fullBuffer.length)
               console.log('produced length', packetBuff.length)
             } else {
               packetValid = true
@@ -245,7 +243,7 @@ exports.startProxy = function (host, port, listenPort, version, authConsent, cal
             // Unknown packet ID so packet is invalid
             packetValid = false
           }
-          handleServerboundPacket(packetData, meta, buffer, packetValid)
+          handleServerboundPacket(packetData, meta, fullBuffer, packetValid)
         })
         targetClient.on('end', function () {
           endedTargetClient = true
