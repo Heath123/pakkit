@@ -151,9 +151,10 @@ exports.startProxy = function (host, port, listenPort, version, authConsent, cal
             if (!endedTargetClient) {
               // When scripting is enabled, the script sends packets
               if (!scriptingEnabled) {
-                targetClient.write(meta.name, data)
+                // targetClient.write(meta.name, data)
+                targetClient.writeRaw(raw)
               }
-              callback(direction, meta, data, id, raw, canUseScripting)
+              callback(direction, meta, data, id, [...raw], canUseScripting)
             }
           }
         }
@@ -169,9 +170,10 @@ exports.startProxy = function (host, port, listenPort, version, authConsent, cal
             if (!endedClient) {
               // When scripting is enabled, the script sends packets
               if (!scriptingEnabled) {
-                client.write(meta.name, data)
+                // client.write(meta.name, data)
+                client.writeRaw(raw)
               }
-              callback(direction, meta, data, id, raw, true)
+              callback(direction, meta, data, id, [...raw], true)
               if (meta.name === 'set_compression') {
                 client.compressionThreshold = data.threshold
               } // Set compression
@@ -182,7 +184,7 @@ exports.startProxy = function (host, port, listenPort, version, authConsent, cal
         targetClient.on('raw', function (buffer, meta) {
           if (client.state !== states.PLAY || meta.state !== states.PLAY) { return }
           const packetData = targetClient.deserializer.parsePacketBuffer(buffer).data.params
-          handleClientboundPacket(packetData, meta, [...buffer])
+          handleClientboundPacket(packetData, meta, buffer)
           const packetBuff = client.serializer.createPacketBuffer({ name: meta.name, params: packetData })
           if (!bufferEqual(buffer, packetBuff)) {
             console.log('client<-server: Error in packet ' + meta.state + '.' + meta.name)
@@ -202,7 +204,7 @@ exports.startProxy = function (host, port, listenPort, version, authConsent, cal
         client.on('raw', function (buffer, meta) {
           if (meta.state !== states.PLAY || targetClient.state !== states.PLAY) { return }
           const packetData = client.deserializer.parsePacketBuffer(buffer).data.params
-          handleServerboundPacket(packetData, meta, [...buffer])
+          handleServerboundPacket(packetData, meta, buffer)
           const packetBuff = targetClient.serializer.createPacketBuffer({ name: meta.name, params: packetData })
           if (!bufferEqual(buffer, packetBuff)) {
             console.log('client->server: Error in packet ' + meta.state + '.' + meta.name)
