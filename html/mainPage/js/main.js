@@ -45,15 +45,16 @@ function toggleCheckbox (box, packetName, direction) {
     box.readOnly = true
     box.indeterminate = true
   } */
-  box.checked = !box.checked
+  const check = box.checked
 
   // console.log('Toggled visibility of', packetName, 'to', box.checked)
   const index = sharedVars.hiddenPackets[direction].indexOf(packetName)
   const currentlyHidden = index !== -1
-  if (box.checked && currentlyHidden) {
+  console.log(`index ${index} check ${check} currentlyHidden ${currentlyHidden}`);
+  if (check && currentlyHidden) {
     // Remove it from the hidden packets
     sharedVars.hiddenPackets[direction].splice(index, 1)
-  } else if (!box.checked && !currentlyHidden) {
+  } else if (!check && !currentlyHidden) {
     // Add it to the hidden packets
     sharedVars.hiddenPackets[direction].push(packetName)
   }
@@ -230,9 +231,10 @@ function updateFilteringStorage () {
 
 function updateFilteringTab () {
   for (const item of filteringPackets.children) {
-    const name = item.children[2].textContent
+    const name = item.children[0].children[2].textContent
+    console.log(name);
 
-    const checkbox = item.firstElementChild
+    const checkbox = item.children[0].firstElementChild
     checkbox.readOnly = false
     checkbox.indeterminate = false
     let isShown = true
@@ -261,12 +263,14 @@ window.updateFilteringPackets = () => {
       if (packetsObject.hasOwnProperty(key)) {
         console.log(!sharedVars.hiddenPackets[direction].includes(packetsObject[key]))
         filteringPackets.innerHTML +=
-          `<li id="${packetsObject[key].replace(/"/g, '&#39;') + '-' + direction}" class="packet ${direction}" onclick="toggleCheckbox(this.firstElementChild, 'teleport_confirm', 'serverbound')">
-        <input type="checkbox" ${!sharedVars.hiddenPackets[direction].includes(packetsObject[key]) ? 'checked' : ''}
-            onclick="toggleCheckbox(this, ${JSON.stringify(packetsObject[key]).replace(/"/g, '&#39;')}, '${direction}')"/>
-        <span class="id">${escapeHtml(key)}</span>
-        <span class="name">${escapeHtml(packetsObject[key])}</span>
-      </li>`
+          `<li id="${packetsObject[key].replace(/"/g, '&#39;') + '-' + direction}" class="packet ${direction}">
+            <label>
+              <input type="checkbox" ${!sharedVars.hiddenPackets[direction].includes(packetsObject[key]) ? 'checked' : ''}
+                onclick="toggleCheckbox(this, ${JSON.stringify(packetsObject[key]).replace(/"/g, '&#39;')}, '${direction}')"/>
+              <span class="id">${escapeHtml(key)}</span>
+              <span class="name">${escapeHtml(packetsObject[key])}</span>
+            </label>
+          </li>`
         console.log(key + ' -> ' + packetsObject[key])
         appendTo.push(packetsObject[key])
       }
