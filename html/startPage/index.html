@@ -75,6 +75,19 @@
       </p>
       <br><br>
       <p>
+        <label for="manualOnline">Manual online mode:</label>
+        <span style="display: table-cell; width: 1px;">Asks for login credentials in a dialog box on join instead of automatically detecting them</span>
+      </p>
+      <br>
+      <p>
+      <div style="display: table-cell;"></div>
+      <label class="switch" style="padding: 0;">
+        <input id="manualOnline" type="checkbox" value="manualOnline">
+        <span class="slider round"></span>
+      </label>
+      </p>
+      <br><br>
+      <p>
         <label for="connect-address">Connect address:</label>
         <input type="text" name="connect-address" id="connect-address" value="127.0.0.1" placeholder="127.0.0.1">
       </p>
@@ -89,11 +102,10 @@
         <input type="text" name="listen-port" id="listen-port" value="25566" placeholder="25566">
       </p>
       <div id="consent-box" style="display: none;">
-        <br>
-        <br>
+        <br><br>
         <p>
           <label for="consent">Consent:</label>
-          <span style="display: table-cell;">Allow pakkit to use my auth token from launcher_profiles.json for logging in to online mode servers</span>
+          <span style="display: table-cell; width: 1px;">Allow pakkit to use my auth token from launcher_profiles.json for logging in to online mode servers</span>
         </p>
         <br>
         <p>

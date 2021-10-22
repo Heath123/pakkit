@@ -129,7 +129,7 @@ function createWindow() {
 
     // Create the browser window.
     const win = new BrowserWindow({
-        height: store.get('authConsentGiven') ? 550 : 700,
+        height: store.get('authConsentGiven') ? 700 : 870,
         width: 500,
         resizable: false,
         // frame: false,
