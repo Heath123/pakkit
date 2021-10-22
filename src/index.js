@@ -163,6 +163,7 @@ function createWindow() {
             consent: false,
             connectAddress: options.connect,
             connectPort: options.connectPort,
+            manualAuth: options.manualAuth,
             listenPort: options.listenPort,
             platform: options.platform,
             version: options.version
@@ -209,7 +210,7 @@ function requestManualAuth () {
 
 ipcMain.on('setManualAuth', (event, arg) => {
     const ipcMessage = JSON.parse(arg)
-    proxy.setManualAuth(true, ipcMessage.email, ipcMessage.password)
+    proxy.setManualAuth(true, ipcMessage.email, ipcMessage.password, ipcMessage.method)
 })
 
 function startProxy (args) {
@@ -225,7 +226,7 @@ function startProxy (args) {
     proxy.startProxy(args.connectAddress, args.connectPort, args.listenPort, args.version,
       args.consent, packetHandler.packetHandler, packetHandler.messageHandler , dataFolder, () => {
           win.send('updateFiltering', '')
-      }, requestManualAuth)
+      }, requestManualAuth, args.manualAuth)
 
     win.loadFile('html/mainPage/index.html')
 

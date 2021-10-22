@@ -368,7 +368,8 @@ function loginDialog(callback) {
     callback({
       cancelled: false,
       email: document.getElementById('login-email').value,
-      password: document.getElementById('login-password').value
+      password: document.getElementById('login-password').value,
+      method: document.getElementById('msa').checked ? 'microsoft' : 'mojang'
     })
     closeDialog()
   }
@@ -377,6 +378,7 @@ function loginDialog(callback) {
   document.getElementById('dialog').className='dialog dialog-medium'
   document.getElementById('dialog').innerHTML =
  `<form onsubmit="loginFormHandler(event); return false;"> <!-- TODO: prevent page reload? and handle login -->
+    <!-- TODO: Change message in manual auth mode --> 
     <h2>This server is in online mode</h2>
     Please log in to your Minecraft account then reconnect.
     <br><br>
@@ -385,6 +387,12 @@ function loginDialog(callback) {
     <input placeholder="Email" type="text" style="width: calc(100% - 24px);" id="login-email">
     <br><br>
     <input placeholder="Password" type="password" style="width: calc(100% - 24px);" id="login-password">
+    <br><br>
+    <label for="msa">Use Microsoft auth?</label>
+    <label class="switch" style="padding: 0; bottom: 4px; left: 8px;">
+      <input id="msa" type="checkbox" value="consent">
+      <span class="slider round"></span>
+    </label>
     <br>
     <input style="margin-top: 16px; margin-right: 8px;" type="submit" value="Log in">
     

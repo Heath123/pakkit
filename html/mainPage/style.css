@@ -149,9 +149,9 @@ div.dialog-small {
 }
 
 div.dialog-medium {
-  top: calc(50% - 160px);
+  top: calc(50% - 180px);
   left: calc(50% - 250px);
-  height: 320px;
+  height: 360px;
   width: 500px;
 }
 
