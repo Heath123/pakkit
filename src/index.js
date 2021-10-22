@@ -134,7 +134,8 @@ function createWindow() {
         resizable: false,
         // frame: false,
         webPreferences: {
-            nodeIntegration: true
+            nodeIntegration: true,
+            enableRemoteModule: true
         },
         icon: resourcesPath + 'icons/icon.png'
     })
