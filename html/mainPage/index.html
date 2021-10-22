@@ -75,7 +75,7 @@
 
             <!-- TODO: More dynamic and clean method of doing this -->
             <button onclick="sharedVars.hiddenPackets = {
-            serverbound: allServerboundPackets, clientbound: allClientboundPackets
+            serverbound: [...allServerboundPackets], clientbound: [...allClientboundPackets]
           }
           updateFilteringTab()" style="margin-left: 8px;">Hide all
             </button>
