@@ -17,7 +17,7 @@
     "name": "Heath Mitchell",
     "email": "heath.mitchell27@gmail.com"
   },
-  "license": "ISC",
+  "license": "MIT",
   "config": {
     "forge": {
       "packagerConfig": {},
