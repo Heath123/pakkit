@@ -12,5 +12,12 @@
       "clientbound": ["keep_alive", "update_time", "rel_entity_move", "entity_teleport", "map_chunk", "update_light", "update_view_position", "entity_metadata", "entity_update_attributes", "unload_chunk", "entity_velocity", "entity_move_look", "entity_head_rotation"]
     },
     "useExtendedPresets": true
+  },
+  "^bedrock-node-.*$": {
+    "hiddenPackets": {
+      "serverbound": ["move_player","level_sound_event","player_action", "player_auth_input"],
+      "clientbound": ["set_time","level_chunk","move_entity","set_entity_data","update_attributes","level_sound_event","network_chunk_publisher_update","set_entity_motion", "move_entity_delta", "entity_event", "update_block"]
+    },
+    "useExtendedPresets": false
   }
 }

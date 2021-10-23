@@ -33,7 +33,7 @@ const resourcesPath = fs.existsSync(process.resourcesPath.concat('/app/'))
 
 
 const javaProxy = require('./proxy/java/proxy.js')
-const bedrockProxy = require('./proxy/bedrock/proxy.js')
+const bedrockProxy = require('./proxy/bedrock-node/proxy.js')
 const packetHandler = require('./packetHandler.js')
 const setupDataFolder = require('./setupDataFolder.js')
 
@@ -134,7 +134,9 @@ function createWindow() {
         resizable: false,
         // frame: false,
         webPreferences: {
-            nodeIntegration: true
+            nodeIntegration: true,
+            contextIsolation: false,
+            enableRemoteModule: true
         },
         icon: resourcesPath + 'icons/icon.png'
     })
@@ -168,6 +170,7 @@ function createWindow() {
         })
     } else {
         win.loadFile('html/startPage/index.html')
+        Store.initRenderer()
     }
 }
 

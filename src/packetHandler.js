@@ -44,7 +44,12 @@ exports.init = function (window, passedIpcMain, passedProxy) {
 
 exports.packetHandler = function (direction, meta, data, id, raw, canUseScripting, packetValid) {
   try {
-    mainWindow.send('packet', JSON.stringify({ meta: meta, data: data, direction: direction, hexIdString: id, raw: raw, time: Date.now(), packetValid: packetValid }))
+    // Handle BigInts in bedrock-protocol
+    mainWindow.send('packet', JSON.stringify({ meta: meta, data: data, direction: direction, hexIdString: id, raw: raw, time: Date.now(), packetValid: packetValid }, (key, value) =>
+      typeof value === 'bigint'
+        ? value.toString()
+        : value // return everything else unchanged
+    ))
     // TODO: Maybe write raw data?
     if (proxy.capabilities.scriptingSupport && canUseScripting) {
       if (direction === 'clientbound') {

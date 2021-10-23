@@ -22,7 +22,7 @@ function wrappedClusterizeUpdate (htmlArray) {
   const newArray = []
   for (const item of htmlArray) {
     // If the packet is hidden
-    if (item[0].match(/<li .* class=".*filter-hidden">/)) {
+    if (item[0].match(/<li .* class=".*filter-hidden.*">/)) {
       sharedVars.hiddenPacketsAmount += 1
     } else {
       newArray.push(item)
