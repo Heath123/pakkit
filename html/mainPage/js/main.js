@@ -171,7 +171,6 @@ function findDefault(setting) {
 }
 // TODO: saving and loading custom presets
 function findPreset(elem) {
-  console.log(elem)
   const name = elem.innerText.match(/Preset: ([\w|\s]+)/i)[1].replace(/\s/g, '_')
   defaultsJson.extended_presets.forEach((value) => {
     if (value.hasOwnProperty(name)) {
