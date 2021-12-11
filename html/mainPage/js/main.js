@@ -181,7 +181,7 @@ function findPreset(elem) {
 defaultsJson.extended_presets.forEach((value) => {
   const e = document.createElement('button')
   e.setAttribute('onclick', 'findPreset(this); updateFilteringTab()')
-  e.setAttribute('style',  'margin-left: 10px;');
+  e.setAttribute('style',  'margin-left: 8px;');
   e.innerText = `Preset: ${Object.keys(value)[0].replace(/_/g, ' ')}`;
   document.getElementById('extendedPresets').appendChild(e)
 })
