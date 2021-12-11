@@ -169,6 +169,23 @@ function findDefault(setting) {
     }
   }
 }
+// TODO: saving and loading custom presets
+function findPreset(elem) {
+  console.log(elem)
+  const name = elem.innerText.match(/Preset: ([\w|\s]+)/i)[1].replace(/\s/g, '_')
+  defaultsJson.extended_presets.forEach((value) => {
+    if (value.hasOwnProperty(name)) {
+      sharedVars.hiddenPackets = value[name]
+    }
+  })
+}
+defaultsJson.extended_presets.forEach((value) => {
+  const e = document.createElement('button')
+  e.setAttribute('onclick', 'findPreset(this); updateFilteringTab()')
+  e.setAttribute('style',  'margin-left: 10px;');
+  e.innerText = `Preset: ${Object.keys(value)[0].replace(/_/g, ' ')}`;
+  document.getElementById('extendedPresets').appendChild(e)
+})
 
 if (!findDefault('useExtendedPresets')) {
   document.getElementById('extendedPresets').style.display = 'none'
@@ -232,7 +249,7 @@ function updateFilteringStorage () {
 function updateFilteringTab () {
   for (const item of filteringPackets.children) {
     const name = item.children[0].children[2].textContent
-    console.log(name);
+    //console.log(name);
 
     const checkbox = item.children[0].firstElementChild
     checkbox.readOnly = false
