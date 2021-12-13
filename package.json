@@ -43,7 +43,7 @@
     "electron-rebuild": "^2.3.4"
   },
   "dependencies": {
-    "axios": "^0.21.1",
+    "axios": "^0.21.2",
     "clusterize.js": "^0.18.1",
     "commander": "^7.1.0",
     "electron-localshortcut": "^3.2.1",
