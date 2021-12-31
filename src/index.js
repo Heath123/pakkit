@@ -141,6 +141,8 @@ function createWindow() {
         icon: resourcesPath + 'icons/icon.png'
     })
 
+    win.setMenuBarVisibility(false)
+
     // Open the DevTools.
     // win.webContents.openDevTools()
     electronLocalShortcut.register(win, 'F12', () => {
