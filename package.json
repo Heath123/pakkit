@@ -17,7 +17,7 @@
     "name": "Heath Mitchell",
     "email": "heath.mitchell27@gmail.com"
   },
-  "license": "ISC",
+  "license": "MIT",
   "config": {
     "forge": {
       "packagerConfig": {},
@@ -34,12 +34,21 @@
     }
   },
   "devDependencies": {
+<<<<<<< HEAD
     "@electron-forge/cli": "^6.0.0-beta.54",
     "@electron-forge/maker-deb": "^6.0.0-beta.54",
     "@electron-forge/maker-rpm": "^6.0.0-beta.54",
     "@electron-forge/maker-squirrel": "^6.0.0-beta.54",
     "@electron-forge/maker-zip": "^6.0.0-beta.54",
     "electron": "^13.1.7",
+=======
+    "@electron-forge/cli": "^6.0.0-beta.61",
+    "@electron-forge/maker-deb": "^6.0.0-beta.61",
+    "@electron-forge/maker-rpm": "^6.0.0-beta.61",
+    "@electron-forge/maker-squirrel": "^6.0.0-beta.61",
+    "@electron-forge/maker-zip": "^6.0.0-beta.61",
+    "electron": "^16.0.5",
+>>>>>>> master
     "electron-rebuild": "^2.3.4"
   },
   "dependencies": {
@@ -49,7 +58,11 @@
     "commander": "^7.1.0",
     "electron-localshortcut": "^3.2.1",
     "electron-squirrel-startup": "^1.0.0",
+<<<<<<< HEAD
     "electron-store": "^8.0.0",
+=======
+    "electron-store": "^8.0.1",
+>>>>>>> master
     "electron-unhandled": "^3.0.2",
     "electron-window-state": "^5.0.3",
     "escape-html": "^1.0.3",

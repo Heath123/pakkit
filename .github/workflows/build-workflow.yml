@@ -19,7 +19,7 @@ jobs:
         java-version: 1.8
 
     - name: Install Wine
-      run: sudo apt install wine64
+      run: sudo apt update && sudo apt install wine64
 
     - name: Install node-prune
       run: curl -sf https://gobinaries.com/tj/node-prune | sh

@@ -45,15 +45,16 @@ function toggleCheckbox (box, packetName, direction) {
     box.readOnly = true
     box.indeterminate = true
   } */
-  box.checked = !box.checked
+  const check = box.checked
 
   // console.log('Toggled visibility of', packetName, 'to', box.checked)
   const index = sharedVars.hiddenPackets[direction].indexOf(packetName)
   const currentlyHidden = index !== -1
-  if (box.checked && currentlyHidden) {
+  console.log(`index ${index} check ${check} currentlyHidden ${currentlyHidden}`);
+  if (check && currentlyHidden) {
     // Remove it from the hidden packets
     sharedVars.hiddenPackets[direction].splice(index, 1)
-  } else if (!box.checked && !currentlyHidden) {
+  } else if (!check && !currentlyHidden) {
     // Add it to the hidden packets
     sharedVars.hiddenPackets[direction].push(packetName)
   }
@@ -168,6 +169,22 @@ function findDefault(setting) {
     }
   }
 }
+// TODO: saving and loading custom presets
+function findPreset(elem) {
+  const name = elem.innerText.match(/Preset: ([\w|\s]+)/i)[1].replace(/\s/g, '_')
+  defaultsJson.extended_presets.forEach((value) => {
+    if (value.hasOwnProperty(name)) {
+      sharedVars.hiddenPackets = value[name]
+    }
+  })
+}
+defaultsJson.extended_presets.forEach((value) => {
+  const e = document.createElement('button')
+  e.setAttribute('onclick', 'findPreset(this); updateFilteringTab()')
+  e.setAttribute('style',  'margin-left: 8px;');
+  e.innerText = `Preset: ${Object.keys(value)[0].replace(/_/g, ' ')}`;
+  document.getElementById('extendedPresets').appendChild(e)
+})
 
 if (!findDefault('useExtendedPresets')) {
   document.getElementById('extendedPresets').style.display = 'none'
@@ -230,9 +247,10 @@ function updateFilteringStorage () {
 
 function updateFilteringTab () {
   for (const item of filteringPackets.children) {
-    const name = item.children[2].textContent
+    const name = item.children[0].children[2].textContent
+    //console.log(name);
 
-    const checkbox = item.firstElementChild
+    const checkbox = item.children[0].firstElementChild
     checkbox.readOnly = false
     checkbox.indeterminate = false
     let isShown = true
@@ -261,12 +279,14 @@ window.updateFilteringPackets = () => {
       if (packetsObject.hasOwnProperty(key)) {
         console.log(!sharedVars.hiddenPackets[direction].includes(packetsObject[key]))
         filteringPackets.innerHTML +=
-          `<li id="${packetsObject[key].replace(/"/g, '&#39;') + '-' + direction}" class="packet ${direction}" onclick="toggleCheckbox(this.firstElementChild, 'teleport_confirm', 'serverbound')">
-        <input type="checkbox" ${!sharedVars.hiddenPackets[direction].includes(packetsObject[key]) ? 'checked' : ''}
-            onclick="toggleCheckbox(this, ${JSON.stringify(packetsObject[key]).replace(/"/g, '&#39;')}, '${direction}')"/>
-        <span class="id">${escapeHtml(key)}</span>
-        <span class="name">${escapeHtml(packetsObject[key])}</span>
-      </li>`
+          `<li id="${packetsObject[key].replace(/"/g, '&#39;') + '-' + direction}" class="packet ${direction}">
+            <label>
+              <input type="checkbox" ${!sharedVars.hiddenPackets[direction].includes(packetsObject[key]) ? 'checked' : ''}
+                onclick="toggleCheckbox(this, ${JSON.stringify(packetsObject[key]).replace(/"/g, '&#39;')}, '${direction}')"/>
+              <span class="id">${escapeHtml(key)}</span>
+              <span class="name">${escapeHtml(packetsObject[key])}</span>
+            </label>
+          </li>`
         console.log(key + ' -> ' + packetsObject[key])
         appendTo.push(packetsObject[key])
       }
@@ -364,7 +384,8 @@ function loginDialog(callback) {
     callback({
       cancelled: false,
       email: document.getElementById('login-email').value,
-      password: document.getElementById('login-password').value
+      password: document.getElementById('login-password').value,
+      method: document.getElementById('msa').checked ? 'microsoft' : 'mojang'
     })
     closeDialog()
   }
@@ -373,6 +394,7 @@ function loginDialog(callback) {
   document.getElementById('dialog').className='dialog dialog-medium'
   document.getElementById('dialog').innerHTML =
  `<form onsubmit="loginFormHandler(event); return false;"> <!-- TODO: prevent page reload? and handle login -->
+    <!-- TODO: Change message in manual auth mode --> 
     <h2>This server is in online mode</h2>
     Please log in to your Minecraft account then reconnect.
     <br><br>
@@ -381,6 +403,12 @@ function loginDialog(callback) {
     <input placeholder="Email" type="text" style="width: calc(100% - 24px);" id="login-email">
     <br><br>
     <input placeholder="Password" type="password" style="width: calc(100% - 24px);" id="login-password">
+    <br><br>
+    <label for="msa">Use Microsoft auth?</label>
+    <label class="switch" style="padding: 0; bottom: 4px; left: 8px;">
+      <input id="msa" type="checkbox" value="consent">
+      <span class="slider round"></span>
+    </label>
     <br>
     <input style="margin-top: 16px; margin-right: 8px;" type="submit" value="Log in">
     

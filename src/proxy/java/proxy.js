@@ -43,17 +43,22 @@ exports.capabilities = {
 let manualAuthEnabled = false
 let manualAuthEmail = undefined
 let manualAuthPassword = undefined
+let manualAuthMethod = undefined
 
-exports.setManualAuth = function (enabled, email, password) {
+let authWindowOpen = false
+
+exports.setManualAuth = function (enabled, email, password, method) {
+  authWindowOpen = false
   manualAuthEnabled = enabled
   if (enabled) {
     manualAuthEmail = email
     manualAuthPassword = password
+    manualAuthMethod = method
   }
 }
 
 exports.startProxy = function (host, port, listenPort, version, authConsent, callback, messageCallback, dataFolder,
-  updateFilteringCallback, manualAuthCallback) {
+  updateFilteringCallback, manualAuthCallback, manualAuth) {
   storedCallback = callback
 
   // . cannot be in a JSON property name with electron-store
@@ -122,6 +127,10 @@ exports.startProxy = function (host, port, listenPort, version, authConsent, cal
         } else {
           console.warn('Consent not given to use launcher_profiles.json - automatic online mode will not work')
         }
+        if (manualAuth && !manualAuthEmail) {
+          authWindowOpen = true
+          manualAuthCallback()
+        }
         const clientOptions = {
           host: host,
           port: port,
@@ -129,13 +138,15 @@ exports.startProxy = function (host, port, listenPort, version, authConsent, cal
           password: manualAuthEnabled ? manualAuthPassword : undefined,
           keepAlive: false,
           version: version,
-          profilesFolder: (authConsent && !manualAuthEnabled) ? minecraftFolder : dataFolder
+          profilesFolder: (authConsent && !manualAuthEnabled) ? minecraftFolder : dataFolder,
+          auth: manualAuthMethod
         }
         let targetClient = mc.createClient(clientOptions)
         realServer = targetClient
         targetClient.on('noAuth', () => {
           // Request manual authentication
           console.log('Automatic auth failed - manual auth needed')
+          authWindowOpen = true
           manualAuthCallback()
         })
 
@@ -254,6 +265,7 @@ exports.startProxy = function (host, port, listenPort, version, authConsent, cal
           endedTargetClient = true
           console.log('Connection error by server', '(' + host + ':' + port + ') ', err)
           console.log(err.stack)
+          if (authWindowOpen) return
           let header = 'Unable to connect to server'
           let message = err.message
           if (err.message.includes('ECONNREFUSED')) {

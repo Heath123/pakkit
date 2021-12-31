@@ -32,6 +32,7 @@ function loadSettings (newPlatform) {
   loadSetting(newPlatform + 'LastConnectAddress', 'connectAddress', 'connect-address', '127.0.0.1')
   loadSetting(newPlatform + 'LastConnectPort', 'connectPort', 'connect-port', platform === 'java' ? '25565' : '19132')
   loadSetting(newPlatform + 'LastListenPort', 'listenPort', 'listen-port', platform === 'java' ? '25566' : '19142')
+  loadSetting(newPlatform + 'LastManualAuth', 'manualAuth', 'manual-auth', platform === 'java' ? '25566' : '19142')
 }
 
 function saveSettings (thePlatform) {
@@ -40,6 +41,7 @@ function saveSettings (thePlatform) {
   store.set(thePlatform + 'LastConnectAddress', connectAddress)
   store.set(thePlatform + 'LastConnectPort', connectPort)
   store.set(thePlatform + 'LastListenPort', listenPort)
+  store.set(thePlatform + 'LastManualAuth', manualAuth)
 }
 
 function loadSetting (name, varname, elementID, defaultValue) {
@@ -54,6 +56,7 @@ function loadSetting (name, varname, elementID, defaultValue) {
 function updateVars () {
   connectAddress = document.getElementById('connect-address').value
   connectPort = document.getElementById('connect-port').value
+  manualAuth = document.getElementById('manual-auth').value
   listenPort = document.getElementById('listen-port').value
   platform = document.getElementById('platform').value
   version = document.getElementById('version').value
@@ -101,8 +104,9 @@ window.startProxy = function (event) {
     consent: store.get('authConsentGiven'),
     connectAddress: connectAddress,
     connectPort: connectPort,
+    manualAuth: manualAuth,
     listenPort: listenPort,
     platform: platform,
-    version: version
+    version: version,
   }))
 }
