@@ -19,7 +19,7 @@ jobs:
         java-version: 1.8
 
     - name: Install Wine
-      run: sudo apt update && sudo apt install wine64
+      run: sudo apt-get update && sudo apt-get install wine64 fonts-wine- gstreamer1.0-plugins-base- gstreamer1.0-plugins-good- gstreamer1.0-x- i965-va-driver- intel-media-va-driver- libaa1- libaom0- libasound2-plugins- libasyncns0- libavc1394-0- libavcodec58- libavutil56- libcaca0- libcapi20-3- libcdparanoia0- libcodec2-0.9- libdv4- libfaudio0- libflac8- libglu1-mesa- libgphoto2-6- libgphoto2-l10n- libgphoto2-port12- libgsm- - libgstreamer-plugins-base1.0-0- libgstreamer-plugins-good1.0-0- libiec61883-0- libieee1284-3- libigdgmm11- libjack-jackd2-0- libmp3lame0- libmpg123-0- libopenal-data- libopenal1- libopenjp2-7- libopus0- liborc-0.4-0- libosmesa6- libpulse0- libraw1394-11- libsamplerate0- libsane- libsane-common- libsdl2-2.0-0- libshine3- libshout3- libsndfile1- libsndio7.0- libsoxr0- libspeex1- libstb0- libswresample3- libtag1v5- libtag1v5-vanilla- libtheora0- libtwolame0- libv4l-0- libv4lconvert0- libva-drm2- libva-x11-2- libva2- libvdpau1- libvisual-0.4-0- libvkd3d1- libvorbisenc2- libwavpack1- libwine- libx264-155- libx265-179- libxvidcore4- libzvbi-common- libzvbi0- mesa-va-drivers- mesa-vdpau-drivers- ocl-icd-libopencl1- sane-utils- update-inetd- va-driver-all- vdpau-driver-all-
 
     - name: Install node-prune
       run: curl -sf https://gobinaries.com/tj/node-prune | sh
