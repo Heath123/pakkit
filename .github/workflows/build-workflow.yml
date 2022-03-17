@@ -72,7 +72,7 @@ jobs:
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: out/pakkit-windows-x64.zip
-        asset_name: pakkit-windows-x64.zip
+        asset_name: pakkit-windows-x64-v${{ github.run_number }}.zip
         asset_content_type: application/zip
 
     - name: Upload Linux build
@@ -83,7 +83,7 @@ jobs:
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: out/pakkit-linux-x64.zip
-        asset_name: pakkit-linux-x64.zip
+        asset_name: pakkit-linux-x64-v${{ github.run_number }}.zip
         asset_content_type: application/zip
 
     - name: Upload macOS build
@@ -94,7 +94,7 @@ jobs:
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: out/pakkit-macos-x64.zip
-        asset_name: pakkit-macos-x64.zip
+        asset_name: pakkit-macos-x64-v${{ github.run_number }}.zip
         asset_content_type: application/zip
 
     - name: Prepare to upload artifacts
