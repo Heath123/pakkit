@@ -372,57 +372,42 @@ function errorDialog(header, info, fatal) {
   <button style="margin-top: 16px;" class="bottom-button" onclick="${fatal ? 'sharedVars.ipcRenderer.send(\'relaunchApp\', \'\')' : 'closeDialog()' }">Close</button>`
 }
 
-function loginDialog(callback) {
-  // dialogOpen = true
-  window.loginFormHandler = function (event) {
-    if (event === 'cancel') {
-      callback({cancelled: true})
-      closeDialog()
-      return
-    }
-    event.preventDefault()
-    callback({
-      cancelled: false,
-      email: document.getElementById('login-email').value,
-      password: document.getElementById('login-password').value,
-      method: document.getElementById('msa').checked ? 'microsoft' : 'mojang'
-    })
-    closeDialog()
+function loginDialog(data) {
+  // TODO: Take into account the other parameters
+  /*
+  {
+    user_code: 'ABCDEFGH',
+    device_code: '[long tokenish string]',
+    verification_uri: 'https://www.microsoft.com/link',
+    interval: 5,
+    expires_in: 900,
+    message: 'To sign in, use a web browser to open the page https://www.microsoft.com/link and enter the code ABCDEFGH to authenticate.'
   }
-
+  */
   document.getElementById('dialog-overlay').className = 'dialog-overlay active'
   document.getElementById('dialog').className='dialog dialog-medium'
   document.getElementById('dialog').innerHTML =
- `<form onsubmit="loginFormHandler(event); return false;"> <!-- TODO: prevent page reload? and handle login -->
-    <!-- TODO: Change message in manual auth mode --> 
-    <h2>This server is in online mode</h2>
-    Please log in to your Minecraft account then reconnect.
-    <br><br>
-    pakkit does not store passwords, though it may store authentication tokens.
-    <br><br>
-    <input placeholder="Email" type="text" style="width: calc(100% - 24px);" id="login-email">
-    <br><br>
-    <input placeholder="Password" type="password" style="width: calc(100% - 24px);" id="login-password">
-    <br><br>
-    <label for="msa">Use Microsoft auth?</label>
-    <label class="switch" style="padding: 0; bottom: 4px; left: 8px;">
-      <input id="msa" type="checkbox" value="consent">
-      <span class="slider round"></span>
-    </label>
-    <br>
-    <input style="margin-top: 16px; margin-right: 8px;" type="submit" value="Log in">
-    
-    <!-- Need to specify that this is a button so it doesn't submit the form: https://stackoverflow.com/questions/932653/how-to-prevent-buttons-from-submitting-forms -->
-    <button style="margin-top: 16px;" onclick="loginFormHandler('cancel')" type="button">Cancel</button>
-  </form>`
+ `<h2>This server is in online mode</h2>
+  Please log in to your Microsoft account at the following URL:
+  <br><br>
+  <a href="https://www.microsoft.com/link" style="color: rgba(64, 128, 255, 0.8);" target="_blank" id="msaLink">microsoft.com/link</a>
+  <br><br>
+  and enter the code:
+  <br><br>
+  <code style="font-size: 200%; user-select: all;" id="msaCode">${data.user_code}</code>
+  <br><br>
+  pakkit does not store passwords, though it may store authentication tokens.
+  <br><br>
+  <button onclick="navigator.clipboard.writeText(document.getElementById('msaCode').innerText); document.getElementById('msaLink').click()" type="button">Open in browser and copy code</button>`
 }
 
-sharedVars.ipcRenderer.on('requestManualAuth', (event, arg) => {
-  loginDialog((data) => {
-    if (!data.cancelled) {
-      sharedVars.ipcRenderer.send('setManualAuth', JSON.stringify(data))
-    }
-  })
+sharedVars.ipcRenderer.on('showAuthCode', (event, arg) => {
+  const ipcMessage = JSON.parse(arg)
+  if (ipcMessage === 'close') {
+    closeDialog()
+  } else {
+    loginDialog(ipcMessage)
+  }
 })
 
 sharedVars.ipcRenderer.on('editAndResend', (event, arg) => {

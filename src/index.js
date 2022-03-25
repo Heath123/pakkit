@@ -18,7 +18,7 @@ if (options.autostart) {
     }
 }
 
-const {app, BrowserWindow, ipcMain, clipboard, Menu, dialog } = require('electron')
+const {app, BrowserWindow, ipcMain, clipboard, Menu, dialog, shell } = require('electron')
 app.allowRendererProcessReuse = true
 
 const fs = require('fs')
@@ -129,7 +129,7 @@ function createWindow() {
 
     // Create the browser window.
     const win = new BrowserWindow({
-        height: store.get('authConsentGiven') ? 680 : 810,
+        height: store.get('authConsentGiven') ? 540 : 670,
         width: 500,
         // resizable: false,
         // frame: false,
@@ -149,6 +149,11 @@ function createWindow() {
         win.openDevTools()
     })
 
+    win.webContents.setWindowOpenHandler(function(details) {
+        shell.openExternal(details.url)
+        return { action: 'deny' }
+    })
+
     unhandled({
         logger: (err) => {
             win.send('error', JSON.stringify({msg: err.message, stack: err.stack}))
@@ -156,7 +161,7 @@ function createWindow() {
             console.error(err)
         },
         showDialog: false
-    });
+    })
 
     win.setMenu(null)
     // and load the index.html of the app.
@@ -166,7 +171,6 @@ function createWindow() {
             consent: false,
             connectAddress: options.connect,
             connectPort: options.connectPort,
-            manualAuth: options.manualAuth,
             listenPort: options.listenPort,
             platform: options.platform,
             version: options.version
@@ -206,15 +210,10 @@ ipcMain.on('startProxy', (event, arg) => {
     startProxy(ipcMessage)
 })
 
-function requestManualAuth () {
+function showAuthCode (data) {
     const win = BrowserWindow.getAllWindows()[0]
-    win.send('requestManualAuth', '')
+    win.send('showAuthCode', JSON.stringify(data))
 }
-
-ipcMain.on('setManualAuth', (event, arg) => {
-    const ipcMessage = JSON.parse(arg)
-    proxy.setManualAuth(true, ipcMessage.email, ipcMessage.password, ipcMessage.method)
-})
 
 function startProxy (args) {
     if (args.platform === 'java') {
@@ -229,7 +228,7 @@ function startProxy (args) {
     proxy.startProxy(args.connectAddress, args.connectPort, args.listenPort, args.version,
       args.consent, packetHandler.packetHandler, packetHandler.messageHandler , dataFolder, () => {
           win.send('updateFiltering', '')
-      }, requestManualAuth, args.manualAuth)
+      }, showAuthCode)
 
     win.loadFile('html/mainPage/index.html')
 

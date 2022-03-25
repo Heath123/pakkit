@@ -40,25 +40,10 @@ exports.capabilities = {
   versionId: undefined
 }
 
-let manualAuthEnabled = false
-let manualAuthEmail = undefined
-let manualAuthPassword = undefined
-let manualAuthMethod = undefined
-
 let authWindowOpen = false
 
-exports.setManualAuth = function (enabled, email, password, method) {
-  authWindowOpen = false
-  manualAuthEnabled = enabled
-  if (enabled) {
-    manualAuthEmail = email
-    manualAuthPassword = password
-    manualAuthMethod = method
-  }
-}
-
 exports.startProxy = function (host, port, listenPort, version, authConsent, callback, messageCallback, dataFolder,
-  updateFilteringCallback, manualAuthCallback, manualAuth) {
+  updateFilteringCallback, authCodeCallback) {
   storedCallback = callback
 
   // . cannot be in a JSON property name with electron-store
@@ -127,28 +112,29 @@ exports.startProxy = function (host, port, listenPort, version, authConsent, cal
         } else {
           console.warn('Consent not given to use launcher_profiles.json - automatic online mode will not work')
         }
-        if (manualAuth && !manualAuthEmail) {
-          authWindowOpen = true
-          manualAuthCallback()
-        }
         const clientOptions = {
           host: host,
           port: port,
-          username: manualAuthEnabled ? manualAuthEmail : client.username,
-          password: manualAuthEnabled ? manualAuthPassword : undefined,
+          username: client.username,
           keepAlive: false,
           version: version,
-          profilesFolder: (authConsent && !manualAuthEnabled) ? minecraftFolder : dataFolder,
-          auth: manualAuthMethod
+          profilesFolder: authConsent ? minecraftFolder : dataFolder,
+          auth: 'microsoft',
+          onMsaCode: function (data) {
+            console.log('MSA code:', data.user_code)
+            authWindowOpen = true
+            authCodeCallback(data)
+          }
         }
         let targetClient = mc.createClient(clientOptions)
-        realServer = targetClient
-        targetClient.on('noAuth', () => {
-          // Request manual authentication
-          console.log('Automatic auth failed - manual auth needed')
-          authWindowOpen = true
-          manualAuthCallback()
+        targetClient.on('session', function (session) {
+          // Login complete - the dialog can be closed
+          console.log('Login done')
+          authWindowOpen = false
+          authCodeCallback('close')
         })
+        
+        realServer = targetClient
 
         function getId (meta, mappings) {
           let id
