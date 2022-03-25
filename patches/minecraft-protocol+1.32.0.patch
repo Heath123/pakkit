@@ -1,0 +1,12 @@
+diff --git a/node_modules/minecraft-protocol/src/client/encrypt.js b/node_modules/minecraft-protocol/src/client/encrypt.js
+index d9ff607..b9e7e71 100644
+--- a/node_modules/minecraft-protocol/src/client/encrypt.js
++++ b/node_modules/minecraft-protocol/src/client/encrypt.js
+@@ -22,6 +22,7 @@ module.exports = function (client, options) {
+         joinServerRequest(onJoinServerResponse)
+       } else {
+         if (packet.serverId !== '-') {
++          client.emit('noAuth')
+           debug('This server appears to be an online server and you are providing no password, the authentication will probably fail')
+         }
+         sendEncryptionKeyResponse()
