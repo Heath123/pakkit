@@ -105,21 +105,6 @@ function updateFiltering () {
 
 setInterval(updateFilterBox, 100)
 
-/* let hiddenPackets = [
-  // TODO: Do this properly
-  // JE
-  'update_time', 'position', 'position', 'keep_alive', 'keep_alive', 'rel_entity_move', 'position_look', 'look', 'position_look', 'map_chunk', 'update_light', 'entity_action', 'entity_update_attributes', 'unload_chunk', 'unload_chunk', 'update_view_position', 'entity_metadata',
-  // BE
-  'network_stack_latency', 'level_chunk', 'move_player', 'player_auth_input', 'network_chunk_publisher_update', 'client_cache_blob_status', 'client_cache_miss_response', 'move_entity_delta', 'set_entity_data', 'set_time', 'set_entity_data', 'set_entity_motion', /* "add_entity", *//* 'level_event', 'level_sound_event2', 'update_attributes', 'entity_event', 'remove_entity', 'mob_armor_equipment', 'mob_equipment', 'update_block', 'player_action', 'move_entity_absolute'
-] */
-
-// let dialogOpen = false Not currently used
-
-const defaultHiddenPackets = {
-  serverbound: ['position', 'position_look', 'look', 'keep_alive', 'entity_action'],
-  clientbound: ['keep_alive', 'update_time', 'rel_entity_move', 'entity_teleport', 'map_chunk', 'update_light', 'update_view_position', 'entity_metadata', 'entity_update_attributes', 'unload_chunk', 'entity_velocity', 'entity_move_look', 'entity_head_rotation']
-}
-
 const sharedVars = {
   allPackets: [],
   allPacketsHTML: [],
@@ -174,7 +159,12 @@ function findPreset(elem) {
   const name = elem.innerText.match(/Preset: ([\w|\s]+)/i)[1].replace(/\s/g, '_')
   defaultsJson.extended_presets.forEach((value) => {
     if (value.hasOwnProperty(name)) {
-      sharedVars.hiddenPackets = value[name]
+      // Copy the object
+      // Otherwise it will be a reference and changing it will change the preset
+      sharedVars.hiddenPackets = {
+        serverbound: [...value[name].serverbound],
+        clientbound: [...value[name].clientbound]
+      }
     }
   })
 }

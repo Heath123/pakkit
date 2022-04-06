@@ -80,7 +80,10 @@
           updateFilteringTab()" style="margin-left: 8px;">Hide all
             </button>
 
-            <button onclick="sharedVars.hiddenPackets = findDefault('hiddenPackets')
+            <button onclick="const defaultHidden = findDefault('hiddenPackets')
+          sharedVars.hiddenPackets = {
+            serverbound: [...defaultHidden.serverbound], clientbound: [...defaultHidden.clientbound]
+          }
           updateFilteringTab()" style="margin-left: 8px;">Defaults
             </button>
         </div>
