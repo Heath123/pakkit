@@ -305,5 +305,47 @@ ipcMain.on('loadLog', async (event, arg) => {
     }
 })
 
+ipcMain.on('saveScript', async (event, arg) => {
+    const win = BrowserWindow.getAllWindows()[0]
+
+    const result = await dialog.showSaveDialog(win, {
+        title: "Save user script",
+        filters: [
+            { name: 'javascript files', extensions: ['js'] }
+        ]
+    })
+
+    if (!result.canceled) {
+        const realPath = result.filePath.endsWith('.js') ? result.filePath : result.filePath + '.js'
+        console.log('Saving script to', realPath)
+        fs.writeFile(realPath, arg, function (err) {
+            if (err) throw err;
+            console.log('Saved!');
+        })
+    }
+})
+
+ipcMain.on('loadScript', async (event, arg) => {
+    const win = BrowserWindow.getAllWindows()[0]
+
+    const result = await dialog.showOpenDialog(win, {
+        title: "Load user script",
+        filters: [
+            { name: 'javascript files', extensions: ['js'] }
+        ],
+        properties: ['openFile']
+    })
+
+    if (!result.canceled) {
+        // It's an array, but we have multi-select off so it should only have one item
+        console.log('Loading script from', result.filePaths[0])
+        fs.readFile(result.filePaths[0], 'utf-8', function(err, data) {
+            if (err) throw err;
+            console.log('File has been read')
+            win.send('loadScriptData', data)
+        })
+    }
+})
+
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.

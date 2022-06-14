@@ -671,3 +671,11 @@ function saveLog() {
 function loadLog() {
   sharedVars.ipcRenderer.send('loadLog', '')
 }
+
+function saveScript() {
+  sharedVars.ipcRenderer.send('saveScript', window.scriptEditor.getDoc().getValue() )
+}
+
+function loadScript() {
+  sharedVars.ipcRenderer.send('loadScript', '')
+}
