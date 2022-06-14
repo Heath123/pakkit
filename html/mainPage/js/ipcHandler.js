@@ -65,4 +65,13 @@ exports.setup = function (passedSharedVars) {
       sharedVars.packetDom.addPacketToDOM(packet)
     }
   })
+
+  sharedVars.ipcRenderer.on('loadScriptData', (event, arg) => {
+    window.scriptEditor.getDoc().setValue(arg)
+    sharedVars.ipcRenderer.send('scriptStateChange', JSON.stringify({ //
+      scriptingEnabled: document.getElementById('enableScripting').checked,
+      script: arg
+    }))
+  })
+
 }

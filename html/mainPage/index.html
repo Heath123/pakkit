@@ -104,6 +104,9 @@
         <input id="enableScripting" name="enableScripting" onchange="sharedVars.scripting.updateScript(true)"
                type="checkbox">
         <label for="enableScripting">Enable scripting</label>
+        &nbsp;
+        <button onclick="saveScript()">Save</button>
+        <button onclick="loadScript()">Load</button>
         <br><br>
         <textarea id="scriptEditor">
       </textarea>
