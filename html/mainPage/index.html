@@ -101,15 +101,16 @@
         <h3>Scripting (beta)</h3>
         Scripting allows you to modify and inject packets on-the-fly
         <br><br>
-        <input id="enableScripting" name="enableScripting" onchange="sharedVars.scripting.updateScript(true)"
-               type="checkbox">
+        <label class="switch">
+            <input id="enableScripting" onchange="sharedVars.scripting.updateScript(true)" type="checkbox">
+            <span class="slider round"></span>
+        </label>
         <label for="enableScripting">Enable scripting</label>
-        &nbsp;
-        <button onclick="saveScript()">Save</button>
-        <button onclick="loadScript()">Load</button>
+        <button id="btnScriptLoad" onclick="loadScript()" style="margin-left: 16px;">Load</button>
+        <button id="btnScriptSave" onclick="saveScript(false)" style="margin-left: 8px;" disabled>Save</button>
+        <button id="btnScriptSaveAs" onclick="saveScript(true)" style="margin-left: 8px;">Save as..</button>
         <br><br>
-        <textarea id="scriptEditor">
-      </textarea>
+        <textarea id="scriptEditor"></textarea>
         <br>
         <a href="#" onclick="resetScriptEditor()">Reset</a>
     </div>

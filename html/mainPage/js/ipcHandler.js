@@ -74,4 +74,14 @@ exports.setup = function (passedSharedVars) {
     }))
   })
 
+  sharedVars.ipcRenderer.on('enableBtnScriptSave', (event, arg) => {
+    document.getElementById('btnScriptSave').disabled = false
+    document.getElementById('btnScriptSave').title = arg
+  })
+
+sharedVars.ipcRenderer.on('disableBtnScriptSave', (event, arg) => {
+  document.getElementById('btnScriptSave').disabled = true
+  document.getElementById('btnScriptSave').title = ''
+})
+
 }

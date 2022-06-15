@@ -38,7 +38,12 @@ exports.init = function (window, passedIpcMain, passedProxy) {
     scriptingEnabled = ipcMessage.scriptingEnabled
     proxy.setScriptingEnabled(scriptingEnabled)
     currentScript = ipcMessage.script
-    currentScriptModule = _eval(currentScript, '/script.js')
+    // prevent that the script gets executed when scripting is disabled
+    if(scriptingEnabled) {
+      currentScriptModule = _eval(currentScript, '/script.js')
+    } else {
+      currentScriptModule = _eval('', '/script.js')
+    }
   })
 }
 
@@ -46,15 +51,11 @@ exports.packetHandler = function (direction, meta, data, id, raw, canUseScriptin
   try {
     mainWindow.send('packet', JSON.stringify({ meta: meta, data: data, direction: direction, hexIdString: id, raw: raw, time: Date.now(), packetValid: packetValid }))
     // TODO: Maybe write raw data?
-    if (proxy.capabilities.scriptingSupport && canUseScripting) {
+    if (proxy.capabilities.scriptingSupport && canUseScripting && scriptingEnabled) {
       if (direction === 'clientbound') {
-        if (scriptingEnabled) {
-          currentScriptModule.downstreamHandler(meta, data, server, client)
-        }
+        currentScriptModule.downstreamHandler(meta, data, server, client)
       } else {
-        if (scriptingEnabled) {
-          currentScriptModule.upstreamHandler(meta, data, server, client)
-        }
+        currentScriptModule.upstreamHandler(meta, data, server, client)
       }
     }
   } catch (err) {

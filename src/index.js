@@ -45,6 +45,8 @@ const osDataFolder = app.getPath('appData')
 
 const dataFolder = setupDataFolder.setup(osDataFolder, resourcesPath)
 
+var currentScriptFile = null
+
 function makeMenu(direction, text, id, invalid, noData) {
     if (direction !== 'clientbound' && direction !== 'serverbound') {
         // This probably isn't a packet
@@ -305,7 +307,7 @@ ipcMain.on('loadLog', async (event, arg) => {
     }
 })
 
-ipcMain.on('saveScript', async (event, arg) => {
+ipcMain.on('saveAsScript', async (event, arg) => {
     const win = BrowserWindow.getAllWindows()[0]
 
     const result = await dialog.showSaveDialog(win, {
@@ -317,10 +319,29 @@ ipcMain.on('saveScript', async (event, arg) => {
 
     if (!result.canceled) {
         const realPath = result.filePath.endsWith('.js') ? result.filePath : result.filePath + '.js'
+        win.send('disableBtnScriptSave')
         console.log('Saving script to', realPath)
         fs.writeFile(realPath, arg, function (err) {
             if (err) throw err;
             console.log('Saved!');
+            currentScriptFile = realPath
+            win.send('enableBtnScriptSave', currentScriptFile)
+        })
+    }
+})
+
+ipcMain.on('saveScript', async (event, arg) => {
+    const win = BrowserWindow.getAllWindows()[0]
+    const validScriptPath = (currentScriptFile != null || fs.existsSync(currentScriptFile) )
+
+    win.send('disableBtnScriptSave')
+
+    if (validScriptPath) {
+        console.log('Overwrite script to', currentScriptFile)
+        fs.writeFile(currentScriptFile, arg, function (err) {
+            if (err) throw err;
+            console.log('Saved!');
+            win.send('enableBtnScriptSave', currentScriptFile)
         })
     }
 })
@@ -337,12 +358,16 @@ ipcMain.on('loadScript', async (event, arg) => {
     })
 
     if (!result.canceled) {
+        win.send('disableBtnScriptSave')
+
         // It's an array, but we have multi-select off so it should only have one item
         console.log('Loading script from', result.filePaths[0])
         fs.readFile(result.filePaths[0], 'utf-8', function(err, data) {
             if (err) throw err;
             console.log('File has been read')
+            currentScriptFile = result.filePaths[0]
             win.send('loadScriptData', data)
+            win.send('enableBtnScriptSave', currentScriptFile)
         })
     }
 })
