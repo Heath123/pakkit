@@ -33,6 +33,8 @@ exports.downstreamHandler = function (meta, data, server, client) {
   window.resetScriptEditor = function () {
     // document.getElementById('scriptEditor').value = defaultScript
     window.scriptEditor.getDoc().setValue(defaultScript)
+    // reset save button
+    // todo: maybe confirm dialog, if there are unsaved changes?
     document.getElementById('btnScriptSave').disabled = true
     document.getElementById('btnScriptSave').title = ''
   }
