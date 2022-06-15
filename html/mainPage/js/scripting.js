@@ -33,6 +33,8 @@ exports.downstreamHandler = function (meta, data, server, client) {
   window.resetScriptEditor = function () {
     // document.getElementById('scriptEditor').value = defaultScript
     window.scriptEditor.getDoc().setValue(defaultScript)
+    document.getElementById('btnScriptSave').disabled = true
+    document.getElementById('btnScriptSave').title = ''
   }
   window.scriptEditor = CodeMirror.fromTextArea(document.getElementById('scriptEditor'), { // window. stops standardjs from complaining
     lineNumbers: true,
