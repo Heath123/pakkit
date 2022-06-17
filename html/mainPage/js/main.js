@@ -672,8 +672,12 @@ function loadLog() {
   sharedVars.ipcRenderer.send('loadLog', '')
 }
 
-function saveScript() {
-  sharedVars.ipcRenderer.send('saveScript', window.scriptEditor.getDoc().getValue() )
+function saveScript( newfile = true ) {
+  if (newfile) {
+    sharedVars.ipcRenderer.send('saveAsScript', window.scriptEditor.getDoc().getValue())
+  } else  {
+    sharedVars.ipcRenderer.send('saveScript', window.scriptEditor.getDoc().getValue())
+  }
 }
 
 function loadScript() {

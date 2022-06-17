@@ -15,8 +15,16 @@ input, select, button {
   padding: 10px;
   outline: none;
 }
+button, input[type=submit] {
+   cursor: pointer;
+}
 button:hover, input[type=submit]:hover {
   background: #1F1F1F;
+}
+button:disabled, input[type=submit]:disabled {
+  background: #191919;
+  color: rgba(255,255,255,0.5);
+  cursor: not-allowed;
 }
 a {
   color: rgba(255, 255, 255, 0.8);
@@ -32,6 +40,8 @@ a:active {
   display: inline-block;
   width: 42px;
   height: 24px;
+  vertical-align: middle;
+  margin-right: 3px;
 }
 
 .switch input {
