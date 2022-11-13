@@ -11,7 +11,7 @@ jobs:
     - name: Set up Node
       uses: actions/setup-node@v1
       with:
-        node-version: 12.x
+        node-version: 16.x
 
     - name: Set up Java
       uses: actions/setup-java@v1
@@ -29,19 +29,19 @@ jobs:
     - name: Build for Windows
       run: |
         npx electron-forge package --platform win32
-        cd out/pakkit-win32-x64/resources/app/; node-prune; npx electron-rebuild -v 8.5.2
+        cd out/pakkit-win32-x64/resources/app/; node-prune
 
     - name: Build for Linux
       run: |
         npx electron-forge package --platform linux
-        cd out/pakkit-linux-x64/resources/app/; node-prune; npx electron-rebuild -v 8.5.2;
+        cd out/pakkit-linux-x64/resources/app/; node-prune
 
     - run: chmod +x out/pakkit-linux-x64/pakkit
 
     - name: Build for macOS
       run: |
         npx electron-forge package --platform darwin
-        cd out/pakkit-darwin-x64/pakkit.app/Contents/Resources/app/; node-prune; npx electron-rebuild -v 8.5.2
+        cd out/pakkit-darwin-x64/pakkit.app/Contents/Resources/app/; node-prune
 
     - name: Create archives for new release
       if: ${{ github.ref == 'refs/heads/master' }}
