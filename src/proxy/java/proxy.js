@@ -119,7 +119,7 @@ exports.startProxy = function (host, port, listenPort, version, authConsent, cal
           keepAlive: false,
           version: version,
           profilesFolder: authConsent ? minecraftFolder : dataFolder,
-          auth: 'microsoft',
+          // auth: 'microsoft',
           onMsaCode: function (data) {
             console.log('MSA code:', data.user_code)
             authWindowOpen = true
