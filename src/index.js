@@ -28,8 +28,8 @@ const store = new Store()
 
 let proxy // Defined later when an option is chosen
 const resourcesPath = fs.existsSync(process.resourcesPath.concat('/app/'))
-    ? process.resourcesPath.concat('/app/') // Packaged with electron-forge
-    : './' // npm start
+  ? process.resourcesPath.concat('/app/') // Packaged with electron-forge
+  : './' // npm start
 
 
 const javaProxy = require('./proxy/java/proxy.js')
@@ -84,40 +84,40 @@ function makeMenu(direction, text, id, invalid, noData) {
 
     if (!noData) {
         menuData.splice(2, 0,
-            {
-                label: proxy.capabilities.jsonData ? 'Copy JSON data' : 'Copy data',
-                click: () => {
-                    BrowserWindow.getAllWindows()[0].send('copyPacketData', JSON.stringify({
-                        id: id
-                    }))
-                }
-            }
+          {
+              label: proxy.capabilities.jsonData ? 'Copy JSON data' : 'Copy data',
+              click: () => {
+                  BrowserWindow.getAllWindows()[0].send('copyPacketData', JSON.stringify({
+                      id: id
+                  }))
+              }
+          }
         )
     }
 
     if (!noData && text.split(' ')[1] === 'position' && direction === 'clientbound') {
         menuData.splice(3, 0,
-            {
-                label: 'Copy teleport as command',
-                click: () => {
-                    BrowserWindow.getAllWindows()[0].send('copyTeleportCommand', JSON.stringify({
-                        id: id
-                    }))
-                }
-            }
+          {
+              label: 'Copy teleport as command',
+              click: () => {
+                  BrowserWindow.getAllWindows()[0].send('copyTeleportCommand', JSON.stringify({
+                      id: id
+                  }))
+              }
+          }
         )
     }
 
     if (proxy.capabilities.rawData) {
         menuData.splice(3, 0,
-            {
-                label: 'Copy hex data',
-                click: () => {
-                    BrowserWindow.getAllWindows()[0].send('copyHexData', JSON.stringify({
-                        id: id
-                    }))
-                }
-            }
+          {
+              label: 'Copy hex data',
+              click: () => {
+                  BrowserWindow.getAllWindows()[0].send('copyHexData', JSON.stringify({
+                      id: id
+                  }))
+              }
+          }
         )
     }
 
@@ -131,8 +131,8 @@ function createWindow() {
 
     // Create the browser window.
     const win = new BrowserWindow({
-        height: store.get('authConsentGiven') ? 540 : 670,
-        width: 500,
+        height: store.get('authConsentGiven') ? 550 : 650,
+        width: 480,
         // resizable: false,
         // frame: false,
         webPreferences: {
@@ -169,8 +169,9 @@ function createWindow() {
     // and load the index.html of the app.
     if (options.autostart) {
         startProxy({
-            // TODO
+            // TODO: make online-mode working in headless via command-line parameters
             consent: false,
+            onlineMode: false,
             connectAddress: options.connect,
             connectPort: options.connectPort,
             listenPort: options.listenPort,
@@ -227,7 +228,7 @@ function startProxy (args) {
     const win = BrowserWindow.getAllWindows()[0]
 
     packetHandler.init(BrowserWindow.getAllWindows()[0], ipcMain, proxy)
-    proxy.startProxy(args.connectAddress, args.connectPort, args.listenPort, args.version,
+    proxy.startProxy(args.connectAddress, args.connectPort, args.listenPort, args.version, args.onlineMode,
       args.consent, packetHandler.packetHandler, packetHandler.messageHandler , dataFolder, () => {
           win.send('updateFiltering', '')
       }, showAuthCode)

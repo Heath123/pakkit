@@ -42,8 +42,8 @@ exports.capabilities = {
 
 let authWindowOpen = false
 
-exports.startProxy = function (host, port, listenPort, version, authConsent, callback, messageCallback, dataFolder,
-  updateFilteringCallback, authCodeCallback) {
+exports.startProxy = function (host, port, listenPort, version, onlineMode, authConsent, callback, messageCallback, dataFolder,
+                               updateFilteringCallback, authCodeCallback) {
   storedCallback = callback
 
   // . cannot be in a JSON property name with electron-store
@@ -119,7 +119,7 @@ exports.startProxy = function (host, port, listenPort, version, authConsent, cal
           keepAlive: false,
           version: version,
           profilesFolder: authConsent ? minecraftFolder : dataFolder,
-          // auth: 'microsoft',
+          auth: onlineMode ? 'microsoft' : 'offline',
           onMsaCode: function (data) {
             console.log('MSA code:', data.user_code)
             authWindowOpen = true
@@ -133,7 +133,7 @@ exports.startProxy = function (host, port, listenPort, version, authConsent, cal
           authWindowOpen = false
           authCodeCallback('close')
         })
-        
+
         realServer = targetClient
 
         function getId (meta, mappings) {
@@ -193,7 +193,7 @@ exports.startProxy = function (host, port, listenPort, version, authConsent, cal
         const bufferEqual = require('buffer-equal')
         targetClient.on('packet', function (data, meta, buffer, fullBuffer) {
           if (client.state !== states.PLAY || meta.state !== states.PLAY) { return }
-          
+
           let packetValid = false
           try {
             const packetBuff = client.serializer.createPacketBuffer({ name: meta.name, params: data })

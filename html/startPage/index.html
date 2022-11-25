@@ -1,117 +1,119 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
     <meta charset="UTF-8">
     <title>pakkit</title>
-    <link rel="stylesheet" href="style.css">
+    <link href="style.css" rel="stylesheet">
     <!-- https://electronjs.org/docs/tutorial/security#csp-meta-tag -->
-    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
-    <link href="../scrollbar.css" rel="stylesheet" type="text/css" />
-    <link href="../shared.css" rel="stylesheet" type="text/css" />
-  </head>
-  <body>
-    <h1 class='title'>pakkit</h1>
-    pakkit is an advanced packet monitor proxy for Minecraft: Java Edition and Minecraft: Bedrock Edition based on node-minecraft-protocol and ProxyPass.
-    <br><br>
-    <form onsubmit="startProxy(event)">
-      <p>
-        <label for="platform">Platform:</label>
-        <select id="platform" style="width: 191px;" onchange="platformChange()">
-          <option value="java">Java Edition</option>
-          <option value="bedrock">Bedrock Edition (beta)</option>
-        </select>
-      </p>
-      <br>
-      <p>
-        <label for="version">Version:</label>
-        <select id="version" style="width: 191px;">
-          <option value="1.19">1.19</option>
-          <option value="1.18.2">1.18.2</option>
-          <option value="1.18">1.18(.1)</option>
-          <option value="1.17.1">1.17.1</option>
-          <option value="1.17">1.17</option>
-          <option value="21w07a">21w07a</option>
-          <option value="1.16.4">1.16.4/1.16.5</option>
-          <option value="1.16.3">1.16.3</option>
-          <option value="1.16.2">1.16.2</option>
-          <option value="1.16.1">1.16.1</option>
-          <option value="1.16">1.16</option>
-          <option value="20w13b">20w13b</option>
-          <option value="1.15.2">1.15.2</option>
-          <option value="1.15.1">1.15.1</option>
-          <option value="1.15">1.15</option>
-          <option value="1.14.4">1.14.4</option>
-          <option value="1.14.3">1.14.3</option>
-          <option value="1.14.1">1.14.1</option>
-          <option value="1.14">1.14</option>
-          <option value="1.13.2">1.13.2</option>
-          <option value="1.13.2-pre2">1.13.2-pre2</option>
-          <option value="1.13.2-pre1">1.13.2-pre1</option>
-          <option value="1.13.1">1.13.1</option>
-          <option value="1.13">1.13</option>
-          <option value="17w50a">17w50a</option>
-          <option value="1.12.2">1.12.2</option>
-          <option value="1.12.1">1.12.1</option>
-          <option value="1.12">1.12</option>
-          <option value="1.12-pre4">1.12-pre4</option>
-          <option value="17w18b">17w18b</option>
-          <option value="17w15a">17w15a</option>
-          <option value="1.11.2">1.11.2</option>
-          <option value="1.11">1.11</option>
-          <option value="16w35a">16w35a</option>
-          <option value="1.10.2">1.10.2</option>
-          <option value="1.10.1">1.10.1</option>
-          <option value="1.10">1.10</option>
-          <option value="1.10-pre1">1.10-pre1</option>
-          <option value="16w20a">16w20a</option>
-          <option value="1.9.4">1.9.4</option>
-          <option value="1.9.2">1.9.2</option>
-          <option value="1.9.1-pre2">1.9.1-pre2</option>
-          <option value="1.9">1.9</option>
-          <option value="15w40b">15w40b</option>
-          <option value="1.8.8">1.8.x</option>
-          <option value="1.7.10">1.7.10</option>
-        </select>
-        <select id="version-bedrock" disabled style="width: 191px; display: none;">
-          <option value="1.15.2">1.16.221 (latest)</option>
-        </select>
-      </p>
-      <br><br>
-      <p>
-        <label for="connect-address">Connect address:</label>
-        <input type="text" name="connect-address" id="connect-address" value="127.0.0.1" placeholder="127.0.0.1">
-      </p>
-      <br>
-      <p>
-        <label for="connect-port">Connect port:</label>
-        <input type="text" name="connect-port" id="connect-port" value="25565" placeholder="25565">
-      </p>
-      <br><br>
-      <p>
-        <label for="listen-port">Listen port:</label>
-        <input type="text" name="listen-port" id="listen-port" value="25566" placeholder="25566">
-      </p>
-      <div id="consent-box" style="display: none;">
-        <br><br>
-        <p>
-          <label for="consent">Consent:</label>
-          <span style="display: table-cell; width: calc(100vw - 200px);">Allow pakkit to use my auth token from launcher_profiles.json for logging in to online mode servers</span>
-        </p>
-        <br>
-        <p>
-          <div style="display: table-cell;"></div>
-          <label class="switch" style="padding: 0;">
-            <input id="consent" type="checkbox" value="consent">
-            <span class="slider round"></span>
-          </label>
-        </p>
-      </div>
-      <br>
-      <p>
-        <label for="start"></label>
-        <input id="start" type="submit" value="Start!">
-      </p>
-    </form>
-    <script src="script.js"></script>
-  </body>
+    <meta content="script-src 'self' 'unsafe-inline';" http-equiv="Content-Security-Policy"/>
+    <link href="../scrollbar.css" rel="stylesheet" type="text/css"/>
+    <link href="../shared.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<h1 class='title'>pakkit</h1>
+<p>pakkit is an advanced packet monitor proxy for Minecraft: Java Edition and Minecraft: Bedrock Edition based on
+    node-minecraft-protocol and ProxyPass.</p>
+<form onsubmit="startProxy(event)">
+    <ul class="form-wrapper">
+
+        <li class="form-row">
+            <label for="platform">Platform:</label>
+            <select id="platform" onchange="platformChange()">
+                <option value="java">Java Edition</option>
+                <option value="bedrock">Bedrock Edition (beta)</option>
+            </select>
+        </li>
+        <li class="form-row">
+            <label for="version">Version:</label>
+            <select id="version">
+                <option value="1.19">1.19</option>
+                <option value="1.18.2">1.18.2</option>
+                <option value="1.18">1.18(.1)</option>
+                <option value="1.17.1">1.17.1</option>
+                <option value="1.17">1.17</option>
+                <option value="21w07a">21w07a</option>
+                <option value="1.16.4">1.16.4/1.16.5</option>
+                <option value="1.16.3">1.16.3</option>
+                <option value="1.16.2">1.16.2</option>
+                <option value="1.16.1">1.16.1</option>
+                <option value="1.16">1.16</option>
+                <option value="20w13b">20w13b</option>
+                <option value="1.15.2">1.15.2</option>
+                <option value="1.15.1">1.15.1</option>
+                <option value="1.15">1.15</option>
+                <option value="1.14.4">1.14.4</option>
+                <option value="1.14.3">1.14.3</option>
+                <option value="1.14.1">1.14.1</option>
+                <option value="1.14">1.14</option>
+                <option value="1.13.2">1.13.2</option>
+                <option value="1.13.2-pre2">1.13.2-pre2</option>
+                <option value="1.13.2-pre1">1.13.2-pre1</option>
+                <option value="1.13.1">1.13.1</option>
+                <option value="1.13">1.13</option>
+                <option value="17w50a">17w50a</option>
+                <option value="1.12.2">1.12.2</option>
+                <option value="1.12.1">1.12.1</option>
+                <option value="1.12">1.12</option>
+                <option value="1.12-pre4">1.12-pre4</option>
+                <option value="17w18b">17w18b</option>
+                <option value="17w15a">17w15a</option>
+                <option value="1.11.2">1.11.2</option>
+                <option value="1.11">1.11</option>
+                <option value="16w35a">16w35a</option>
+                <option value="1.10.2">1.10.2</option>
+                <option value="1.10.1">1.10.1</option>
+                <option value="1.10">1.10</option>
+                <option value="1.10-pre1">1.10-pre1</option>
+                <option value="16w20a">16w20a</option>
+                <option value="1.9.4">1.9.4</option>
+                <option value="1.9.2">1.9.2</option>
+                <option value="1.9.1-pre2">1.9.1-pre2</option>
+                <option value="1.9">1.9</option>
+                <option value="15w40b">15w40b</option>
+                <option value="1.8.8">1.8.x</option>
+                <option value="1.7.10">1.7.10</option>
+            </select>
+            <select disabled id="version-bedrock" style="display: none;">
+                <option value="1.15.2">1.16.221 (latest)</option>
+            </select>
+        </li>
+        <li class="form-row">
+            <label for="connect-address">Connect address:</label>
+            <input id="connect-address" name="connect-address" placeholder="127.0.0.1" type="text" value="127.0.0.1"/>
+        </li>
+        <li class="form-row">
+            <label for="connect-port">Connect port:</label>
+            <input id="connect-port" name="connect-port" placeholder="25565" type="text" value="25565"/>
+        </li>
+        <li class="form-row" id="auth-row">
+            <label for="connect-port">Auth-Method:</label>
+            <span>
+            <label class="switch" style="padding: 0;">
+              <input id="auth-online" type="checkbox" value="auth-online"/>
+              <span class="slider round"></span>
+            </label>
+            Online-Mode (Microsoft-Auth)
+        </span>
+        </li>
+        <li class="form-row topspacer">
+            <label for="listen-port">Listen port:</label>
+            <input id="listen-port" name="listen-port" placeholder="25566" type="text" value="25566"/>
+        </li>
+        <li class="form-row" id="consent-row" style="display: none;">
+            <label for="consent">Consent:<br>
+                <label class="switch" style="padding: 0;">
+                    <input id="consent" type="checkbox" value="consent"/>
+                    <span class="slider round"></span>
+                </label>
+            </label>
+            <p>Allow pakkit to use my auth token from launcher_profiles.json for logging in to online mode servers.</p>
+        </li>
+        <li class="form-row">
+            <label></label>
+            <span class="start"><input id="start" type="submit" value="Start!"/></span>
+        </li>
+    </ul>
+</form>
+<script src="script.js"></script>
+</body>
 </html>
