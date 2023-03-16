@@ -15,7 +15,6 @@
     node-minecraft-protocol and ProxyPass.</p>
 <form onsubmit="startProxy(event)">
     <ul class="form-wrapper">
-
         <li class="form-row">
             <label for="platform">Platform:</label>
             <select id="platform" onchange="platformChange()">
@@ -77,7 +76,7 @@
                 <option value="1.7.10">1.7.10</option>
             </select>
             <select disabled id="version-bedrock" style="display: none;">
-                <option value="1.15.2">1.16.221 (latest)</option>
+                <option value="1.15.2">1.16.221</option>
             </select>
         </li>
         <li class="form-row">
@@ -88,16 +87,21 @@
             <label for="connect-port">Connect port:</label>
             <input id="connect-port" name="connect-port" placeholder="25565" type="text" value="25565"/>
         </li>
-        <li class="form-row" id="auth-row">
-            <label for="connect-port">Auth method:</label>
-            <span>
-            <label class="switch" style="padding: 0;">
-              <input id="auth-online" type="checkbox" value="auth-online"/>
-              <span class="slider round"></span>
-            </label>
-            Online mode
-        </span>
-        </li>
+        <div id="auth-row">
+            <li class="form-row">
+                <label for="auth-online">Auth method:</label>
+                <span>Enable online mode?</span>
+            </span>
+            <li class="form-row">
+                <label></label>
+                <span>
+                <label class="switch" style="padding: 0;">
+                <input id="auth-online" type="checkbox" value="auth-online"/>
+                <span class="slider round"></span>
+                </label>
+            </span>
+            </li>
+        </div>
         <li class="form-row topspacer">
             <label for="listen-port">Listen port:</label>
             <input id="listen-port" name="listen-port" placeholder="25566" type="text" value="25566"/>

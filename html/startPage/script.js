@@ -83,7 +83,7 @@ function platformChange()
   } else {
     document.getElementById('version').style.display = 'block'
     document.getElementById('version-bedrock').style.display = 'none'
-    document.getElementById('auth-row').style.display = 'flex'
+    document.getElementById('auth-row').style.display = 'block'
   }
   loadSettings(platform)
   lastPlatform = platform
