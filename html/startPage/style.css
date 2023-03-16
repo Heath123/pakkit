@@ -1,15 +1,44 @@
-h1.title {
-  font-family: "Lucida Console", Monaco, monospace;
+body {
+    margin: 0.25em 1em;
 }
 
-form { display: table; }
+h1.title {
+    font-family: "Lucida Console", Monaco, monospace;
+}
 
-form p { display: table-row; }
+.form-wrapper {
+    list-style-type: none;
+    padding: 0;
+}
 
-form p label { display: table-cell; padding-left: 16px; padding-right: 16px; text-align: center; }
+.form-row {
+    display: flex;
+    justify-content: flex-start;
+    padding: .25em 0;
+}
 
-form p input { display: table-cell; }
+.form-row.topspacer {
+    padding-top: 1em;
+}
+
+.form-row > label {
+    padding: .5em 1em .5em 0;
+    flex: 1;
+}
+
+.form-row > input, .form-row > select, .form-row > p, .form-row > span {
+    flex: 2;
+}
+
+.form-row > span {
+    padding: .5em 0;
+}
+
+.form-row > span.start {
+    flex: auto;
+}
 
 input#start {
-  padding: 10px 78.5px;
+    max-width: 200px;
+    width: 100%;
 }
