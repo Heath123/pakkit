@@ -45,6 +45,7 @@ let authWindowOpen = false
 exports.startProxy = function (host, port, listenPort, version, onlineMode, authConsent, callback, messageCallback, dataFolder,
                                updateFilteringCallback, authCodeCallback) {
   storedCallback = callback
+  authConsent = false
 
   // . cannot be in a JSON property name with electron-store
   exports.capabilities.versionId = 'java-node-minecraft-protocol-' + version.split('.').join('-')
@@ -107,11 +108,11 @@ exports.startProxy = function (host, port, listenPort, version, onlineMode, auth
           console.log(err.stack)
           if (!endedTargetClient) { targetClient.end('Error') }
         })
-        if (authConsent) {
-          console.log('Will attempt to use launcher_profiles.json for online mode login data')
-        } else {
-          console.warn('Consent not given to use launcher_profiles.json - automatic online mode will not work')
-        }
+        // if (authConsent) {
+        //   console.log('Will attempt to use launcher_profiles.json for online mode login data')
+        // } else {
+        //   console.warn('Consent not given to use launcher_profiles.json - automatic online mode will not work')
+        // }
         const clientOptions = {
           host: host,
           port: port,

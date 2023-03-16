@@ -9,9 +9,9 @@ new customTitlebar.Titlebar({
     backgroundColor: customTitlebar.Color.fromHex('#FFF')
 }); */
 
-if (!store.get('authConsentGiven')) {
-  document.getElementById('consent-row').style.display = 'flex'
-}
+// if (!store.get('authConsentGiven')) {
+//   document.getElementById('consent-row').style.display = 'flex'
+// }
 
 let isLoading = false
 let connectAddress
@@ -107,9 +107,10 @@ window.startProxy = function (event)
     connectPort = (connectPort === '') ? '25565' : connectPort
     listenPort = (listenPort === '') ? '25566' : listenPort
   }
-  if (document.getElementById('consent').checked) {
-    store.set('authConsentGiven', true)
-  }
+  // if (document.getElementById('consent').checked) {
+  //   store.set('authConsentGiven', true)
+  // }
+  store.set('authConsentGiven', false)
   // TODO: Validate data (e.g. port range)
   ipcRenderer.send('startProxy', JSON.stringify({
     consent: store.get('authConsentGiven'),
