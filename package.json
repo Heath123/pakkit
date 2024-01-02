@@ -34,35 +34,35 @@
     }
   },
   "devDependencies": {
-    "@electron-forge/cli": "^6.0.0-beta.61",
-    "@electron-forge/maker-deb": "^6.0.0-beta.61",
-    "@electron-forge/maker-rpm": "^6.0.0-beta.61",
-    "@electron-forge/maker-squirrel": "^6.0.0-beta.61",
-    "@electron-forge/maker-zip": "^6.0.0-beta.61",
-    "electron": "^16.0.5",
-    "electron-rebuild": "^2.3.4"
+    "@electron-forge/cli": "^6.4.2",
+    "@electron-forge/maker-deb": "^6.4.2",
+    "@electron-forge/maker-rpm": "^6.4.2",
+    "@electron-forge/maker-squirrel": "^6.4.2",
+    "@electron-forge/maker-zip": "^6.4.2",
+    "electron": "^27.0.0",
+    "electron-rebuild": "^3.2.9"
   },
   "dependencies": {
-    "axios": "^0.21.1",
+    "axios": "^0.21.4",
     "clusterize.js": "^0.18.1",
-    "commander": "^7.1.0",
+    "commander": "^7.2.0",
     "electron-localshortcut": "^3.2.1",
     "electron-squirrel-startup": "^1.0.0",
-    "electron-store": "^8.0.1",
+    "electron-store": "^8.1.0",
     "electron-unhandled": "^3.0.2",
     "electron-window-state": "^5.0.3",
     "escape-html": "^1.0.3",
     "md5-file": "^5.0.0",
-    "minecraft-data": "^3.36.1",
-    "minecraft-folder-path": "^1.1.0",
-    "minecraft-protocol": "^1.43.0",
+    "minecraft-data": "^3.46.2",
+    "minecraft-folder-path": "^1.2.0",
+    "minecraft-protocol": "^1.44.0",
     "node-eval": "^2.0.0",
-    "patch-package": "^6.4.7",
-    "source-map-support": "^0.5.19",
-    "ws": "^7.4.6"
+    "patch-package": "^6.5.1",
+    "source-map-support": "^0.5.21",
+    "ws": "^7.5.9"
   },
   "optionalDependencies": {
-    "bufferutil": "^4.0.2",
-    "utf-8-validate": "^5.0.3"
+    "bufferutil": "^4.0.7",
+    "utf-8-validate": "^5.0.10"
   }
 }
