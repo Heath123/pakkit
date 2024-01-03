@@ -55,7 +55,7 @@
     "md5-file": "^5.0.0",
     "minecraft-data": "^3.36.1",
     "minecraft-folder-path": "^1.1.0",
-    "minecraft-protocol": "^1.43.0",
+    "minecraft-protocol": "^1.45",
     "node-eval": "^2.0.0",
     "patch-package": "^6.4.7",
     "source-map-support": "^0.5.19",
