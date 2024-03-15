@@ -1,6 +1,10 @@
 const { Relay } = require('bedrock-protocol')
+const minecraftFolder = require("minecraft-folder-path");
 
 let scriptingEnabled = false
+
+// http://prismarinejs.github.io/minecraft-data/?v=bedrock_1.19.62&d=protocol#packet_server_to_client_handshake
+// http://prismarinejs.github.io/minecraft-data/?v=bedrock_[VERSION]&d=protocol#[PACKET]
 
 exports.capabilities = {
   modifyPackets: true,
@@ -10,7 +14,7 @@ exports.capabilities = {
   clientboundPackets: {},
   serverboundPackets: {},
   wikiVgPage: 'https://wiki.vg/Bedrock_Protocol',
-  versionId: 'bedrock-node-1.17.10'
+  versionId: undefined
 }
 
 let host
@@ -24,8 +28,8 @@ let updateFilteringCallback
 let relay
 let relayPlayer
 
-exports.startProxy = function (passedHost, passedPort, passedListenPort, version, authConsent, passedPacketCallback,
-  passedMessageCallback, passedDataFolder, passedUpdateFilteringCallback, authCodeCallback) {
+exports.startProxy = function (passedHost, passedPort, passedListenPort, version, onlineMode, authConsent, passedPacketCallback,
+                               passedMessageCallback, passedDataFolder, passedUpdateFilteringCallback, authCodeCallback) {
   host = passedHost
   port = passedPort
   listenPort = passedListenPort
@@ -33,16 +37,36 @@ exports.startProxy = function (passedHost, passedPort, passedListenPort, version
   messageCallback = passedMessageCallback
   dataFolder = passedDataFolder
   updateFilteringCallback = passedUpdateFilteringCallback
+  // TODO: add dynamic version loading as in bedrock-packet-interceptor
+  /*
+  const mcdata = require('minecraft-data')('bedrock_' + version) // Used to get packets, may remove if I find a better way
+  toClientMappings = mcdata.protocol.play.toClient.types.packet[1][0].type[1].mappings
+  toServerMappings = mcdata.protocol.play.toServer.types.packet[1][0].type[1].mappings
+
+  exports.capabilities.clientboundPackets = mcdata.protocol.play.toClient.types.packet[1][0].type[1].mappings
+  exports.capabilities.serverboundPackets = mcdata.protocol.play.toServer.types.packet[1][0].type[1].mappings
+  */
+
+  exports.capabilities.versionId = 'bedrock-node-' + version.split('.').join('-')
 
   relay = new Relay({
-    version: '1.17.10', // The version
+    version: version, // The version
     /* host and port to listen for clients on */
     host: '0.0.0.0',
     port: Number(listenPort),
+    //offline: true,
+    offline: onlineMode,
     /* Where to send upstream packets to */
     destination: {
       host: host,
       port: Number(port)
+    },
+    // TODO: use minecraftFolder ?
+    profilesFolder: authConsent ? './profiles/bedrock/default' : dataFolder,
+    onMsaCode: function (data) {
+      console.log('MSA code:', data.user_code)
+      authWindowOpen = true
+      authCodeCallback(data)
     }
   })
 
@@ -56,17 +80,18 @@ exports.startProxy = function (passedHost, passedPort, passedListenPort, version
     // Server is sending a message to the client.
     player.on('clientbound', ({ name, params }) => {
       // TODO: check validity
-      packetCallback('clientbound', { name: name }, params, '0x00', undefined, false, true)
+      packetCallback('clientbound', { name: name }, params, '0x00', {}, scriptingEnabled, true)
     })
     // Client is sending a message to the server
     player.on('serverbound', ({ name, params }) => {
-      packetCallback('serverbound', { name: name }, params, '0x00', undefined, false, true)
+      packetCallback('serverbound', { name: name }, params, '0x00', {}, scriptingEnabled, true)
     })
   })
 }
 
 exports.end = function () {
   // TODO
+  relay.close()
 }
 
 exports.writeToClient = function (meta, data) {
@@ -86,3 +111,6 @@ exports.writeToServer = function (meta, data) {
   scriptingEnabled = isEnabled
   proxyPlayerSession.setDontSendPacketsPromise(scriptingEnabled)
 } */
+exports.setScriptingEnabled = function (isEnabled) {
+  scriptingEnabled = isEnabled
+}

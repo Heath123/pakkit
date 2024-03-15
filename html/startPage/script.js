@@ -65,7 +65,7 @@ function updateVars()
   connectPort = document.getElementById('connect-port').value
   listenPort = document.getElementById('listen-port').value
   platform = document.getElementById('platform').value
-  version = document.getElementById('version').value
+  version = platform === 'java' ? document.getElementById('version').value : document.getElementById('version-bedrock').value
   onlineMode = document.getElementById('auth-online').checked
 }
 

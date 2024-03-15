@@ -33,7 +33,7 @@ const resourcesPath = fs.existsSync(process.resourcesPath.concat('/app/'))
 
 
 const javaProxy = require('./proxy/java/proxy.js')
-const bedrockProxy = require('./proxy/bedrock/proxy.js')
+const bedrockProxy = require('./proxy/bedrock-node/proxy.js')
 const packetHandler = require('./packetHandler.js')
 const setupDataFolder = require('./setupDataFolder.js')
 
