@@ -1,5 +1,6 @@
 exports.packetFilteredByFilterBox = function (packet, filter, hiddenPackets, inverseFiltering, regexFilter,
   sharedVars) {
+  if(!hiddenPackets) return false;
   if (hiddenPackets[packet.direction].includes(packet.meta.name)) {
     return true
   }
