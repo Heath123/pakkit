@@ -242,7 +242,7 @@ function startProxy (args) {
     });
 
     win.setResizable(true)
-    win.setPosition(mainWindowState.x, mainWindowState.y)
+    //win.setPosition(mainWindowState.x, mainWindowState.y) // TODO: figure out why this causes an issue
     win.setSize(mainWindowState.width, mainWindowState.height)
 
     mainWindowState.manage(win)
