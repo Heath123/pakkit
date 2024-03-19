@@ -6,6 +6,13 @@
     },
     "useExtendedPresets": false
   },
+  "^bedrock-node-.*$": {
+    "hiddenPackets": {
+      "serverbound": ["move_player", "player_action", "level_sound_event", "player_auth_input"],
+      "clientbound": ["level_chunk", "update_block", "network_chunk_publisher_update", "set_entity_motion", "move_entity_absolute", "set_entity_data", "level_sound_event", "move_entity_delta"]
+    },
+    "useExtendedPresets": false
+  },
   "^java-node-minecraft-protocol-.*$": {
     "hiddenPackets": {
       "serverbound": ["position", "position_look", "look", "keep_alive", "entity_action"],
