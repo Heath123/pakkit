@@ -1,5 +1,4 @@
 const { Relay } = require('bedrock-protocol')
-const minecraftFolder = require("minecraft-folder-path");
 
 let scriptingEnabled = false
 
@@ -37,15 +36,19 @@ exports.startProxy = function (passedHost, passedPort, passedListenPort, version
   messageCallback = passedMessageCallback
   dataFolder = passedDataFolder
   updateFilteringCallback = passedUpdateFilteringCallback
-  // TODO: add dynamic version loading as in bedrock-packet-interceptor
-  /*
-  const mcdata = require('minecraft-data')('bedrock_' + version) // Used to get packets, may remove if I find a better way
-  toClientMappings = mcdata.protocol.play.toClient.types.packet[1][0].type[1].mappings
-  toServerMappings = mcdata.protocol.play.toServer.types.packet[1][0].type[1].mappings
 
-  exports.capabilities.clientboundPackets = mcdata.protocol.play.toClient.types.packet[1][0].type[1].mappings
-  exports.capabilities.serverboundPackets = mcdata.protocol.play.toServer.types.packet[1][0].type[1].mappings
-  */
+  // TODO: add dynamic version loading as in bedrock-packet-interceptor
+
+  const mcdata = require('minecraft-data')('bedrock_' + version) // Used to get packets, may remove if I find a better way
+
+  toClientMappings = mcdata.protocol.types.mcpe_packet[1][0].type[1].mappings
+  toServerMappings = mcdata.protocol.types.mcpe_packet[1][0].type[1].mappings
+
+  exports.capabilities.clientboundPackets = toClientMappings
+  exports.capabilities.serverboundPackets = toServerMappings
+
+  // TODO: minecraft-data docs should replace wikiVgPage
+  //exports.capabilities.wikiVgPage = "http://prismarinejs.github.io/minecraft-data/?v=bedrock_{VERSION}&d=protocol".replace("{VERSION}", version)
 
   exports.capabilities.versionId = 'bedrock-node-' + version.split('.').join('-')
 
@@ -55,7 +58,7 @@ exports.startProxy = function (passedHost, passedPort, passedListenPort, version
     host: '0.0.0.0',
     port: Number(listenPort),
     //offline: true,
-    offline: onlineMode,
+    offline: !onlineMode,
     /* Where to send upstream packets to */
     destination: {
       host: host,
@@ -65,7 +68,6 @@ exports.startProxy = function (passedHost, passedPort, passedListenPort, version
     profilesFolder: authConsent ? './profiles/bedrock/default' : dataFolder,
     onMsaCode: function (data) {
       console.log('MSA code:', data.user_code)
-      authWindowOpen = true
       authCodeCallback(data)
     }
   })
