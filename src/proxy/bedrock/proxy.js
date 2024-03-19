@@ -1,4 +1,5 @@
 const { Relay } = require('bedrock-protocol')
+const {readFileSync} = require("fs");
 
 let scriptingEnabled = false
 
@@ -37,15 +38,31 @@ exports.startProxy = function (passedHost, passedPort, passedListenPort, version
   dataFolder = passedDataFolder
   updateFilteringCallback = passedUpdateFilteringCallback
 
-  // TODO: add dynamic version loading as in bedrock-packet-interceptor
-
   const mcdata = require('minecraft-data')('bedrock_' + version) // Used to get packets, may remove if I find a better way
 
-  toClientMappings = mcdata.protocol.types.mcpe_packet[1][0].type[1].mappings
-  toServerMappings = mcdata.protocol.types.mcpe_packet[1][0].type[1].mappings
+  //const packets = mcdata.protocol.types.mcpe_packet[1][0].type[1].mappings
+  const packetsYamlProtoPath = mcdata.protocolYaml[0]
+  const packetsYamlProto = readFileSync(packetsYamlProtoPath, 'utf8');
+  const packets = {
+    "server": [],
+    "client": []
+  };
 
-  exports.capabilities.clientboundPackets = toClientMappings
-  exports.capabilities.serverboundPackets = toServerMappings
+  const packetRegex = /packet_(.*?):\n.*!id: .*\n.*!bound: (.*?)\n/g;
+  let match;
+
+  while (match = packetRegex.exec(packetsYamlProto)) {
+    let boundTo = match[2];
+    if (boundTo === "both") {
+      packets["server"].push(match[1]);
+      packets["client"].push(match[1]);
+    } else {
+      packets[boundTo].push(match[1]);
+    }
+  }
+
+  exports.capabilities.clientboundPackets = packets["client"]
+  exports.capabilities.serverboundPackets = packets["server"]
 
   // TODO: minecraft-data docs should replace wikiVgPage
   //exports.capabilities.wikiVgPage = "http://prismarinejs.github.io/minecraft-data/?v=bedrock_{VERSION}&d=protocol".replace("{VERSION}", version)
@@ -53,11 +70,10 @@ exports.startProxy = function (passedHost, passedPort, passedListenPort, version
   exports.capabilities.versionId = 'node-bedrock-protocol-' + version.split('.').join('-')
 
   relay = new Relay({
-    version: version, // The version
+    version: version,
     /* host and port to listen for clients on */
     host: '0.0.0.0',
     port: Number(listenPort),
-    //offline: true,
     offline: !onlineMode,
     /* Where to send upstream packets to */
     destination: {
