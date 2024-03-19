@@ -1,5 +1,6 @@
 const { Relay } = require('bedrock-protocol')
 const {readFileSync} = require("fs");
+const minecraftFolder = require("minecraft-folder-path");
 
 let scriptingEnabled = false
 
@@ -40,7 +41,6 @@ exports.startProxy = function (passedHost, passedPort, passedListenPort, version
 
   const mcdata = require('minecraft-data')('bedrock_' + version) // Used to get packets, may remove if I find a better way
 
-  //const packets = mcdata.protocol.types.mcpe_packet[1][0].type[1].mappings
   const packetsYamlProtoPath = mcdata.protocolYaml[0]
   const packetsYamlProto = readFileSync(packetsYamlProtoPath, 'utf8');
   const packets = {
@@ -80,8 +80,7 @@ exports.startProxy = function (passedHost, passedPort, passedListenPort, version
       host: host,
       port: Number(port)
     },
-    // TODO: use minecraftFolder ?
-    profilesFolder: authConsent ? './profiles/bedrock/default' : dataFolder,
+    profilesFolder: authConsent ? minecraftFolder : dataFolder,
     onMsaCode: function (data) {
       console.log('MSA code:', data.user_code)
       authCodeCallback(data)
@@ -94,7 +93,11 @@ exports.startProxy = function (passedHost, passedPort, passedListenPort, version
   relay.on('connect', player => {
     relayPlayer = player
     console.log('New connection', player.connection.address)
-  
+
+    relay.once('join', () => {
+      console.log('Login done')
+      authCodeCallback('close')
+    })
     // Server is sending a message to the client.
     player.on('clientbound', ({ name, params }) => {
       // TODO: check validity
