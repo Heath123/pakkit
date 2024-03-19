@@ -34,6 +34,7 @@ const resourcesPath = fs.existsSync(process.resourcesPath.concat('/app/'))
 
 const javaProxy = require('./proxy/java/proxy.js')
 const bedrockProxy = require('./proxy/bedrock-node/proxy.js')
+const bedrockProxyPassProxy = require('./proxy/bedrock-node/proxy.js')
 const packetHandler = require('./packetHandler.js')
 const setupDataFolder = require('./setupDataFolder.js')
 
@@ -219,10 +220,16 @@ function showAuthCode (data) {
 }
 
 function startProxy (args) {
-    if (args.platform === 'java') { // TODO: add proxypass option
-        proxy = javaProxy
-    } else {
-        proxy = bedrockProxy
+    switch(args.platform){
+        case 'bedrock':
+            proxy = bedrockProxy
+            break;
+        case 'bedrock-proxypass':
+            proxy = bedrockProxyPassProxy
+            break;
+        case 'java':
+            proxy = javaProxy
+            break;
     }
 
     const win = BrowserWindow.getAllWindows()[0]

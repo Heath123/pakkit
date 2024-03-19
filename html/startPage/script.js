@@ -59,31 +59,53 @@ function loadSetting(name, varname, elementID, defaultValue)
   }
 }
 
-function updateVars()
+function updateVars(platform)
 {
   connectAddress = document.getElementById('connect-address').value
   connectPort = document.getElementById('connect-port').value
   listenPort = document.getElementById('listen-port').value
-  platform = document.getElementById('platform').value
-  version = platform === 'java' ? document.getElementById('version').value : document.getElementById('version-bedrock').value
+
+  switch(platform){
+    case 'bedrock':
+      version = document.getElementById('version-bedrock').value;
+      break;
+    case 'bedrock-proxypass':
+      version = document.getElementById('version-bedrock-proxypass').value;
+      break;
+    case 'java':
+      version = document.getElementById('version').value;
+      break;
+  }
+
   onlineMode = document.getElementById('auth-online').checked
 }
 
 function platformChange()
 {
   platform = document.getElementById('platform').value
-  if (lastPlatform !== platform) {
-    updateVars()
+  if (lastPlatform !== platform && lastPlatform) {
+    updateVars(lastPlatform)
     saveSettings(lastPlatform)
   }
-  if (platform === 'bedrock') {
-    document.getElementById('version-bedrock').style.display = 'block'
-    document.getElementById('version').style.display = 'none'
-    document.getElementById('auth-row').style.display = 'none'
-  } else {
-    document.getElementById('version').style.display = 'block'
-    document.getElementById('version-bedrock').style.display = 'none'
-    document.getElementById('auth-row').style.display = 'block'
+  switch(platform){
+    case 'bedrock':
+      document.getElementById('version').style.display = 'none'
+      document.getElementById('version-bedrock').style.display = 'block'
+      document.getElementById('version-bedrock-proxypass').style.display = 'none'
+      document.getElementById('auth-row').style.display = 'block'
+      break;
+    case 'bedrock-proxypass':
+      document.getElementById('version').style.display = 'none'
+      document.getElementById('version-bedrock').style.display = 'none'
+      document.getElementById('version-bedrock-proxypass').style.display = 'block'
+      document.getElementById('auth-row').style.display = 'none'
+      break;
+    case 'java':
+      document.getElementById('version').style.display = 'block'
+      document.getElementById('version-bedrock').style.display = 'none'
+      document.getElementById('version-bedrock-proxypass').style.display = 'none'
+      document.getElementById('auth-row').style.display = 'block'
+      break;
   }
   loadSettings(platform)
   lastPlatform = platform
@@ -96,11 +118,11 @@ window.startProxy = function (event)
   }
   isLoading = true
   event.preventDefault()
-  updateVars()
+  updateVars(platform)
   saveSettings(platform)
   // If blank use default values
   connectAddress = (connectAddress === '') ? '127.0.0.1' : connectAddress
-  if (platform === 'bedrock') {
+  if (platform === 'bedrock' || platform === 'bedrock-proxypass') {
     connectPort = (connectPort === '') ? '19132' : connectPort
     listenPort = (listenPort === '') ? '19142' : listenPort
   } else {
