@@ -52,7 +52,7 @@ function loadSetting(name, varname, elementID, defaultValue)
   }
 
   window[varname] = store.get(name)
-  if (varname == 'onlineMode') {
+  if (varname === 'onlineMode') {
     document.getElementById(elementID).checked = window[varname]
   } else {
     document.getElementById(elementID).value = window[varname]
