@@ -219,7 +219,7 @@ function showAuthCode (data) {
 }
 
 function startProxy (args) {
-    if (args.platform === 'java') {
+    if (args.platform === 'java') { // TODO: add proxypass option
         proxy = javaProxy
     } else {
         proxy = bedrockProxy
