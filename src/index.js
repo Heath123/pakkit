@@ -252,7 +252,7 @@ function startProxy (args) {
 }
 
 ipcMain.on('proxyCapabilities', (event, arg) => {
-    event.returnValue = JSON.stringify(proxy.capabilities)
+    event.returnValue = proxy.capabilities
 })
 
 ipcMain.on('copyToClipboard', (event, arg) => {

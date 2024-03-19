@@ -118,7 +118,7 @@ const sharedVars = {
   store: new Store()
 }
 
-sharedVars.proxyCapabilities = JSON.parse(sharedVars.ipcRenderer.sendSync('proxyCapabilities', ''))
+sharedVars.proxyCapabilities = sharedVars.ipcRenderer.sendSync('proxyCapabilities', '')
 
 function getVersionSpecificVar(name, defaultValue) {
   const versionId = 'version-' + sharedVars.proxyCapabilities.versionId
