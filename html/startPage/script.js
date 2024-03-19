@@ -1,5 +1,6 @@
 const {ipcRenderer} = require('electron')
 const Store = require('electron-store')
+const mcData = require('minecraft-data');
 
 const store = new Store()
 
@@ -21,11 +22,33 @@ let platform
 let version
 let onlineMode
 
+loadVersionsFromMcData();
 loadSetting('lastPlatform', 'platform', 'platform', 'java')
 let lastPlatform = platform
 platformChange()
 loadSettings(platform)
 
+function loadVersionsFromMcData() {
+  const bedrockVersions = mcData.supportedVersions.bedrock.reverse();
+  const bedrockSelect = document.getElementById('version-bedrock');
+  bedrockSelect.innerHTML = ''; // Clear existing options
+  bedrockVersions.forEach((version) => {
+    const option = document.createElement('option');
+    option.value = version;
+    option.textContent = version;
+    bedrockSelect.appendChild(option);
+  });
+
+  const javaVersions = mcData.supportedVersions.pc.reverse();
+  const javaSelect = document.getElementById('version');
+  javaSelect.innerHTML = ''; // Clear existing options
+  javaVersions.forEach((version) => {
+    const option = document.createElement('option');
+    option.value = version;
+    option.textContent = version;
+    javaSelect.appendChild(option);
+  });
+}
 function loadSettings(newPlatform)
 {
   loadSetting(newPlatform + 'LastVersion', 'version', 'version', '1.18.2')
