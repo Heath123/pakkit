@@ -33,10 +33,9 @@ const resourcesPath = fs.existsSync(process.resourcesPath.concat('/app/'))
 
 
 const javaProxy = require('./proxy/java/proxy.js')
-const bedrockProxy = require('./proxy/bedrock-node/proxy.js')
-const bedrockProxyPassProxy = require('./proxy/bedrock-node/proxy.js')
+const bedrockProxy = require('./proxy/bedrock/proxy.js')
+
 const packetHandler = require('./packetHandler.js')
-const setupDataFolder = require('./setupDataFolder.js')
 
 const electronLocalShortcut = require('electron-localshortcut')
 const windowStateKeeper = require('electron-window-state')
@@ -44,7 +43,7 @@ const unhandled = require('electron-unhandled')
 
 const osDataFolder = app.getPath('appData')
 
-const dataFolder = setupDataFolder.setup(osDataFolder, resourcesPath)
+const dataFolder = osDataFolder + '/pakkit'
 
 var currentScriptFile = null
 
@@ -223,9 +222,6 @@ function startProxy (args) {
     switch(args.platform){
         case 'bedrock':
             proxy = bedrockProxy
-            break;
-        case 'bedrock-proxypass':
-            proxy = bedrockProxyPassProxy
             break;
         case 'java':
             proxy = javaProxy

@@ -69,9 +69,6 @@ function updateVars(platform)
     case 'bedrock':
       version = document.getElementById('version-bedrock').value;
       break;
-    case 'bedrock-proxypass':
-      version = document.getElementById('version-bedrock-proxypass').value;
-      break;
     case 'java':
       version = document.getElementById('version').value;
       break;
@@ -91,19 +88,11 @@ function platformChange()
     case 'bedrock':
       document.getElementById('version').style.display = 'none'
       document.getElementById('version-bedrock').style.display = 'block'
-      document.getElementById('version-bedrock-proxypass').style.display = 'none'
       document.getElementById('auth-row').style.display = 'block'
-      break;
-    case 'bedrock-proxypass':
-      document.getElementById('version').style.display = 'none'
-      document.getElementById('version-bedrock').style.display = 'none'
-      document.getElementById('version-bedrock-proxypass').style.display = 'block'
-      document.getElementById('auth-row').style.display = 'none'
       break;
     case 'java':
       document.getElementById('version').style.display = 'block'
       document.getElementById('version-bedrock').style.display = 'none'
-      document.getElementById('version-bedrock-proxypass').style.display = 'none'
       document.getElementById('auth-row').style.display = 'block'
       break;
   }
@@ -122,7 +111,7 @@ window.startProxy = function (event)
   saveSettings(platform)
   // If blank use default values
   connectAddress = (connectAddress === '') ? '127.0.0.1' : connectAddress
-  if (platform === 'bedrock' || platform === 'bedrock-proxypass') {
+  if (platform === 'bedrock') {
     connectPort = (connectPort === '') ? '19132' : connectPort
     listenPort = (listenPort === '') ? '19142' : listenPort
   } else {
