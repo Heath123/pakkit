@@ -10,7 +10,7 @@ let scriptingEnabled = false
 exports.capabilities = {
   modifyPackets: true,
   jsonData: true,
-  rawData: false,
+  rawData: true,
   scriptingSupport: false,
   clientboundPackets: {},
   serverboundPackets: {},
@@ -25,6 +25,9 @@ let packetCallback
 let messageCallback
 let dataFolder
 let updateFilteringCallback
+
+let toClientMappings
+let toServerMappings
 
 let relay
 let relayPlayer
@@ -48,26 +51,52 @@ exports.startProxy = function (passedHost, passedPort, passedListenPort, version
     "client": []
   };
 
-  const packetRegex = /packet_(.*?):\n.*!id: .*\n.*!bound: (.*?)\n/g;
+  const packetRegex = /packet_(.*?):\n.*!id: (.*?)\n...(.*?\n)/g;
+  const boundRegex = /!bound: (.*?)\n/g;
   let match;
 
   while (match = packetRegex.exec(packetsYamlProto)) {
-    let boundTo = match[2];
+    let packetID = match[2];
+    let packetName = match[1];
+
+    let boundToMatch = boundRegex.exec(match[0]);
+    let boundTo;
+
+    if(boundToMatch)
+      boundTo = boundToMatch[1]
+    else
+      boundTo = "both" // sometimes packets have unknown direction
+
     if (boundTo === "both") {
-      packets["server"].push(match[1]);
-      packets["client"].push(match[1]);
+      packets["server"][packetID] = packetName;
+      packets["client"][packetID] = packetName;
     } else {
-      packets[boundTo].push(match[1]);
+      packets[boundTo][packetID] = packetName;
     }
   }
 
-  exports.capabilities.clientboundPackets = packets["client"]
-  exports.capabilities.serverboundPackets = packets["server"]
+  toClientMappings = packets["client"]
+  toServerMappings = packets["server"]
+
+  exports.capabilities.clientboundPackets = toClientMappings
+  exports.capabilities.serverboundPackets = toServerMappings
 
   // TODO: minecraft-data docs should replace wikiVgPage
   //exports.capabilities.wikiVgPage = "http://prismarinejs.github.io/minecraft-data/?v=bedrock_{VERSION}&d=protocol".replace("{VERSION}", version)
 
   exports.capabilities.versionId = 'node-bedrock-protocol-' + version.split('.').join('-')
+
+  function getId (name, mappings) {
+    if(!name) return '0x00'
+    let id = Object.keys(mappings).find(key => mappings[key] === name)
+    if(!id) {
+      console.log('Couldn\'t get ID:', name)
+      return '0x00'
+    }
+    if(id.indexOf('x')===-1)// just number, requires conversion
+      id = '0x' + Number(id.toString()).toString().padStart(2, '0')
+    return id
+  }
 
   relay = new Relay({
     version: version,
@@ -101,12 +130,17 @@ exports.startProxy = function (passedHost, passedPort, passedListenPort, version
     // Server is sending a message to the client.
     player.on('clientbound', ({ name, params }) => {
       // TODO: check validity
-      packetCallback('clientbound', { name: name }, params, '0x00', {}, scriptingEnabled, true)
+      const packetBuff = relay.serializer.createPacketBuffer({ name, params })
+      const id = getId(name, toClientMappings)
+      packetCallback('clientbound', { name: name }, params, id, [...packetBuff], scriptingEnabled, true)
     })
     // Client is sending a message to the server
     player.on('serverbound', ({ name, params }) => {
-      packetCallback('serverbound', { name: name }, params, '0x00', {}, scriptingEnabled, true)
+      const packetBuff = relay.serializer.createPacketBuffer({ name, params })
+      const id = getId(name, toServerMappings)
+      packetCallback('serverbound', { name: name }, params, id, [...packetBuff], scriptingEnabled, true)
     })
+    // player on -> close, error, closeConnection (by server), disconnect (by me)
   })
 }
 
@@ -127,11 +161,6 @@ exports.writeToServer = function (meta, data) {
   }
 }
 
-// TODO
-/* imports.setScriptingEnabled = function (isEnabled) {
-  scriptingEnabled = isEnabled
-  proxyPlayerSession.setDontSendPacketsPromise(scriptingEnabled)
-} */
 exports.setScriptingEnabled = function (isEnabled) {
   scriptingEnabled = isEnabled
 }
