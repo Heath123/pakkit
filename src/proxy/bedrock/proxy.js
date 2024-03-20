@@ -11,7 +11,7 @@ exports.capabilities = {
   modifyPackets: true,
   jsonData: true,
   rawData: true,
-  scriptingSupport: false,
+  scriptingSupport: true,
   clientboundPackets: {},
   serverboundPackets: {},
   wikiVgPage: 'https://wiki.vg/Bedrock_Protocol',
@@ -130,15 +130,13 @@ exports.startProxy = function (passedHost, passedPort, passedListenPort, version
     // Server is sending a message to the client.
     player.on('clientbound', ({ name, params }) => {
       // TODO: check validity
-      const packetBuff = relay.serializer.createPacketBuffer({ name, params })
       const id = getId(name, toClientMappings)
-      packetCallback('clientbound', { name: name }, params, id, [...packetBuff], scriptingEnabled, true)
+      packetCallback('clientbound', { name: name }, params, id, scriptingEnabled, true)
     })
     // Client is sending a message to the server
     player.on('serverbound', ({ name, params }) => {
-      const packetBuff = relay.serializer.createPacketBuffer({ name, params })
       const id = getId(name, toServerMappings)
-      packetCallback('serverbound', { name: name }, params, id, [...packetBuff], scriptingEnabled, true)
+      packetCallback('serverbound', { name: name }, params, id, scriptingEnabled, true)
     })
     // player on -> close, error, closeConnection (by server), disconnect (by me)
   })
@@ -147,6 +145,12 @@ exports.startProxy = function (passedHost, passedPort, passedListenPort, version
 exports.end = function () {
   // TODO
   relay.close()
+}
+
+exports.getRaw = function (name, params) {
+  if (relay) {
+    return [...relay.serializer.createPacketBuffer({ name, params })]
+  }
 }
 
 exports.writeToClient = function (meta, data) {

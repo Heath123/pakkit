@@ -52,9 +52,8 @@ exports.init = function (window, passedIpcMain, passedProxy) {
   })
 }
 
-exports.packetHandler = function (direction, meta, data, id, raw, canUseScripting, packetValid) {
+exports.packetHandler = function (direction, meta, data, id, canUseScripting, packetValid) {
   try {
-    mainWindow.send('packet', JSON.stringify({ meta: meta, data: data, direction: direction, hexIdString: id, raw: raw, time: Date.now(), packetValid: packetValid }))
     // TODO: Maybe write raw data?
     if (proxy.capabilities.scriptingSupport && canUseScripting && scriptingEnabled) {
       if (direction === 'clientbound') {
@@ -63,6 +62,8 @@ exports.packetHandler = function (direction, meta, data, id, raw, canUseScriptin
         currentScriptModule.upstreamHandler(meta, data, server, client)
       }
     }
+    let raw = proxy.getRaw(meta.name, data)
+    mainWindow.send('packet', JSON.stringify({ meta: meta, data: data, direction: direction, hexIdString: id, raw: raw, time: Date.now(), packetValid: packetValid }))
   } catch (err) {
     console.error(err)
   }
