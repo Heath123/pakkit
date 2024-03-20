@@ -111,14 +111,14 @@ const sharedVars = {
   proxyCapabilities: {},
   ipcRenderer: require('electron').ipcRenderer,
   packetList: document.getElementById('packetlist'),
-  hiddenPackets: undefined,
+  hiddenPackets: {},
   scripting: undefined,
   lastFilter: '',
   hiddenPacketsAmount: 0,
   store: new Store()
 }
 
-sharedVars.proxyCapabilities = JSON.parse(sharedVars.ipcRenderer.sendSync('proxyCapabilities', ''))
+sharedVars.proxyCapabilities = sharedVars.ipcRenderer.sendSync('proxyCapabilities', '')
 
 function getVersionSpecificVar(name, defaultValue) {
   const versionId = 'version-' + sharedVars.proxyCapabilities.versionId
@@ -133,7 +133,7 @@ function getVersionSpecificVar(name, defaultValue) {
       [name]: JSON.stringify(defaultValue)
     })
   }
-  return JSON.parse(sharedVars.store.get(versionId)[name])
+  return sharedVars.store.get(versionId)[name] ? JSON.parse(sharedVars.store.get(versionId)[name]) : sharedVars.store.get(versionId)[name]
 }
 
 function setVersionSpecificVar(name, value) {

@@ -1,41 +1,21 @@
-const { spawn } = require('child_process')
-const WebSocket = require('ws')
-const net = require('net')
-
-// const java = require('java')
-
-/* java.asyncOptions = {
-  asyncSuffix: undefined,
-  syncSuffix: "",
-  promiseSuffix: "Promise",
-  promisify: require('util').promisify
-} */
-
-let child
-
-// TODO: Can it still be frozen?
-// let mayBeFrozen = false
-// let timeFrozen
-
-let proxyPass
-let proxyPlayerSession
-
-let wsPort
-let ws
+const { Relay } = require('bedrock-protocol')
+const {readFileSync} = require("fs");
+const minecraftFolder = require("minecraft-folder-path");
 
 let scriptingEnabled = false
 
-// This whole thing is messy for now.
+// http://prismarinejs.github.io/minecraft-data/?v=bedrock_1.19.62&d=protocol#packet_server_to_client_handshake
+// http://prismarinejs.github.io/minecraft-data/?v=bedrock_[VERSION]&d=protocol#[PACKET]
 
 exports.capabilities = {
   modifyPackets: true,
   jsonData: true,
   rawData: true,
-  scriptingSupport: false,
+  scriptingSupport: true,
   clientboundPackets: {},
   serverboundPackets: {},
   wikiVgPage: 'https://wiki.vg/Bedrock_Protocol',
-  versionId: 'bedrock-proxypass-json'
+  versionId: undefined
 }
 
 let host
@@ -46,144 +26,11 @@ let messageCallback
 let dataFolder
 let updateFilteringCallback
 
-// https://stackoverflow.com/questions/28050171/nodejs-random-free-tcp-ports
-function freePort () {
-  return new Promise((resolve, reject) => {
-    const srv = net.createServer(function(sock) {
-      sock.end()
-    })
-    srv.listen(0, function() {
-      const port = srv.address().port
-      srv.close()
-      resolve(port)
-    })
-    srv.on('error', (err) => {
-      reject(err)
-    })
-  })
-}
+let toClientMappings
+let toServerMappings
 
-async function launch() {
-  wsPort = Number(await freePort())
-
-  child = spawn('java', ['-jar', dataFolder + '/proxypass/' + 'proxypass-pakkit.jar', '--start-from-args', '0.0.0.0',
-    listenPort.toString(), host, port.toString(), '1', 'true', 'true', 'pakkit', 'pakkitProxyPoweredByProxyPass',
-    'true', wsPort.toString()])
-
-  child.stdout.on('data', handleOutput)
-  child.stderr.on('data', handleError)
-  child.on('close', (code, signal) => {
-    setTimeout(() => {
-      launch()
-    }, 50)
-  })
-
-
-  // setTimeout(startWebsocket, 3000)
-}
-
-function startWebsocket () {
-  ws = new WebSocket('ws://localhost:' + wsPort)
-
-  /* ws.on('open', function open() {
-    ws.send('something')
-  }); */
-
-  ws.on('message', function incoming(data) {
-    // console.log(data);
-    try {
-      data = JSON.parse(data)
-    } catch (err) {
-      console.error(err)
-      return
-    }
-    switch (data.type) {
-      case 'packet':
-        handlePacket(data.data)
-        break
-      case 'event':
-        handleEvent(data)
-        break
-      default:
-        console.log('Unknown message type', data.type)
-    }
-  })
-
-  console.log('Proxy started (Bedrock)!')
-}
-
-function handlePacket (packet) {
-  const name = packet.packetType.toLowerCase()
-
-  const data = JSON.parse(packet.jsonData);
-  const hexIdString = '0x' + packet.packetId.toString(16).padStart(2, '0')
-
-  // These values are unneeded or are exposed elsewhere in the GUI
-  delete data.packetId
-  delete data.packetType
-  delete data.clientId
-  delete data.senderId
-
-  const raw = Object.values(packet.bytes)
-  // Prepend packet ID for consistency with Java Edition
-  raw.unshift(packet.packetId)
-
-  // If the packet as already handled bya  custom handler then scripting cannot modify it
-  // (well it can but that would be annoying to add)
-  const canUseScripting = !data.isHandled
-
-  // TODO: check validity
-  packetCallback(packet.direction, { name: name, className: packet.className }, data, hexIdString, raw, canUseScripting, true)
-}
-
-function handleEvent (event) {
-  switch(event.eventType) {
-    case 'unableToConnect':
-      messageCallback('Unable to connect to server', 'Unable to connect to the Bedrock server at ' +
-        event.eventData.replace(/^\//, '') + // Remove slash at start
-        '. Make sure the server is online.')
-      relaunch()
-      break;
-    case 'disconnect':
-      console.log('Disconnect - relaunching proxy')
-      relaunch()
-      break;
-    case 'filteringPackets':
-      console.log('rec')
-      const packetTypes = JSON.parse(event.eventData)
-      for (const index in packetTypes) {
-        const idString = '0x' + Number(index).toString(16).padStart(2, '0')
-        const name = packetTypes[index].toLowerCase()
-        // There isn't much of a distinction between serverbound and clientbound in Bedrock and many packets can be sent both ways
-        exports.capabilities.clientboundPackets[idString] = name
-        exports.capabilities.serverboundPackets[idString] = name
-      }
-      updateFilteringCallback()
-      break;
-    default:
-      console.log('Unknown event', event.eventType)
-  }
-}
-
-function handleOutput (chunk) {
-  try {
-    const text = chunk.toString('utf8').trim()
-    console.log('ProxyPass output:', text)
-    if (text.startsWith('ProxyPass - Websocket started on port: ') && !(ws && ws.readyState === WebSocket.OPEN)) {
-      setTimeout(startWebsocket, 100)
-    }
-  } catch (err) {
-    console.error(err)
-  }
-}
-
-function handleError (chunk) {
-  try {
-    console.log('ProxyPass error:', chunk.toString('utf8').trim())
-  } catch (err) {
-    console.error(err)
-  }
-}
+let relay
+let relayPlayer
 
 exports.startProxy = function (passedHost, passedPort, passedListenPort, version, onlineMode, authConsent, passedPacketCallback,
                                passedMessageCallback, passedDataFolder, passedUpdateFilteringCallback, authCodeCallback) {
@@ -195,42 +42,129 @@ exports.startProxy = function (passedHost, passedPort, passedListenPort, version
   dataFolder = passedDataFolder
   updateFilteringCallback = passedUpdateFilteringCallback
 
-  launch()
+  const mcdata = require('minecraft-data')('bedrock_' + version) // Used to get packets, may remove if I find a better way
+
+  const packetsYamlProtoPath = mcdata.protocolYaml[0]
+  const packetsYamlProto = readFileSync(packetsYamlProtoPath, 'utf8');
+  const packets = {
+    "server": [],
+    "client": []
+  };
+
+  const packetRegex = /packet_(.*?):\n.*!id: (.*?)\n...(.*?\n)/g;
+  const boundRegex = /!bound: (.*?)\n/g;
+  let match;
+
+  while (match = packetRegex.exec(packetsYamlProto)) {
+    let packetID = match[2];
+    let packetName = match[1];
+
+    let boundToMatch = boundRegex.exec(match[0]);
+    let boundTo;
+
+    if(boundToMatch)
+      boundTo = boundToMatch[1]
+    else
+      boundTo = "both" // sometimes packets have unknown direction
+
+    if (boundTo === "both") {
+      packets["server"][packetID] = packetName;
+      packets["client"][packetID] = packetName;
+    } else {
+      packets[boundTo][packetID] = packetName;
+    }
+  }
+
+  toClientMappings = packets["client"]
+  toServerMappings = packets["server"]
+
+  exports.capabilities.clientboundPackets = toClientMappings
+  exports.capabilities.serverboundPackets = toServerMappings
+
+  // TODO: minecraft-data docs should replace wikiVgPage
+  //exports.capabilities.wikiVgPage = "http://prismarinejs.github.io/minecraft-data/?v=bedrock_{VERSION}&d=protocol".replace("{VERSION}", version)
+
+  exports.capabilities.versionId = 'node-bedrock-protocol-' + version.split('.').join('-')
+
+  function getId (name, mappings) {
+    if(!name) return '0x00'
+    let id = Object.keys(mappings).find(key => mappings[key] === name)
+    if(!id) {
+      console.log('Couldn\'t get ID:', name)
+      return '0x00'
+    }
+    if(id.indexOf('x')===-1)// just number, requires conversion
+      id = '0x' + Number(id.toString()).toString().padStart(2, '0')
+    return id
+  }
+
+  relay = new Relay({
+    version: version,
+    /* host and port to listen for clients on */
+    host: '0.0.0.0',
+    port: Number(listenPort),
+    offline: !onlineMode,
+    /* Where to send upstream packets to */
+    destination: {
+      host: host,
+      port: Number(port)
+    },
+    profilesFolder: authConsent ? minecraftFolder : dataFolder,
+    onMsaCode: function (data) {
+      console.log('MSA code:', data.user_code)
+      authCodeCallback(data)
+    }
+  })
+
+  relay.conLog = console.debug
+  relay.listen() // Tell the server to start listening.
+
+  relay.on('connect', player => {
+    relayPlayer = player
+    console.log('New connection', player.connection.address)
+
+    relay.once('join', () => {
+      console.log('Login done')
+      authCodeCallback('close')
+    })
+    // Server is sending a message to the client.
+    player.on('clientbound', ({ name, params }) => {
+      // TODO: check validity
+      const id = getId(name, toClientMappings)
+      packetCallback('clientbound', { name: name }, params, id, scriptingEnabled, true)
+    })
+    // Client is sending a message to the server
+    player.on('serverbound', ({ name, params }) => {
+      const id = getId(name, toServerMappings)
+      packetCallback('serverbound', { name: name }, params, id, scriptingEnabled, true)
+    })
+    // player on -> close, error, closeConnection (by server), disconnect (by me)
+  })
 }
 
 exports.end = function () {
-  child.kill()
+  // TODO
+  relay.close()
 }
 
-// used to relaunch on disconnect
-function relaunch () {
-  ws.close()
-  // Will auto-restart
-  child.kill()
+exports.getRaw = function (name, params) {
+  if (relay) {
+    return [...relay.serializer.createPacketBuffer({ name, params })]
+  }
 }
 
 exports.writeToClient = function (meta, data) {
-  ws.send(JSON.stringify({
-    type: 'inject',
-    className: meta.className,
-    direction: 'client',
-    data: data
-  }))
-  // proxyPlayerSession.injectPacketStaticPromise(JSON.stringify(data), meta.className, 'client')
+  if (relayPlayer) {
+    relayPlayer.queue(meta.name, data)
+  }
 }
 
 exports.writeToServer = function (meta, data) {
-  // proxyPlayerSession.injectPacketStaticPromise(JSON.stringify(data), meta.className, 'server')
-  ws.send(JSON.stringify({
-    type: 'inject',
-    className: meta.className,
-    direction: 'server',
-    data: data
-  }))
+  if (relayPlayer) {
+    relayPlayer.upstream.queue(meta.name, data)
+  }
 }
 
-// TODO
-/* imports.setScriptingEnabled = function (isEnabled) {
+exports.setScriptingEnabled = function (isEnabled) {
   scriptingEnabled = isEnabled
-  proxyPlayerSession.setDontSendPacketsPromise(scriptingEnabled)
-} */
+}
