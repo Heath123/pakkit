@@ -34,8 +34,8 @@ const resourcesPath = fs.existsSync(process.resourcesPath.concat('/app/'))
 
 const javaProxy = require('./proxy/java/proxy.js')
 const bedrockProxy = require('./proxy/bedrock/proxy.js')
+
 const packetHandler = require('./packetHandler.js')
-const setupDataFolder = require('./setupDataFolder.js')
 
 const electronLocalShortcut = require('electron-localshortcut')
 const windowStateKeeper = require('electron-window-state')
@@ -43,7 +43,7 @@ const unhandled = require('electron-unhandled')
 
 const osDataFolder = app.getPath('appData')
 
-const dataFolder = setupDataFolder.setup(osDataFolder, resourcesPath)
+const dataFolder = osDataFolder + '/pakkit'
 
 var currentScriptFile = null
 
@@ -219,10 +219,13 @@ function showAuthCode (data) {
 }
 
 function startProxy (args) {
-    if (args.platform === 'java') {
-        proxy = javaProxy
-    } else {
-        proxy = bedrockProxy
+    switch(args.platform){
+        case 'bedrock':
+            proxy = bedrockProxy
+            break;
+        case 'java':
+            proxy = javaProxy
+            break;
     }
 
     const win = BrowserWindow.getAllWindows()[0]
@@ -242,14 +245,14 @@ function startProxy (args) {
     });
 
     win.setResizable(true)
-    win.setPosition(mainWindowState.x, mainWindowState.y)
+    //win.setPosition(mainWindowState.x, mainWindowState.y) // TODO: figure out why this causes an issue
     win.setSize(mainWindowState.width, mainWindowState.height)
 
     mainWindowState.manage(win)
 }
 
 ipcMain.on('proxyCapabilities', (event, arg) => {
-    event.returnValue = JSON.stringify(proxy.capabilities)
+    event.returnValue = proxy.capabilities
 })
 
 ipcMain.on('copyToClipboard', (event, arg) => {

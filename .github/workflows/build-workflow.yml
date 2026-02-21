@@ -13,7 +13,7 @@ jobs:
     - name: Set up Node
       uses: actions/setup-node@v1
       with:
-        node-version: 16.x
+        node-version: 24.x
 
     - name: Set up Java
       uses: actions/setup-java@v1
@@ -21,7 +21,11 @@ jobs:
         java-version: 1.8
 
     - name: Install Wine
-      run: sudo apt update && sudo apt install wine64
+      run: |
+        sudo apt update
+        sudo apt install wine64
+        sudo ln -s $(which wine) /usr/local/bin/wine64
+        wine64 --version
 
     - name: Install node-prune
       run: curl -sf https://gobinaries.com/tj/node-prune | sh
@@ -110,21 +114,21 @@ jobs:
         mv out/pakkit-darwin-x64 out/macos/pakkit-macos-x64
 
     - name: Upload Windows artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       if: ${{ github.ref != 'refs/heads/master' }}
       with:
         name: pakkit-windows-x64
         path: out/windows/
 
     - name: Upload Linux artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       if: ${{ github.ref != 'refs/heads/master' }}
       with:
         name: pakkit-linux-x64
         path: out/linux/
 
     - name: Upload macOS artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       if: ${{ github.ref != 'refs/heads/master' }}
       with:
         name: pakkit-macos-x64

@@ -1,5 +1,6 @@
 const {ipcRenderer} = require('electron')
 const Store = require('electron-store')
+const mcData = require('minecraft-data');
 
 const store = new Store()
 
@@ -21,11 +22,33 @@ let platform
 let version
 let onlineMode
 
+loadVersionsFromMcData();
 loadSetting('lastPlatform', 'platform', 'platform', 'java')
 let lastPlatform = platform
 platformChange()
 loadSettings(platform)
 
+function loadVersionsFromMcData() {
+  const bedrockVersions = mcData.supportedVersions.bedrock.reverse();
+  const bedrockSelect = document.getElementById('version-bedrock');
+  bedrockSelect.innerHTML = ''; // Clear existing options
+  bedrockVersions.forEach((version) => {
+    const option = document.createElement('option');
+    option.value = version;
+    option.textContent = version;
+    bedrockSelect.appendChild(option);
+  });
+
+  const javaVersions = mcData.supportedVersions.pc.reverse();
+  const javaSelect = document.getElementById('version');
+  javaSelect.innerHTML = ''; // Clear existing options
+  javaVersions.forEach((version) => {
+    const option = document.createElement('option');
+    option.value = version;
+    option.textContent = version;
+    javaSelect.appendChild(option);
+  });
+}
 function loadSettings(newPlatform)
 {
   loadSetting(newPlatform + 'LastVersion', 'version', 'version', '1.18.2')
@@ -52,38 +75,49 @@ function loadSetting(name, varname, elementID, defaultValue)
   }
 
   window[varname] = store.get(name)
-  if (varname == 'onlineMode') {
+  if (varname === 'onlineMode') {
     document.getElementById(elementID).checked = window[varname]
   } else {
     document.getElementById(elementID).value = window[varname]
   }
 }
 
-function updateVars()
+function updateVars(platform)
 {
   connectAddress = document.getElementById('connect-address').value
   connectPort = document.getElementById('connect-port').value
   listenPort = document.getElementById('listen-port').value
-  platform = document.getElementById('platform').value
-  version = document.getElementById('version').value
+
+  switch(platform){
+    case 'bedrock':
+      version = document.getElementById('version-bedrock').value;
+      break;
+    case 'java':
+      version = document.getElementById('version').value;
+      break;
+  }
+
   onlineMode = document.getElementById('auth-online').checked
 }
 
 function platformChange()
 {
   platform = document.getElementById('platform').value
-  if (lastPlatform !== platform) {
-    updateVars()
+  if (lastPlatform !== platform && lastPlatform) {
+    updateVars(lastPlatform)
     saveSettings(lastPlatform)
   }
-  if (platform === 'bedrock') {
-    document.getElementById('version-bedrock').style.display = 'block'
-    document.getElementById('version').style.display = 'none'
-    document.getElementById('auth-row').style.display = 'none'
-  } else {
-    document.getElementById('version').style.display = 'block'
-    document.getElementById('version-bedrock').style.display = 'none'
-    document.getElementById('auth-row').style.display = 'block'
+  switch(platform){
+    case 'bedrock':
+      document.getElementById('version').style.display = 'none'
+      document.getElementById('version-bedrock').style.display = 'block'
+      document.getElementById('auth-row').style.display = 'block'
+      break;
+    case 'java':
+      document.getElementById('version').style.display = 'block'
+      document.getElementById('version-bedrock').style.display = 'none'
+      document.getElementById('auth-row').style.display = 'block'
+      break;
   }
   loadSettings(platform)
   lastPlatform = platform
@@ -96,7 +130,7 @@ window.startProxy = function (event)
   }
   isLoading = true
   event.preventDefault()
-  updateVars()
+  updateVars(platform)
   saveSettings(platform)
   // If blank use default values
   connectAddress = (connectAddress === '') ? '127.0.0.1' : connectAddress

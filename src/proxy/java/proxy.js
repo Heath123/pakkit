@@ -2,6 +2,7 @@
 
 const mc = require('minecraft-protocol')
 const minecraftFolder = require('minecraft-folder-path')
+const {getRaw} = require("../bedrock/proxy");
 
 const states = mc.states
 
@@ -165,7 +166,7 @@ exports.startProxy = function (host, port, listenPort, version, onlineMode, auth
                 // targetClient.write(meta.name, data)
                 targetClient.writeRaw(raw)
               }
-              callback(direction, meta, data, id, [...raw], canUseScripting, packetValid)
+              callback(direction, meta, data, id, canUseScripting, packetValid)
             }
           }
         }
@@ -184,7 +185,7 @@ exports.startProxy = function (host, port, listenPort, version, onlineMode, auth
                 // client.write(meta.name, data)
                 client.writeRaw(raw)
               }
-              callback(direction, meta, data, id, [...raw], canUseScripting, packetValid)
+              callback(direction, meta, data, id, canUseScripting, packetValid)
               if (meta.name === 'set_compression') {
                 client.compressionThreshold = data.threshold
               } // Set compression
@@ -197,7 +198,7 @@ exports.startProxy = function (host, port, listenPort, version, onlineMode, auth
 
           let packetValid = false
           try {
-            const packetBuff = client.serializer.createPacketBuffer({ name: meta.name, params: data })
+            const packetBuff = this.getRaw({ name: meta.name, params: data })
             if (!bufferEqual(fullBuffer, packetBuff)) {
               console.log('client<-server: Error in packet ' + meta.state + '.' + meta.name)
               console.log('received buffer', fullBuffer.toString('hex'))
@@ -224,7 +225,7 @@ exports.startProxy = function (host, port, listenPort, version, onlineMode, auth
           const packetData = client.deserializer.parsePacketBuffer(fullBuffer).data.params
           let packetValid = false
           try {
-            const packetBuff = targetClient.serializer.createPacketBuffer({ name: meta.name, params: packetData })
+            const packetBuff = this.getRaw({ name: meta.name, params: packetData })
             if (!bufferEqual(fullBuffer, packetBuff)) {
               console.log('client->server: Error in packet ' + meta.state + '.' + meta.name)
               console.log('received buffer', fullBuffer.toString('hex'))
@@ -269,6 +270,12 @@ exports.startProxy = function (host, port, listenPort, version, onlineMode, auth
 }
 
 exports.end = function () {}
+
+exports.getRaw = function (name, params) {
+  if (realClient) {
+    return [...realClient.serializer.createPacketBuffer({ name, params })]
+  }
+}
 
 exports.writeToClient = function (meta, data, noCallback) {
   if (typeof meta === 'string') {

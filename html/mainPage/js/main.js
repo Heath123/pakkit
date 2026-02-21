@@ -111,14 +111,14 @@ const sharedVars = {
   proxyCapabilities: {},
   ipcRenderer: require('electron').ipcRenderer,
   packetList: document.getElementById('packetlist'),
-  hiddenPackets: undefined,
+  hiddenPackets: {},
   scripting: undefined,
   lastFilter: '',
   hiddenPacketsAmount: 0,
   store: new Store()
 }
 
-sharedVars.proxyCapabilities = JSON.parse(sharedVars.ipcRenderer.sendSync('proxyCapabilities', ''))
+sharedVars.proxyCapabilities = sharedVars.ipcRenderer.sendSync('proxyCapabilities', '')
 
 function getVersionSpecificVar(name, defaultValue) {
   const versionId = 'version-' + sharedVars.proxyCapabilities.versionId
@@ -133,7 +133,7 @@ function getVersionSpecificVar(name, defaultValue) {
       [name]: JSON.stringify(defaultValue)
     })
   }
-  return JSON.parse(sharedVars.store.get(versionId)[name])
+  return sharedVars.store.get(versionId)[name] ? JSON.parse(sharedVars.store.get(versionId)[name]) : sharedVars.store.get(versionId)[name]
 }
 
 function setVersionSpecificVar(name, value) {
@@ -562,9 +562,30 @@ var clusterize = new Clusterize({
 })
 
 // TODO: move to own file?
+const isPrismarineDocs = (url) => url && url.includes('prismarinejs.github.io/minecraft-data')
+
 async function fillWiki () {
-  let data = (await axios.get(sharedVars.proxyCapabilities.wikiVgPage)).data
-// Allow it to load properly
+  const wikiUrl = sharedVars.proxyCapabilities.wikiVgPage
+
+  if (isPrismarineDocs(wikiUrl)) {
+    const iframe = document.getElementById('iframe')
+    iframe.src = wikiUrl
+
+    const style = document.createElement('style')
+    style.id = 'wiki-iframe-style'
+    style.innerHTML = `
+      #iframe::-webkit-scrollbar { width: 17px; }
+      #iframe::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.3); border-radius: 10px; }
+      #iframe::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.2); border-radius: 10px; }
+      #iframe::-webkit-scrollbar-thumb:hover { background: rgba(0, 0, 0, 0.5); }
+      #iframe::-webkit-scrollbar-corner { background: #242424; }
+    `
+    document.head.appendChild(style)
+    return
+  }
+
+  // wiki.vg (Java): fetch HTML and inject
+  let data = (await axios.get(wikiUrl)).data
   data = data
     .split('/images/')
     .join('https://wiki.vg/images/')
@@ -573,7 +594,6 @@ async function fillWiki () {
     .split('/load.php?')
     .join('https://wiki.vg/load.php?')
 
-  // TODO: Break or modify links?
   document.getElementById('iframe').contentWindow.document.write(data)
 
   const style = document.createElement('style');
@@ -654,13 +674,26 @@ function scrollIdIntoView (id, bound) {
 }
 
 function scrollWikiToCurrentPacket () {
-  if (currentPacket) {
-    const packet = sharedVars.allPackets[currentPacket]
+  if (!currentPacket) return
+  const packet = sharedVars.allPackets[currentPacket]
+  const wikiUrl = sharedVars.proxyCapabilities.wikiVgPage
+
+  if (isPrismarineDocs(wikiUrl)) {
+    const baseUrl = wikiUrl.split('#')[0]
+    const packetAnchor = 'packet_' + (packet.meta.name || '')
+    const iframe = document.getElementById('iframe')
     try {
-      scrollIdIntoView(packet.hexIdString, packet.direction)
+      iframe.contentWindow.location = baseUrl + '#' + packetAnchor
     } catch (err) {
-      console.error(err);
+      console.error(err)
     }
+    return
+  }
+
+  try {
+    scrollIdIntoView(packet.hexIdString, packet.direction)
+  } catch (err) {
+    console.error(err)
   }
 }
 

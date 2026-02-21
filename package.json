@@ -44,6 +44,7 @@
   },
   "dependencies": {
     "axios": "^0.21.1",
+    "bedrock-protocol": "^3.35.0",
     "clusterize.js": "^0.18.1",
     "commander": "^7.1.0",
     "electron-localshortcut": "^3.2.1",
